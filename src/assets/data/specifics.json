@@ -1,0 +1,11 @@
+[
+    { "icon": "store", "title": "brand", "text": "ecstasy" },
+    { "icon": "pix", "title": "category", "text": "man's" },
+    { "icon": "settings", "title": "tags", "list": ["suite", "party", "dress", "smart", "man", "styles"] },
+    { "icon": "palette", "title": "color", "list": ["red", "blue", "green", "yellow", "purple"] },
+    { "icon": "summarize", "title": "size", "list": ["sm", "md", "lg", "xl", "xxl"] },
+    { "icon": "sell", "title": "price", "price": { "now": "$37.00", "old": "$42.00" } },
+    { "icon": "shopping_cart", "title": "stock", "text": "(68) piece" },
+    { "icon": "hotel_class", "title": "review", "text": "(03) review" },
+    { "icon": "verified", "title": "published", "text": "02 feb 2020" }
+]

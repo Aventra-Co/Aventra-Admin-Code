@@ -1,0 +1,18 @@
+[
+    {
+        "code": "en",
+        "dir": "ltr",
+        "tag": "en-US", 
+        "name": "english",
+        "currency": "USD", 
+        "flag": "/images/flags/us.webp"
+    },
+    {
+        "code": "ar",
+        "dir": "rtl",
+        "tag": "ar-SA",
+        "name": "العربية",
+        "currency": "SAR",
+        "flag": "/images/flags/sa.webp"
+    }
+]

@@ -1,0 +1,91 @@
+@mixin transition-linear {
+    transition: all linear .3s;
+    -webkit-transition: all linear .3s;
+    -moz-transition: all linear .3s;
+    -ms-transition: all linear .3s;
+    -o-transition: all linear .3s;
+}
+
+@mixin position-top-left ($position, $top, $left, $zindex) {
+    position: $position;
+    top: $top;
+    left: $left;
+    z-index: $zindex;
+}
+
+@mixin position-top-right ($position, $top, $right, $zindex) {
+    position: $position;
+    top: $top;
+    right: $right;
+    z-index: $zindex;
+}
+
+@mixin position-bottom-left ($position, $bottom, $left, $zindex) {
+    position: $position;
+    bottom: $bottom;
+    left: $left;
+    z-index: $zindex;
+}
+
+@mixin position-bottom-right ($position, $bottom, $right, $zindex) {
+    position: $position;
+    bottom: $bottom;
+    right: $right;
+    z-index: $zindex;
+}
+
+@mixin flex-dimension ($alignItems, $justifyContent, $gap) {
+    display: flex;
+    align-items: $alignItems;
+    justify-content: $justifyContent;
+    gap: $gap;
+}
+
+@mixin text-font ($fontSize, $fontWeight) {
+    font-size: $fontSize;
+    font-weight: $fontWeight;
+}
+
+@mixin content-center ($widthHeight, $lineHeight, $borderRadius) {
+    width: $widthHeight;
+    height: $widthHeight;
+    line-height: $lineHeight;
+    border-radius: $borderRadius;
+    text-align: center;
+}
+
+@mixin grid-column ($gridGap, $gridColumn) {
+    display: grid;
+    grid-gap: $gridGap;
+    grid-template-columns: repeat($gridColumn, 1fr);
+    grid-template-rows: auto;
+}
+
+@mixin grid-minmax ($gridGap, $gridMinmax) {
+    display: grid;
+    grid-gap: $gridGap;
+    grid-template-columns: repeat(auto-fit, minmax($gridMinmax, 1fr));
+    grid-template-rows: auto;
+}
+
+@mixin border-radius ($topLeft, $topRight, $bottomLeft, $bottomRight) {
+    border-top-left-radius: $topLeft;
+    border-top-right-radius: $topRight;
+    border-bottom-left-radius: $bottomLeft;
+    border-bottom-right-radius: $bottomRight;
+}
+
+@mixin margin ($top, $right, $bottom, $left) {
+    margin-top: $top;
+    margin-bottom: $bottom;
+    margin-right: $right;
+    margin-left: $left;
+}
+
+@mixin padding ($top, $right, $bottom, $left) {
+    padding-top: $top;
+    padding-bottom: $bottom;
+    padding-right: $right;
+    padding-left: $left;
+}
+

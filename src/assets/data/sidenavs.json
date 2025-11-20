@@ -1,0 +1,209 @@
+[
+    {
+        "title": "",
+        "menus": [
+            {
+                "path": "/dashboard",
+                "icon": "DashboardIcon",
+                "text": "dashboard"
+            },
+            {
+                "icon": "AccountCircle",
+                "text": "manage users",
+                "submenus": [
+                    {
+                        "path": "/manage-users",
+                        "text": "Manage Users"
+                    },
+                    {
+                        "path": "/deleted-users",
+                        "text": "Deleted Users"
+                    }
+                ]
+            },
+            {
+                "icon": "GroupsIcon",
+                "text": "Manage Owners",
+                "submenus": [
+                    {
+                        "path": "/manage-owners",
+                        "text": "Manage Owners"
+                    },
+                    {
+                        "path": "/deleted-owners",
+                        "text": "Deleted owners"
+                    }
+                ]
+            },
+            {
+                "icon": "GroupAddIcon",
+                "text": "Manage Staff",
+                "submenus": [
+                    {
+                        "path": "/manage-staff",
+                        "text": "Manage Staff"
+                    },
+                    {
+                        "path": "/deleted-staff",
+                        "text": "Deleted Staff"
+                    }
+                ]
+            },
+            {
+                "path": "/manage-sub-admin",
+                "icon": "AccountCircle",
+                "text": "manage Sub Admin"
+            },
+            {
+                "path": "/manage-role",
+                "icon": "FormatListBulletedIcon",
+                "text": "manage role"
+            },
+            {
+                "path": "/manage-banner",
+                "icon": "EditCalendarIcon",
+                "text": "manage promotions"
+            },
+            {
+                "path": "/manage-country",
+                "icon": "PublicIcon",
+                "text": "Manage Country"
+            },
+            {
+                "path": "/manage-city",
+                "icon": "ApartmentIcon",
+                "text": "manage city"
+            },
+            {
+                "path": "/help-and-support",
+                "icon": "ContactSupportIcon",
+                "text": "Help & Support"
+            },
+            {
+                "path": "/manage-trip-type",
+                "icon": "CompareArrowsIcon",
+                "text": "Manage Activity"
+            },
+            {
+                "path": "/manage-trips",
+                "icon": "DirectionsBoatIcon",
+                "text": "Manage Trips"
+            },
+            {
+                "path": "/manage-addons",
+                "icon": "DataSaverOnIcon",
+                "text": "Manage Addons"
+            },
+            {
+                "path": "/addons-subcategory",
+                "icon": "ControlPointDuplicateIcon",
+                "text": "Addons Subcategory"
+            },
+            {
+                "path": "/manage-booking",
+                "icon": "FactCheckIcon",
+                "text": "Manage Booking"
+            },
+            {
+                "path": "/manage-commision",
+                "icon": "CopyrightIcon",
+                "text": "Manage Commision"
+            },
+            {
+                "path": "/manage-earning",
+                "icon": "AccountBalanceWalletIcon",
+                "text": "Manage Earning"
+            },
+            {
+                "path": "/manage-review-rating",
+                "icon": "ReviewsIcon",
+                "text": "Manage Review Ratings"
+            },
+            {
+                "path": "/manage-destination",
+                "icon": "AddLocationIcon",
+                "text": "Manage Destination"
+            },
+            {
+                "path": "/manage-faq",
+                "icon": "AddLocationIcon",
+                "text": "Manage FAQ"
+            },
+            {
+                "path": "/manage-content",
+                "icon": "AssignmentIcon",
+                "text": "Manage Content"
+            },
+            {
+                "path": "/manage-broadcast",
+                "icon": "CellTowerIcon",
+                "text": "Manage Broadcast"
+            },
+            {
+                "path": "/manage-contactus",
+                "icon": "PermPhoneMsgIcon",
+                "text": "Manage Contactus"
+            },
+            {
+                "icon": "LibraryBooksIcon",
+                "text": "Tabular Report",
+                "submenus": [
+                    {
+                        "path": "/user-report",
+                        "text": "customer report"
+                    },
+                    {
+                        "path": "/owner-report",
+                        "text": "owner report"
+                    },
+                    {
+                        "path": "/staff-report",
+                        "text": "staff report"
+                    },
+                    {
+                        "path": "/trip-report",
+                        "text": "Trip Report"
+                    },
+                    {
+                        "path": "/earning-tabular-report",
+                        "text": "Earning Report"
+                    },
+                    {
+                        "path": "/broadcast-report",
+                        "text": "Broadcast Report"
+                    },
+                    {
+                        "path": "/promotion-report",
+                        "text": "Promotion Report"
+                    }
+                ]
+            },
+            {
+                "icon": "EqualizerIcon",
+                "text": "Analytical Report",
+                "submenus": [
+                    {
+                        "path": "/user-analytical-report",
+                        "text": "customer analytical report"
+                    },
+                    {
+                        "path": "/owner-analytical-report",
+                        "text": "owner analytical report"
+                    },
+                    {
+                        "path": "/staff-analytical-report",
+                        "text": "staff analytical report"
+                    },
+                    {
+                        "path": "/trip-analytical-report",
+                        "text": "Trip Analytical Report"
+                    },
+                    {
+                        "path": "/earning-analytical-report",
+                        "text": "Earning Analytical Report"
+                    }
+                ]
+            }
+        ]
+    }
+]

@@ -1,0 +1,47 @@
+{
+    "thead": ["source", "users", "sessions", "bounce", "duration"],
+    "tbody": [
+        { 
+            "source": { "icon": "directions", "text": "direct" },
+            "users": "872", 
+            "sessions": "1077",
+            "bounce": "63%", 
+            "duration": "00:09:18"
+        },
+        { 
+            "source": { "icon": "dataset_linked", "text": "referral" },
+            "users": "789", 
+            "sessions": "390",
+            "bounce": "74%", 
+            "duration": "00:03:20"
+        },
+        { 
+            "source": { "icon": "compost", "text": "organic" },
+            "users": "872", 
+            "sessions": "1077",
+            "bounce": "63%", 
+            "duration": "00:09:18"
+        },
+        { 
+            "source": { "icon": "interests", "text": "social" },
+            "users": "1023", 
+            "sessions": "1265",
+            "bounce": "29%", 
+            "duration": "00:06:25"
+        },
+        { 
+            "source": { "icon": "campaign", "text": "campaign" },
+            "users": "7843", 
+            "sessions": "2389",
+            "bounce": "35%", 
+            "duration": "00:15:25"
+        },
+        { 
+            "source": { "icon": "devices_other", "text": "others" },
+            "users": "872", 
+            "sessions": "1077",
+            "bounce": "63%", 
+            "duration": "00:09:18"
+        }
+    ]
+}

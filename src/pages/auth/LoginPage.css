@@ -1,0 +1,77 @@
+.mc-auth {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    position: relative;
+    background-color: #f8f9fa;
+    /* Add background if needed */
+}
+
+.mc-auth-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+.mc-auth-group {
+    z-index: 2;
+    /* background-color: white; */
+    /* padding: 30px; */
+    /* border-radius: 8px; */
+    /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
+}
+
+.select-dropdown {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0px;
+    padding: 0px 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid var(--deepBorder);
+    background-color: var(--lightBG);
+    font-weight: normal;
+}
+
+.selected {
+    background-color: transparent;
+    border: none;
+}
+
+.modal-content {
+    padding: 21px;
+}
+
+
+
+.custom-modal .modal-content {
+    border-radius: 15px;
+    padding: 20px ;
+    width: 25rem;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.custom-modal .modal-header {
+    border-bottom: none;
+}
+
+.custom-modal .modal-footer {
+    border-top: none;
+}
+
+.custom-modal .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    transition: background-color 0.3s ease;
+}
+
+.custom-modal .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}

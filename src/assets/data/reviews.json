@@ -1,0 +1,113 @@
+[
+    {
+        "src": "images/avatar/01.webp",
+        "alt": "avatar",
+        "name": "miron mahmud",
+        "date": "25 minutes ago!",
+        "button": { "path": "#", "icon": "reply", "text": "reply" },
+        "star": ["star", "star", "star", "star", "star_half"],
+        "text": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Omnis quo nostrum dolore fugiat ducimus labore debitis unde autem recusandae? Eius harum tempora quis minima, adipisci natus quod magni omnis quas.",
+        "dots": {
+            "icon": "more_vert",
+            "menu": [
+                { "icon": "edit", "text": "edit" },
+                { "icon": "gpp_bad", "text": "block" },
+                { "icon": "report", "text": "report" },
+                { "icon": "delete", "text": "delete" }
+            ]
+        },
+        "reply": [
+            {
+                "src": "images/avatar/02.webp",
+                "alt": "avatar",
+                "name": "tahmina bonny",
+                "date": "3 weeks ago!",
+                "admin": "admin",
+                "button": { "path": "#", "icon": "reply", "text": "reply" },
+                "text": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Omnis quo nostrum dolore fugiat ducimus labore debitis unde autem recusandae? Eius harum tempora quis minima, adipisci natus quod magni omnis quas.",
+                "dots": {
+                    "icon": "more_vert",
+                    "menu": [
+                        { "icon": "edit", "text": "edit" },
+                        { "icon": "gpp_bad", "text": "block" },
+                        { "icon": "report", "text": "report" },
+                        { "icon": "delete", "text": "delete" }
+                    ]
+                }
+            },
+            {
+                "src": "images/avatar/03.webp",
+                "alt": "avatar",
+                "name": "labonno khan",
+                "date": "15 days ago!",
+                "button": { "path": "#", "icon": "reply", "text": "reply" },
+                "text": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Omnis quo nostrum dolore fugiat ducimus labore debitis unde autem recusandae? Eius harum tempora quis minima, adipisci natus quod magni omnis quas.",
+                "dots": {
+                    "icon": "more_vert",
+                    "menu": [
+                        { "icon": "edit", "text": "edit" },
+                        { "icon": "gpp_bad", "text": "block" },
+                        { "icon": "report", "text": "report" },
+                        { "icon": "delete", "text": "delete" }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "src": "images/avatar/04.webp",
+        "alt": "avatar",
+        "name": "shahriar nafiz",
+        "date": "active now!",
+        "button": { "path": "#", "icon": "reply", "text": "reply" },
+        "star": ["star", "star", "star", "star", "star_half"],
+        "text": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Omnis quo nostrum dolore fugiat ducimus labore debitis unde autem recusandae? Eius harum tempora quis minima, adipisci natus quod magni omnis quas.",
+        "dots": {
+            "icon": "more_vert",
+            "menu": [
+                { "icon": "edit", "text": "edit" },
+                { "icon": "gpp_bad", "text": "block" },
+                { "icon": "report", "text": "report" },
+                { "icon": "delete", "text": "delete" }
+            ]
+        },
+        "reply": [
+            {
+                "src": "images/avatar/02.webp",
+                "alt": "avatar",
+                "name": "tahmina bonny",
+                "date": "3 weeks ago!",
+                "admin": "admin",
+                "button": { "path": "#", "icon": "reply", "text": "reply" },
+                "text": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Omnis quo nostrum dolore fugiat ducimus labore debitis unde autem recusandae? Eius harum tempora quis minima, adipisci natus quod magni omnis quas.",
+                "dots": {
+                    "icon": "more_vert",
+                    "menu": [
+                        { "icon": "edit", "text": "edit" },
+                        { "icon": "gpp_bad", "text": "block" },
+                        { "icon": "report", "text": "report" },
+                        { "icon": "delete", "text": "delete" }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "src": "images/avatar/05.webp",
+        "alt": "avatar",
+        "name": "marjana akter",
+        "date": "few minutes ago!",
+        "button": { "path": "#", "icon": "reply", "text": "reply" },
+        "star": ["star", "star", "star", "star", "star_half"],
+        "text": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Omnis quo nostrum dolore fugiat ducimus labore debitis unde autem recusandae? Eius harum tempora quis minima, adipisci natus quod magni omnis quas.",
+        "dots": {
+            "icon": "more_vert",
+            "menu": [
+                { "icon": "edit", "text": "edit" },
+                { "icon": "gpp_bad", "text": "block" },
+                { "icon": "report", "text": "report" },
+                { "icon": "delete", "text": "delete" }
+            ]
+        }
+    }
+]

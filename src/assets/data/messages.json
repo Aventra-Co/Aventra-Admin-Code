@@ -1,0 +1,104 @@
+[
+    {
+        "user": { "image": "images/avatar/01.webp", "status": "online" },
+        "chat": "Lorem Ipsum has been the industry's standard dummy text ever",
+        "name": "miron mahmud",
+        "addClass": "active",
+        "shortMoment": "now",
+        "badge": 3,
+        "menus": [
+            { "icon": "account_circle", "title": "view profile" },
+            { "icon": "mark_chat_read", "title": "mark as unread" },
+            { "icon": "delete", "title": "delete order" },
+            { "icon": "remove_circle", "title": "block order" }
+        ]
+    },
+    {
+        "user": { "image": "images/avatar/02.webp" },
+        "chat": "Lorem Ipsum has been the industry's standard dummy text ever",
+        "name": "tahmina bonny",
+        "addClass": "active",
+        "shortMoment": "24s",
+        "badge": 1,
+        "menus": [
+            { "icon": "account_circle", "title": "view profile" },
+            { "icon": "mark_chat_read", "title": "mark as unread" },
+            { "icon": "delete", "title": "delete order" },
+            { "icon": "remove_circle", "title": "block order" }
+        ]
+    },
+    {
+        "user": { "image": "images/avatar/03.webp", "status": "online" },
+        "chat": "Lorem Ipsum has been the industry's standard dummy text ever",
+        "name": "labonno khan",
+        "addClass": "active",
+        "shortMoment": "18m",
+        "badge": 9,
+        "menus": [
+            { "icon": "account_circle", "title": "view profile" },
+            { "icon": "mark_chat_read", "title": "mark as unread" },
+            { "icon": "delete", "title": "delete order" },
+            { "icon": "remove_circle", "title": "block order" }
+        ]
+    },
+    {
+        "user": { "image": "images/avatar/04.webp" },
+        "chat": "Lorem Ipsum has been the industry's standard dummy text ever",
+        "name": "shipu shikdar",
+        "shortMoment": "23h",
+        "menus": [
+            { "icon": "account_circle", "title": "view profile" },
+            { "icon": "mark_chat_read", "title": "mark as unread" },
+            { "icon": "delete", "title": "delete order" },
+            { "icon": "remove_circle", "title": "block order" }
+        ]
+    },
+    {
+        "user": { "image": "images/avatar/05.webp", "status": "online" },
+        "chat": "Lorem Ipsum has been the industry's standard dummy text ever",
+        "name": "rabeya akter",
+        "shortMoment": "13d",
+        "menus": [
+            { "icon": "account_circle", "title": "view profile" },
+            { "icon": "mark_chat_read", "title": "mark as unread" },
+            { "icon": "delete", "title": "delete order" },
+            { "icon": "remove_circle", "title": "block order" }
+        ]
+    },
+    {
+        "user": { "image": "images/avatar/06.webp" },
+        "chat": "Lorem Ipsum has been the industry's standard dummy text ever",
+        "name": "md nasrullah",
+        "shortMoment": "15w",
+        "menus": [
+            { "icon": "account_circle", "title": "view profile" },
+            { "icon": "mark_chat_read", "title": "mark as unread" },
+            { "icon": "delete", "title": "delete order" },
+            { "icon": "remove_circle", "title": "block order" }
+        ]
+    },
+    {
+        "user": { "image": "images/avatar/07.webp", "status": "online" },
+        "chat": "Lorem Ipsum has been the industry's standard dummy text ever",
+        "name": "natasha amin",
+        "shortMoment": "10m",
+        "menus": [
+            { "icon": "account_circle", "title": "view profile" },
+            { "icon": "mark_chat_read", "title": "mark as unread" },
+            { "icon": "delete", "title": "delete order" },
+            { "icon": "remove_circle", "title": "block order" }
+        ]
+    },
+    {
+        "user": { "image": "images/avatar/08.webp" },
+        "chat": "Lorem Ipsum has been the industry's standard dummy text ever",
+        "name": "habib wahid",
+        "shortMoment": "2y",
+        "menus": [
+            { "icon": "account_circle", "title": "view profile" },
+            { "icon": "mark_chat_read", "title": "mark as unread" },
+            { "icon": "delete", "title": "delete order" },
+            { "icon": "remove_circle", "title": "block order" }
+        ]
+    }
+]

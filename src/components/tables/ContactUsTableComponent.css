@@ -1,0 +1,57 @@
+.action-btn {
+    background-color: #77C3EC;
+    color: white;
+    border: none;
+}
+
+.modal-dialog {
+    max-width: 500px !important;
+}
+
+
+.status-replied {
+    height: 22px;
+    border-radius: 40px;
+    background-color: rgb(40, 199, 111);
+
+    width: 75px;
+    color: #fff;
+    font-size: 14px;
+    line-height: 22px;
+    display: block;
+    text-align: center;
+
+}
+
+.status-pending {
+    height: 22px;
+    border-radius: 40px;
+    background-color: #f57d2d;
+
+    width: 75px;
+    color: #fff;
+    font-size: 14px;
+    line-height: 22px;
+    display: block;
+    text-align: center;
+}
+
+.search {
+    display: flex;
+    justify-content: end;
+    margin-top: -28px;
+}
+
+@media(max-width:540px) {
+    .searching {
+        width: 14rem !important;
+    }
+}
+
+
+.text-container {
+    word-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
+}
+

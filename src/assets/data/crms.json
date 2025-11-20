@@ -1,0 +1,65 @@
+[
+    {
+        "content": { "icon": "summarize", "value": "6790", "label": "campaign sent" },
+        "status": { "icon": "arrow_upward", "value": "45%", "label": "Since last week" },
+        "variant": { "name": "blue", "deep": "#4094f1", "light": "#64b3f6" },
+        "dataKey": { "label": "weeks", "title": "campaign" },
+        "dataSet": [
+            { "weeks": "S", "campaign": 4000 },
+            { "weeks": "M", "campaign": 3000 },
+            { "weeks": "T", "campaign": 5000 },
+            { "weeks": "W", "campaign": 2780 },
+            { "weeks": "T", "campaign": 1890 },
+            { "weeks": "F", "campaign": 2390 },
+            { "weeks": "S", "campaign": 3490 }
+        ]
+
+    },
+    {
+        "content": { "icon": "thumb_up", "value": "5397", "label": "leads generate" },
+        "status": { "icon": "arrow_upward", "value": "35%", "label": "Since last week" },
+        "variant": { "name": "orange", "deep": "#ff8c0a", "light": "#ffa732" },
+        "dataKey": { "label": "weeks", "title": "leads" },
+        "dataSet": [
+            { "weeks": "S", "leads": 4000 },
+            { "weeks": "M", "leads": 3000 },
+            { "weeks": "T", "leads": 5000 },
+            { "weeks": "W", "leads": 2780 },
+            { "weeks": "T", "leads": 1890 },
+            { "weeks": "F", "leads": 2390 },
+            { "weeks": "S", "leads": 3490 }
+        ]
+
+    },
+    {
+        "content": { "icon": "forum", "value": "4278", "label": "deals customer" },
+        "status": { "icon": "arrow_downward", "value": "25%", "label": "Since last week" },
+        "variant": { "name": "green", "deep": "#27bf68", "light": "#4eda89" },
+        "dataKey": { "label": "weeks", "title": "deals" },
+        "dataSet": [
+            { "weeks": "S", "deals": 4000 },
+            { "weeks": "M", "deals": 3000 },
+            { "weeks": "T", "deals": 5000 },
+            { "weeks": "W", "deals": 2780 },
+            { "weeks": "T", "deals": 1890 },
+            { "weeks": "F", "deals": 2390 },
+            { "weeks": "S", "deals": 3490 }
+        ]
+
+    },
+    {
+        "content": { "icon": "shopping_cart", "value": "3594", "label": "revenue booked" },
+        "status": { "icon": "arrow_upward", "value": "15%", "label": "Since last week" },
+        "variant": { "name": "purple", "deep": "#de2fff", "light": "#ed68ff" },
+        "dataKey": { "label": "weeks", "title": "revenue" },
+        "dataSet": [
+            { "weeks": "S", "revenue": 4000 },
+            { "weeks": "M", "revenue": 3000 },
+            { "weeks": "T", "revenue": 5000 },
+            { "weeks": "W", "revenue": 2780 },
+            { "weeks": "T", "revenue": 1890 },
+            { "weeks": "F", "revenue": 2390 },
+            { "weeks": "S", "revenue": 3490 }
+        ]
+    }
+]

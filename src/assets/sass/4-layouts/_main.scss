@@ -1,0 +1,44 @@
+.mc-main {
+    padding: 20px;
+    border-radius: 8px;
+    background-color: var(--thinGray);
+    @include margin(69px, 16px, 16px, 16px);
+    @include transition-linear;
+    
+    @include mobile-breakpoint {
+        padding: 16px;
+        @include margin(62px, 0px, 0px, 0px);
+    }
+}
+
+[dir="ltr"] {
+    .mc-main {
+        &.active {
+            margin-left: 260px;
+
+            @include laptop-breakpoint {
+                margin-left: 16px;
+            }
+
+            @include mobile-breakpoint {
+                margin-left: 0px;
+            }
+        }
+    }
+}
+
+[dir="rtl"] {
+    .mc-main {
+        &.active {
+            margin-right: 260px;
+
+            @include laptop-breakpoint {
+                margin-right: 16px;
+            }
+
+            @include mobile-breakpoint {
+                margin-right: 0px;
+            }
+        }
+    }
+}

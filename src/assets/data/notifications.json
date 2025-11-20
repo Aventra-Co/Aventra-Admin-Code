@@ -1,0 +1,50 @@
+[
+    {
+        "path": "#",
+        "isActive": true,
+        "type": "favorite",
+        "notify": { "image": "images/avatar/01.webp", "variant": "red", "icon": "favorite" },
+        "note": "<b>Mahmudul</b> added to his favorite list <b>Leather belt steve madden</b>",
+        "longMoment": "few seconds ago!"
+    },
+    {
+        "path": "#",
+        "type": "rating",
+        "isActive": true,
+        "notify": { "image": "images/avatar/02.webp", "variant": "green", "icon": "forum" },
+        "note": "<b>labonno</b> leave her comment to <b>Dressni Breathable female Dress</b>",
+        "longMoment": "25 minutes ago!"
+    },
+    {
+        "path": "#",
+        "type": "comment",
+        "isActive": true,
+        "notify": { "image": "images/avatar/03.webp", "variant": "blue", "icon": "campaign" },
+        "note": "<b>tahmina</b> announce to 50% discount <b>New Exclusive long kurti</b>",
+        "longMoment": "12 hours ago!"
+    },
+    {
+        "path": "#",
+        "type": "announce",
+        "isActive": true,
+        "notify": { "image": "images/avatar/04.webp", "variant": "purple", "icon": "edit" },
+        "note": "<b>jubayer</b> write to his latest blog <b>Best fashion outfit this winter</b>",
+        "longMoment": "4 days ago!"
+    },
+    {
+        "path": "#",
+        "type": "blog",
+        "isActive": false,
+        "notify": { "image": "images/avatar/05.webp", "variant": "yellow", "icon": "star" },
+        "note": "<b>rebeka</b> give a review to <b>Exclusive Designed Multicolor long Kaptan</b>",
+        "longMoment": "1 weeks ago!"
+    },
+    {
+        "path": "#",
+        "type": "privacy",
+        "isActive": false,
+        "notify": { "image": "images/logo.webp", "variant": "primary", "icon": "shield" },
+        "note": "<b>hotash</b> privacy updated and secure <b>all this multitask platform</b>",
+        "longMoment": "2 months ago!"
+    }
+]

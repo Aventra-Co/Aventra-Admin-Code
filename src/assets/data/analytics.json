@@ -1,0 +1,62 @@
+[
+    {
+        "digit": "136,758K", 
+        "label": "impressions",
+        "variant": { "name": "purple", "color": "#f3a0ff" },
+        "dataKey": "uv",
+        "dataSet": [
+            { "name": "fri", "uv": 4000 },
+            { "name": "sat", "uv": 3000 },
+            { "name": "sun", "uv": 5000 },
+            { "name": "mon", "uv": 2780 },
+            { "name": "tue", "uv": 1890 },
+            { "name": "wen", "uv": 2390 },
+            { "name": "thu", "uv": 3490 }
+        ]
+    },
+    {
+        "digit": "125,964K", 
+        "label": "engagements",
+        "variant": { "name": "green", "color": "#89ecb3" },
+        "dataKey": "pv",
+        "dataSet": [
+            { "name": "fri", "pv": 2400 },
+            { "name": "sat", "pv": 1398 },
+            { "name": "sun", "pv": 9800 },
+            { "name": "mon", "pv": 3908 },
+            { "name": "tue", "pv": 4800 },
+            { "name": "wen", "pv": 3800 },
+            { "name": "thu", "pv": 4300 }
+        ]
+    },
+    {
+        "digit": "141,253K", 
+        "label": "conversions",
+        "variant": { "name": "blue", "color": "#96cefa" },
+        "dataKey": "am",
+        "dataSet": [
+            { "name": "fri", "am": 2400 },
+            { "name": "sat", "am": 4210 },
+            { "name": "sun", "am": 2290 },
+            { "name": "mon", "am": 2000 },
+            { "name": "tue", "am": 5181 },
+            { "name": "wen", "am": 2500 },
+            { "name": "thu", "am": 2100 }
+        ]
+    },
+    {
+        "digit": "154,179K", 
+        "label": "bounce rate",
+        "variant": { "name": "red", "color": "#ff9baa" },
+        "dataKey": "xz",
+        "dataSet": [
+            { "name": "fri", "xz": 4000 },
+            { "name": "sat", "xz": 3000 },
+            { "name": "sun", "xz": 2000 },
+            { "name": "mon", "xz": 2780 },
+            { "name": "tue", "xz": 1890 },
+            { "name": "wen", "xz": 2390 },
+            { "name": "thu", "xz": 4490 }
+        ]
+    }
+]

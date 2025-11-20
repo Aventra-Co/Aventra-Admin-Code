@@ -1,0 +1,29 @@
+.pending {
+    padding: 1px 0px 2px 0px;
+    background: #ffc561;
+    border-radius: 25px;
+    color: #fff;
+    font-size: 12px;
+    width: 93px;
+    text-align: center;
+}
+
+.rejected {
+    padding: 1px 0px 2px 0px;
+    background: #ff032a;
+    border-radius: 25px;
+    color: #fff;
+    font-size: 12px;
+    width: 93px;
+    text-align: center;
+}
+
+.approved {
+    padding: 1px 0px 2px 0px;
+    background: #1a9f53;
+    border-radius: 25px;
+    color: #fff;
+    font-size: 12px;
+    width: 93px;
+    text-align: center;
+}

@@ -1,0 +1,16 @@
+.mc-footer {
+
+    font-size: 14px;
+    margin-top: 24px;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    left: 0;
+    padding: 23px;
+    background-color: #fff;
+
+    @include mobile-breakpoint {
+        margin-bottom: 20px;
+    }
+}

@@ -1,0 +1,34 @@
+[
+    { 
+        "icon": "account_circle", 
+        "trend": "trending_up", 
+        "title": "total_users", 
+        "variant": "green", 
+        "number": 277, 
+        "percent": 95 
+    },
+    { 
+        "icon": "shopping_cart", 
+        "trend": "trending_down", 
+        "title": "total_orders",
+        "variant": "purple", 
+        "number": 338, 
+        "percent": 30 
+    },
+    { 
+        "icon": "shopping_bag", 
+        "trend": "trending_down", 
+        "title": "total_products", 
+        "variant": "blue", 
+        "number": 557, 
+        "percent": 25 
+    },
+    { 
+        "icon": "hotel_class", 
+        "trend": "trending_up", 
+        "title": "total_reviews", 
+        "variant": "yellow", 
+        "number": 166, 
+        "percent": 45 
+    }
+]

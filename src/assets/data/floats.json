@@ -1,0 +1,5 @@
+[
+    { "title": "pending users", "digit": "547", "icon": "pending", "variant": "lg purple" }, 
+    { "title": "approved users", "digit": "605", "icon": "check_circle", "variant": "lg green" },
+    { "title": "blocked users", "digit": "249", "icon": "remove_circle", "variant": "lg red" }
+]

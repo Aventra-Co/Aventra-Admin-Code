@@ -1,0 +1,28 @@
+.mc-spinner {
+    width: 100vw;
+    height: 100vh;
+    @include flex-dimension(center, center, 15px);
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+
+    .pattern {
+        @include position-top-left(absolute, 0px, 0px, -1);
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        opacity: 0.1;
+    }
+
+    .favicon { height: 70px }
+}
+
+.mc-spinner-group {
+    @include flex-dimension(center, center, 5px);
+
+    h3 { 
+        font-size: 20px;
+        text-transform: uppercase; 
+        color: var(--primaryHEX);
+    }
+}

@@ -1,0 +1,59 @@
+{
+    "thead": ["clients", "orders", "amount", "action"],
+    "tbody": [
+        {
+            "id": "#4980",
+            "src": "images/avatar/01.webp",
+            "alt": "client",
+            "name": "miron mahmud", 
+            "order": "648",
+            "amount": "$5500",
+            "action": { "chat": "chat", "view": "visibility" }
+        },
+        {
+            "id": "#4981",
+            "src": "images/avatar/02.webp",
+            "alt": "client",
+            "name": "tahmina bonny", 
+            "order": "590",
+            "amount": "$4400",
+            "action": { "chat": "chat", "view": "visibility" }
+        },
+        {
+            "id": "#4982",
+            "src": "images/avatar/03.webp",
+            "alt": "client",
+            "name": "labonno khan", 
+            "order": "408",
+            "amount": "$3300",
+            "action": { "chat": "chat", "view": "visibility" }
+        },
+        {
+            "id": "#4983",
+            "src": "images/avatar/04.webp",
+            "alt": "client",
+            "name": "sheikh adabali", 
+            "order": "357",
+            "amount": "$2200",
+            "action": { "chat": "chat", "view": "visibility" }
+        },
+        {
+            "id": "#4984",
+            "src": "images/avatar/05.webp",
+            "alt": "client",
+            "name": "johara khatun", 
+            "order": "289",
+            "amount": "$1100",
+            "action": { "chat": "chat", "view": "visibility" }
+        },
+        {
+            "id": "#4985",
+            "src": "images/avatar/06.webp",
+            "alt": "client",
+            "name": "kurulus osman", 
+            "order": "194",
+            "amount": "$789",
+            "action": { "chat": "chat", "view": "visibility" }
+        }
+    ]
+}

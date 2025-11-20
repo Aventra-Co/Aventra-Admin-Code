@@ -1,0 +1,134 @@
+.mc-crm-card {
+    gap: 20px;
+    display: flex;
+    margin-bottom: 24px;
+    border-radius: 15px;
+    background-color: var(--cardBG);
+    @include transition-linear;
+
+    @include mobile-breakpoint {
+        @include padding(30px, 10px, 15px, 10px);
+        flex-wrap: wrap;
+        gap: 0px;
+    }
+
+    &:hover {
+        box-shadow: var(--cardBoxShadow);
+    }
+}
+
+[dir="ltr"] {
+    .mc-crm-card {
+        @include padding(30px, 10px, 15px, 28px);
+    }
+}
+
+[dir="rtl"] {
+    .mc-crm-card {
+        @include padding(30px, 28px, 15px, 10px);
+    }
+}
+
+.mc-crm-card-group {
+    width: 160px;
+    flex-shrink: 0;
+
+    i {
+        @include content-center(45px, 45px, 50%);
+        margin-bottom: 25px;
+        font-size: 20px;
+        color: var(--lightColor);
+
+        &.red {
+            background: linear-gradient($red-700, $red-500);
+            box-shadow: 0px 7px 13px 5px rgba($red-700, 0.15);
+        }
+
+        &.blue {
+            background: linear-gradient($blue-700, $blue-500);
+            box-shadow: 0px 7px 13px 5px rgba($blue-700, 0.15);
+        }
+
+        &.green {
+            background: linear-gradient($green-700, $green-500);
+            box-shadow: 0px 7px 13px 5px rgba($green-700, 0.15);
+        }
+
+        &.orange {
+            background: linear-gradient($orange-700, $orange-500);
+            box-shadow: 0px 7px 13px 5px rgba($orange-700, 0.15);
+        }
+
+        &.purple {
+            background: linear-gradient($purple-700, $purple-500);
+            box-shadow: 0px 7px 13px 5px rgba($purple-700, 0.15);
+        }
+    }
+
+    h3 {
+        font-size: 24px;
+        white-space: nowrap;
+    }
+
+    p {
+        font-size: 15px;
+        white-space: nowrap;
+        text-transform: capitalize;
+        margin-bottom: 40px;
+
+        @include mobile-breakpoint {
+            margin-bottom: 10px;
+        }
+    }
+
+    .arrow_upward {
+        &::before {
+            content: "\e5d8";
+            color: $green-600;
+        }
+        small:first-child { color: $green-600; }
+    }
+
+    .arrow_downward {
+        &::before {
+            content: "\e5db";
+            color: $red-600;
+        }
+        small:first-child { color: $red-600; }
+    }
+
+    span {
+        font-size: 14px;
+        @include flex-dimension(center, flex-start, 1px);
+        small:first-child { font-weight: 500;  }
+
+        &::before {
+            font-weight: 600; 
+            font-family: 'Material Icons';
+        }
+    }
+}
+
+[dir="ltr"] {
+    .mc-crm-card-group {
+        @include mobile-breakpoint {
+            margin-left: 20px;
+        }
+
+        span {
+            small:last-child { margin-left: 5px; }
+        }
+    }
+}
+
+[dir="rtl"] {
+    .mc-crm-card-group {
+        @include mobile-breakpoint {
+            margin-right: 20px;
+        }
+
+        span {
+            small:last-child { margin-right: 5px; }
+        }
+    }
+}

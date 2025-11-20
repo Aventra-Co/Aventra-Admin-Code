@@ -1,0 +1,42 @@
+.btn-content {
+  border: 1px solid #0D736E !important;
+  color: #0F225D;
+  padding: 10px 11px;
+  font-size: 13px;
+  width: 200px;
+  background-color: #ffffff;
+}
+
+.btn-content:hover {
+  background: #39A3A4;
+  color: #fff !important;
+
+}
+
+.btn-active {
+  background-color: #0D736E;
+  /* Adjust this color as needed */
+  color: white;
+  border: none;
+}
+
+@media(max-width:540px) {
+  .form Button {
+    margin-left: 0 !important;
+  }
+
+  .mobile {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+.send-btn {
+  border: 1px solid #0F225D !important;
+  color: #ffffff;
+  padding: 10px 11px;
+  font-size: 13px;
+  width: 200px;
+  background-color: #0F225D;
+}
