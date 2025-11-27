@@ -229,6 +229,7 @@ export default function CountryTableComponent({ thead, tbody }) {
                                 </th>
                                 <th>{t("actions")}</th>
                                 <th>{t("Country name")}</th>
+                                <th>{t("Country name arabic")}</th>
                                 <th>{t("createtime")}</th>
                             </tr>
                         </thead>
@@ -251,6 +252,9 @@ export default function CountryTableComponent({ thead, tbody }) {
                                     </td>
                                     <td>
                                         <span>{item.country_name || 'NA'}</span>
+                                    </td>
+                                    <td>
+                                        <span>{item.country_name_arabic || 'NA'}</span>
                                     </td>
                                     <td>{item.createtime || 'NA'}</td>
                                 </tr>
