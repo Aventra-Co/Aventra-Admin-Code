@@ -648,22 +648,22 @@ export default function EditTrip() {
   }, [trip_id]);
 
   useEffect(() => {
-    if (formData.nationality) {
-      axios.get(API_URL + `/fetch_city_for_trip_list?country_id=${formData.nationality}`)
-        .then(response => {
-          setCityDetails(response.data.city_arr || []);
-          if (formData.city && document.activeElement && document.activeElement.id === 'nationality') {
-            handleInputChange('city', '');
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching cities:', error);
-        });
-    } else {
-      setCityDetails([]);
-      handleInputChange('city', '');
-    }
-  }, [formData.nationality]);
+    // if (formData.nationality) {
+    axios.get(API_URL + `/fetch_city_for_trip_list?country_id=1`)
+      .then(response => {
+        setCityDetails(response.data.city_arr || []);
+        if (formData.city && document.activeElement && document.activeElement.id === 'nationality') {
+          handleInputChange('city', '');
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching cities:', error);
+      });
+    // } else {
+    //   setCityDetails([]);
+    //   handleInputChange('city', '');
+    // }
+  }, []);
 
   // Render addon sections dynamically
   const renderAddonSections = () => {
@@ -997,12 +997,12 @@ export default function EditTrip() {
             <Form.Select
               id='city'
               key={`city-select-${cityDetails.length}`}
-              value={formData.city || ''}
+              value={formData.city}
               onChange={e => {
                 handleInputChange('city', e.target.value)
               }}
               isInvalid={!!ownerError.city}
-              disabled={!formData.nationality}
+            // disabled={!formData.nationality}
             >
               <option value=''>
                 {t('Select City')}

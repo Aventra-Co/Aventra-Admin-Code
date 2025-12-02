@@ -11,7 +11,6 @@ import AddIcon from '@mui/icons-material/Add';
 import earthImage from '../../assets/img/earth.webp';
 import { SyncLoader } from 'react-spinners'
 
-
 export default function CountryTableComponent({ thead, tbody }) {
     const { t } = useContext(TranslatorContext);
     const [CountryDetails, setCountryDetails] = useState([]);
@@ -24,7 +23,9 @@ export default function CountryTableComponent({ thead, tbody }) {
     const [msg, setmsg] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [countryName, setcountryName] = useState("");
+    const [countryNameArabic, setCountryNameArabic] = useState("");
     const [editcountryName, seteditcountryName] = useState("");
+    const [editCountryNameArabic, setEditCountryNameArabic] = useState("");
     const [countryError, setcountryError] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const entriesPerPage = 50;
@@ -32,15 +33,14 @@ export default function CountryTableComponent({ thead, tbody }) {
     const indexOfLastEntry = currentPage * entriesPerPage;
     const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
 
-
     const filteredUsers = CountryDetails.filter((user) => {
         const lowercasedTerm = searchTerm.toLowerCase();
         return (
             user.country_name?.toLowerCase().includes(lowercasedTerm) ||
+            user.country_name_arabic?.toLowerCase().includes(lowercasedTerm) ||
             user.createtime?.toLowerCase().includes(lowercasedTerm)
         );
     });
-
 
     const currentUsers = filteredUsers.slice(indexOfFirstEntry, indexOfLastEntry);
 
@@ -52,31 +52,22 @@ export default function CountryTableComponent({ thead, tbody }) {
             .then((response) => {
                 setCountryDetails(response.data.country_arr || []);
                 setLoading(false)
-
             })
             .catch((error) => {
                 console.error('Error fetching user details:', error);
             });
     };
 
-
-
-
-
-
-
-
-
     useEffect(() => {
         fetchCountryDetails();
     }, []);
 
     const handleUserAction = (action, item) => {
-
         if (action === 'edit') {
             setEditModal(true);
             setcountryId(item.country_id);
-            seteditcountryName(item.country_name)
+            seteditcountryName(item.country_name || "");
+            setEditCountryNameArabic(item.country_name_arabic || "");
         }
         else if (action === 'delete') {
             setAlertModal(true);
@@ -95,10 +86,8 @@ export default function CountryTableComponent({ thead, tbody }) {
                     setsuccessModel(false);
                 }, 2000);
             }
-
         }).catch((error) => {
             console.log(error);
-
         })
     }
 
@@ -107,6 +96,9 @@ export default function CountryTableComponent({ thead, tbody }) {
         if (!editcountryName) {
             error.editcountryName = "Please enter country name"
         }
+        if (!editCountryNameArabic) {
+            error.editCountryNameArabic = "Please enter country name in Arabic"
+        }
         if (Object.keys(error).length > 0) {
             setcountryError(error)
             return
@@ -114,6 +106,7 @@ export default function CountryTableComponent({ thead, tbody }) {
         const formData = new FormData();
         formData.append('country_id', countryId)
         formData.append('country_name', editcountryName)
+        formData.append('country_name_arabic', editCountryNameArabic)
 
         axios.post(API_URL + '/edit_country', formData, {
             headers: {
@@ -128,19 +121,16 @@ export default function CountryTableComponent({ thead, tbody }) {
             }
             setmsg(response.data.msg)
             seteditcountryName('')
+            setEditCountryNameArabic('')
             setEditModal(false);
             setsuccessModel(true);
             fetchCountryDetails();
             setTimeout(() => {
                 setsuccessModel(false);
             }, 2000);
-
-
-
         })
             .catch(error => {
-
-                console.error('Error updating clinic:', error);
+                console.error('Error updating country:', error);
             });
     };
 
@@ -148,11 +138,13 @@ export default function CountryTableComponent({ thead, tbody }) {
         setSearchTerm(e.target.value);
     };
 
-
     const handleAddCountry = () => {
         let error = {}
         if (!countryName) {
             error.countryName = "Please enter country name"
+        }
+        if (!countryNameArabic) {
+            error.countryNameArabic = "Please enter country name in Arabic"
         }
         if (Object.keys(error).length > 0) {
             setcountryError(error)
@@ -160,6 +152,7 @@ export default function CountryTableComponent({ thead, tbody }) {
         }
         const formData = new FormData();
         formData.append('country_name', countryName)
+        formData.append('country_name_arabic', countryNameArabic)
 
         axios.post(API_URL + '/add_country', formData, {
             headers: {
@@ -174,30 +167,39 @@ export default function CountryTableComponent({ thead, tbody }) {
             }
             setmsg(response.data.msg)
             setcountryName('')
+            setCountryNameArabic('')
             fetchCountryDetails();
             setAddModal(false);
             setsuccessModel(true);
             setTimeout(() => {
                 setsuccessModel(false);
             }, 2000);
-
-
-
         })
             .catch(error => {
-
-                console.error('Error updating clinic:', error);
+                console.error('Error adding country:', error);
             });
+    };
+
+    const resetAddModal = () => {
+        setAddModal(false);
+        setcountryError('');
+        setcountryName('');
+        setCountryNameArabic('');
+    };
+
+    const resetEditModal = () => {
+        setEditModal(false);
+        setcountryError('');
+        seteditcountryName('');
+        setEditCountryNameArabic('');
     };
 
     return (
         <>
-
             <Row xs={1} sm={2} xl={4} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Col>
                     <LabelFieldComponent
                         type="search"
-                        // label={t('search_by')}
                         icon="Search"
                         placeholder={`${t('search_here')}`}
                         labelDir="label-col"
@@ -207,17 +209,17 @@ export default function CountryTableComponent({ thead, tbody }) {
                     />
                 </Col>
                 <Col style={{ textAlign: 'right', marginBottom: '5px' }}>
-                    <button style={{ background: '#2b77e5', padding: '7px 13px', color: '#fff', borderRadius: '5px' }} onClick={() => setAddModal(true)} > <AddIcon className="me-2" /> {t("add_country")} </button>
+                    <button style={{ background: '#2b77e5', padding: '7px 13px', color: '#fff', borderRadius: '5px' }} onClick={() => setAddModal(true)} >
+                        <AddIcon className="me-2" /> {t("add_country")}
+                    </button>
                 </Col>
             </Row>
-
 
             {loading ? (
                 <div className="d-flex align-items-center" style={{ height: '40vh' }}>
                     <SyncLoader animation="border" color="#086861" variant="primary" style={{ marginLeft: '40%' }} />
                 </div>
             ) : (
-
                 <div className="mc-table-responsive">
                     <table className="mc-table">
                         <thead className="mc-table-head primary">
@@ -243,10 +245,7 @@ export default function CountryTableComponent({ thead, tbody }) {
                                     </td>
                                     <td>
                                         <div className="mc-table-action">
-
-                                            {/* <AnchorComponent to={`${APP_PREFIX_PATH}/doctor-view/${encode(item.doctor_id)}`} title="View" className="material-icons view">visibility</AnchorComponent> */}
                                             <ButtonComponent title="Edit" className="material-icons edit" onClick={() => { handleUserAction('edit', item) }}>edit</ButtonComponent>
-                                            {/* <ButtonComponent title="Block" className="material-icons block" onClick={() => handleUserAction('block', item.user_id, item.active_flag)}>block</ButtonComponent> */}
                                             <ButtonComponent type="button" className="material-icons delete" onClick={() => handleUserAction('delete', item)}>delete</ButtonComponent>
                                         </div>
                                     </td>
@@ -262,7 +261,6 @@ export default function CountryTableComponent({ thead, tbody }) {
                         </tbody>
                     </table>
 
-
                     <PaginationComponent
                         totalEntries={filteredUsers.length}
                         entriesPerPage={entriesPerPage}
@@ -270,14 +268,12 @@ export default function CountryTableComponent({ thead, tbody }) {
                         onPageChange={handlePageChange}
                     />
 
-                    <Modal show={editModal} onHide={() => setEditModal(false)}>
+                    {/* Edit Modal */}
+                    <Modal show={editModal} onHide={resetEditModal}>
                         <div className="mc-user-modal">
-                            <img
-                                src={earthImage}
-                                alt="Profile"
-                            />
+                            <img src={earthImage} alt="Profile" />
                             <Form.Group className="form-group mb-4 ml-2">
-                                <Form.Label>{t('Country')}</Form.Label>
+                                <Form.Label>{t('Country Name')}</Form.Label>
                                 <Form.Control
                                     type="text"
                                     placeholder="Enter country name"
@@ -293,9 +289,26 @@ export default function CountryTableComponent({ thead, tbody }) {
                                     {countryError.editcountryName}
                                 </Form.Control.Feedback>
                             </Form.Group>
-
+                            <Form.Group className="form-group mb-4 ml-2">
+                                <Form.Label>{t('Country Name Arabic')}</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Enter country name in Arabic"
+                                    value={editCountryNameArabic}
+                                    onChange={(e) => {
+                                        setEditCountryNameArabic(e.target.value)
+                                        setcountryError((prev) => ({ ...prev, editCountryNameArabic: "" }));
+                                    }}
+                                    isInvalid={!!countryError.editCountryNameArabic}
+                                    maxLength={25}
+                                    dir="rtl"
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    {countryError.editCountryNameArabic}
+                                </Form.Control.Feedback>
+                            </Form.Group>
                             <Modal.Footer>
-                                <ButtonComponent type="button" className="btn btn-secondary" onClick={() => { setEditModal(false); setcountryError('') }}>
+                                <ButtonComponent type="button" className="btn btn-secondary" onClick={resetEditModal}>
                                     {t('close_popup')}
                                 </ButtonComponent>
                                 <ButtonComponent type="button" className="btn btn-success" onClick={handleEditCountry}>
@@ -303,16 +316,14 @@ export default function CountryTableComponent({ thead, tbody }) {
                                 </ButtonComponent>
                             </Modal.Footer>
                         </div>
-                    </Modal >
+                    </Modal>
 
-                    <Modal show={AddModal} onHide={() => setAddModal(false)} backdrop="static">
+                    {/* Add Modal */}
+                    <Modal show={AddModal} onHide={resetAddModal} backdrop="static">
                         <div className="mc-user-modal">
-                            <img
-                                src={earthImage}
-                                alt="Profile"
-                            />
+                            <img src={earthImage} alt="Profile" />
                             <Form.Group className="form-group mb-4 ml-2">
-                                <Form.Label>{t('Country')}</Form.Label>
+                                <Form.Label>{t('Country Name')}</Form.Label>
                                 <Form.Control
                                     type="text"
                                     placeholder={t('Enter country name')}
@@ -328,8 +339,26 @@ export default function CountryTableComponent({ thead, tbody }) {
                                     {countryError.countryName}
                                 </Form.Control.Feedback>
                             </Form.Group>
+                            <Form.Group className="form-group mb-4 ml-2">
+                                <Form.Label>{t('Country Name Arabic')}</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    placeholder={t('Enter country name in Arabic')}
+                                    maxLength={25}
+                                    value={countryNameArabic}
+                                    onChange={(e) => {
+                                        setCountryNameArabic(e.target.value)
+                                        setcountryError((prev) => ({ ...prev, countryNameArabic: "" }));
+                                    }}
+                                    isInvalid={!!countryError.countryNameArabic}
+                                    dir="rtl"
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    {countryError.countryNameArabic}
+                                </Form.Control.Feedback>
+                            </Form.Group>
                             <Modal.Footer>
-                                <ButtonComponent type="button" className="btn btn-secondary" onClick={() => { setAddModal(false); setcountryError(''); setcountryName('') }}>
+                                <ButtonComponent type="button" className="btn btn-secondary" onClick={resetAddModal}>
                                     {t('close_popup')}
                                 </ButtonComponent>
                                 <ButtonComponent type="button" className="btn btn-success" onClick={handleAddCountry}>
@@ -337,19 +366,19 @@ export default function CountryTableComponent({ thead, tbody }) {
                                 </ButtonComponent>
                             </Modal.Footer>
                         </div>
-                    </Modal >
+                    </Modal>
 
+                    {/* Success Modal */}
                     <Modal show={successModel} onHide={() => setsuccessModel(false)}>
                         <div className="mc-alert-modal">
                             <i className="material-icons" style={{ color: 'green' }}>check_circle</i>
                             <h3>{t('success')}</h3><br />
                             <p>{msg}</p>
-                            <Modal.Footer>
-
-                            </Modal.Footer>
+                            <Modal.Footer></Modal.Footer>
                         </div>
                     </Modal>
 
+                    {/* Delete Confirmation Modal */}
                     <Modal show={alertModal} onHide={() => setAlertModal(false)}>
                         <div className="mc-alert-modal">
                             <i className="material-icons">new_releases</i>
@@ -360,8 +389,8 @@ export default function CountryTableComponent({ thead, tbody }) {
                                 <ButtonComponent type="button" className="btn btn-danger" onClick={() => { setAlertModal(false); CountryDelete(); }}>{t('delete')}</ButtonComponent>
                             </Modal.Footer>
                         </div>
-                    </Modal >
-                </div >
+                    </Modal>
+                </div>
             )}
         </>
     );
