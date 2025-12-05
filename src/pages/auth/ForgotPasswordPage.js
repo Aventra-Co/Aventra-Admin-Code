@@ -76,14 +76,14 @@ export default function ForgotPasswordPage() {
         <div className="mc-auth">
             <img
                 className="mc-auth-pattern"
-                src="https://myboatonline.com/app/server/logo/logo.png"
+                src="https://aventra-co.com/app/server/logo/logo.png"
                 alt="pattern"
             />
             <div className="mc-auth-group">
 
                 <form className="mc-auth-form" onSubmit={handleSubmit}>
                     <LogoComponent
-                        src="https://myboatonline.com/app/server/logo/logo.png"
+                        src="https://aventra-co.com/app/server/logo/logo.png"
                         alt="logo"
                         href={`${APP_PREFIX_PATH}/ecommerce`}
                         className="mc-auth-logo"

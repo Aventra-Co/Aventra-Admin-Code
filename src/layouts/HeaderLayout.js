@@ -78,7 +78,7 @@ export default function HeaderLayout(props) {
         <header className={`mc-header ${scroll}`}>
 
             <Link to={APP_PREFIX_PATH + '/'} className='mc-logo-group'>
-                <img src='https://myboatonline.com/app/server/logo/logo.png' alt='logo' />
+                <img src='https://aventra-co.com/app/server/logo/logo.png' alt='logo' />
                 <span>{t("AVENTRA")}</span>
             </Link>
             <Authentication />

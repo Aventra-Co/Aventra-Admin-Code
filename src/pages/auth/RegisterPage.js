@@ -68,11 +68,11 @@ export default function RegisterPage() {
 
     return (
         <div className="mc-auth">
-            <img src="https://myboatonline.com/app/server/logo/logo.png" alt="pattern" className="mc-auth-pattern" />
+            <img src="https://aventra-co.com/app/server/logo/logo.png" alt="pattern" className="mc-auth-pattern" />
             <div className="mc-auth-group">
                 <form className="mc-auth-form" onSubmit={handleSubmit}>
                     <LogoComponent
-                        src="https://myboatonline.com/app/server/logo/logo.png"
+                        src="https://aventra-co.com/app/server/logo/logo.png"
                         alt="logo"
                         href="/2025/my_boat/admin/"
                         className="mc-auth-logo"

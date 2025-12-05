@@ -125,6 +125,34 @@ const ManageChat = () => {
     }, [currentUserId]);
 
     // // Map user details to inbox data
+    // const mapUserDetailsToInbox = useCallback(
+    //     (inboxData) => {
+    //         const mappedUsers = inboxData
+    //             .filter((inbox) => inbox.id)
+    //             .map((inbox) => {
+    //                 console.log('inbox other user details:', inbox);
+
+    //                 const matchedUser = users.find((user) => `u_${user.id}` == `u_${inbox.id}`);
+
+
+    //                 return matchedUser
+    //                     ? {
+    //                         ...inbox,
+    //                         name: matchedUser.name,
+    //                         image_html: matchedUser.image || placeholder
+    //                     }
+    //                     : { ...inbox, name: 'Unknown User', image_html: placeholder };
+    //             });
+    //         var sortedUsers = mappedUsers.sort((a, b) => new Date(b.lastMsgTime) - new Date(a.lastMsgTime)); // Sort by timestamp in descending order;
+
+    //         console.log('mappedUsers inbox details:', mappedUsers);
+    //         setSortedUserData(sortedUsers);
+    //         setUserDetails(sortedUsers);
+    //         console.log('userDetails:', sortedUsers);
+    //     },
+    //     [users, setUserDetails]
+    // );
+
     const mapUserDetailsToInbox = useCallback(
         (inboxData) => {
             const mappedUsers = inboxData
@@ -134,16 +162,21 @@ const ManageChat = () => {
 
                     const matchedUser = users.find((user) => `u_${user.id}` == `u_${inbox.id}`);
 
-
                     return matchedUser
                         ? {
                             ...inbox,
                             name: matchedUser.name,
+                            user_image: matchedUser.user_image || matchedUser.image || null,
                             image_html: matchedUser.image || placeholder
                         }
-                        : { ...inbox, name: 'Unknown User', image_html: placeholder };
+                        : {
+                            ...inbox,
+                            name: 'Unknown User',
+                            user_image: null,
+                            image_html: placeholder
+                        };
                 });
-            var sortedUsers = mappedUsers.sort((a, b) => new Date(b.lastMsgTime) - new Date(a.lastMsgTime)); // Sort by timestamp in descending order;
+            var sortedUsers = mappedUsers.sort((a, b) => new Date(b.lastMsgTime) - new Date(a.lastMsgTime));
 
             console.log('mappedUsers inbox details:', mappedUsers);
             setSortedUserData(sortedUsers);
@@ -152,6 +185,7 @@ const ManageChat = () => {
         },
         [users, setUserDetails]
     );
+
 
     useEffect(() => {
         mapUserDetailsToInbox(FirebaseInboxJson);
@@ -410,7 +444,7 @@ const ManageChat = () => {
                                             </div>
                                             <div className="d-flex justify-content-between w-100">
                                                 <div>
-                                                    <h5>{user.name}  {user.user_image}</h5>
+                                                    <h6>  {user.name}</h6>
                                                     <div className="msg">{user.lastMsg || ''}</div>
                                                 </div>
                                                 <div>
@@ -486,7 +520,7 @@ const ManageChat = () => {
                                             <div ref={messageEndRef} />
                                         </div>
  */}
-                                        <div className="col-lg-12 chat-messages-container">
+                                        {/* <div className="col-lg-12 chat-messages-container">
                                             {messages.length > 0 ? (
                                                 messages.map((msg) => (
                                                     <div key={msg.id} className={`message-wrapper ${userProvider.getMe().user_id == msg.senderId ? 'sent' : 'received'}`}>
@@ -503,6 +537,41 @@ const ManageChat = () => {
                                                         </div>
                                                     </div>
                                                 ))
+                                            ) : (
+                                                <div className="no-chat">Select a user to view the conversation.</div>
+                                            )}
+                                            <div ref={messageEndRef} />
+                                        </div> */}
+
+
+                                        <div className="col-lg-12 chat-messages-container">
+                                            {messages.length > 0 ? (
+                                                messages.map((msg) => {
+                                                    // Get the sender's user details
+                                                    const senderId = msg.senderId;
+                                                    const senderUser = users.find(u => u.user_id == senderId) ||
+                                                        userDetails.find(u => u.user_id == senderId);
+
+                                                    return (
+                                                        <div key={msg.id} className={`message-wrapper ${userProvider.getMe().user_id == msg.senderId ? 'sent' : 'received'}`}>
+                                                            <div className="message-content">
+                                                                <div className="avatar-container">
+                                                                    <img
+                                                                        src={senderUser?.user_image ? `${IMAGE_PATH}${senderUser.user_image}` : placeholder}
+                                                                        alt="User"
+                                                                        className="message-avatar"
+                                                                    />
+                                                                </div>
+                                                                <div className="message-bubble">
+                                                                    <p className="message-text">{msg.message}</p>
+                                                                    <div className="message-time">
+                                                                        <span>{moment(msg.msg_time).format("DD MMM YYYY HH:mm A")}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })
                                             ) : (
                                                 <div className="no-chat">Select a user to view the conversation.</div>
                                             )}
