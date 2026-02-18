@@ -1,106 +1,43 @@
 var moreActionsuploadChat = "";
-
-
-
 var chat_messages = "";
-
-
-
 var chat_messagebar = "";
-
-
-
 var userChatId_Globle = '';
-
-
-
 var global_chat_page_show_typing = 0;
-
- 
-
 var global_send_msg_scroll = 0;
-
-
-
 var userChatIdGlobal = '';
-
-
-
 var URLAPI = 'https://vigyapn.com/app/admin/libraryPHP/';
-
-
-
 var URLAPIWEB = 'https://vigyapn.com/app/webservice/';
-
-
-
 var URLAPI_img_main = 'https://vigyapn.com/app/webservice/images/';
 
 
 
 var URLAPI_img_200X200 = URLAPI_img_main + '200X200/';
 
-
-
 console.log('URLAPI_img_200X200', URLAPI_img_200X200);
-
-
-
-
-
 
 
 var error_img_books = "https://vigyapn.com/app/admin/assets/images/placeholder.png'";
 
-
-
 var error_img_slider = "https://vigyapn.com/app/admin/assets/images/placeholder.png'";
 
-
-
 var error_img_user = "other_profile_pic";
-
-
 
 var error_img_image = "https://vigyapn.com/app/admin/assets/images/placeholder.png'";
 
 
-
-
-
-
-
 var AppName = 'Vigyapn App';
-
-
 
 var other_user_id_global = 0;
 
-
-
-
-
-
-
 $(document).on('page:beforein', '.page[data-name="group_chat"]', function (e) {
-
-
 
   setcameraOpen();
 
-
-
   setChatRoomIdUpdateAndMsgCount(); // 1. set message count 0 and update chatRoomIdUpdate
-
-
 
   show_user_message_chat();
 
-
-
   send_messgae();
-
-
 
 });
 

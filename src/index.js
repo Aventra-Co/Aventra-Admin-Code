@@ -45,6 +45,7 @@ import PromotionReport from "./pages/main/PromotionReport";
 import FaqPage from "./pages/main/FaqPage";
 import ViewFaq from "./pages/main/ViewFaq";
 import HelpAndSupport from "./pages/main/HelpAndSupport";
+import ManagePropertyAdvertisement from "./pages/main/ManagePropertyAdvertisement";
 
 const router = createBrowserRouter([
 
@@ -116,6 +117,7 @@ const router = createBrowserRouter([
     { path: APP_PREFIX_PATH + "/add-boat/:owner_id", element: <AddBoat /> },
     { path: APP_PREFIX_PATH + "/edit-boat/:boat_id", element: <EditBoat /> },
     { path: APP_PREFIX_PATH + "/add-trip/:user_id", element: <AddTrip /> },
+    { path: APP_PREFIX_PATH + "/add-property-advertisement/:user_id", element: <ManagePropertyAdvertisement /> },
     { path: APP_PREFIX_PATH + "/edit-trip/:trip_id", element: <EditTrip /> },
     { path: APP_PREFIX_PATH + "/edit-staff/:user_id", element: <EditStaff /> },
     { path: APP_PREFIX_PATH + "/add-unavailability/:owner_id", element: <Addunavailability /> },

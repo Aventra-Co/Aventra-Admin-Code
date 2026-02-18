@@ -25,21 +25,6 @@ const firebaseConfig = {
 
 };
 
-
-// Firebase configuration
-// const firebaseConfig = {
-
-//   apiKey: "AIzaSyC7LRqOD4SaMP0H95DYral1_nWIV1O6peU",
-//   authDomain: "happinessindia-4b101.firebaseapp.com",
-//   databaseURL: "https://happinessindia-4b101-default-rtdb.firebaseio.com",
-//   projectId: "happinessindia-4b101",
-//   storageBucket: "happinessindia-4b101.firebasestorage.app",
-//   messagingSenderId: "54316471737",
-//   appId: "1:54316471737:web:a28471b2f7a6d0d02bd268",
-//   measurementId: "G-NWLC4HQ4Z5"
-// };
-
-
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
 

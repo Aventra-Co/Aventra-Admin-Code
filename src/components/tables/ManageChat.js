@@ -486,62 +486,8 @@ const ManageChat = () => {
                                             </div>
                                         </div>
 
-                                        {/* <div className="col-lg-12">
-                                            {messages.length > 0 ? (
-                                                messages.map((msg) => (
-                                                    <>
-                                                        <div className={`${userProvider.getMe().user_id == msg.senderId ? 'float-right' : 'float-left'}  mb-2`}>
 
-                                                            <div className={`${userProvider.getMe().user_id == msg.senderId ? 'comment-own' : 'comment'}  mb-2`} key={msg.id}>
-                                                                <div className="avtar-img">
-                                                                    <img src={placeholder} alt="User" className="avatar-img rounded-circle" />
-                                                                </div>
-                                                                <div className="media-body flex-grow-1">
-                                                                    <div className="msg-box new-msg">
-                                                                        <div className="box">
-                                                                            <p>{msg.message}</p>
-                                                                            <ul className="chat-msg-info">
-                                                                                <li>
-                                                                                    <div className="chat-time">
-                                                                                        <span>{moment(msg.msg_time).format("DD MMM YYYY HH:MM A")}</span>
-                                                                                    </div>
-                                                                                </li>
-                                                                            </ul>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </>
-                                                ))
-                                            ) : (
-                                                <div className="no-chat">Select a user to view the conversation.</div>
-                                            )}
-                                            <div ref={messageEndRef} />
-                                        </div>
- */}
-                                        {/* <div className="col-lg-12 chat-messages-container">
-                                            {messages.length > 0 ? (
-                                                messages.map((msg) => (
-                                                    <div key={msg.id} className={`message-wrapper ${userProvider.getMe().user_id == msg.senderId ? 'sent' : 'received'}`}>
-                                                        <div className="message-content">
-                                                            <div className="avatar-container">
-                                                                <img src={user_image} alt="User" className="message-avatar" />
-                                                            </div>
-                                                            <div className="message-bubble">
-                                                                <p className="message-text">{msg.message}</p>
-                                                                <div className="message-time">
-                                                                    <span>{moment(msg.msg_time).format("DD MMM YYYY HH:mm A")}</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <div className="no-chat">Select a user to view the conversation.</div>
-                                            )}
-                                            <div ref={messageEndRef} />
-                                        </div> */}
+
 
 
                                         <div className="col-lg-12 chat-messages-container">
@@ -591,8 +537,7 @@ const ManageChat = () => {
                             {emptyPage && (
                                 <div className="col-12 d-flex">
                                     <div className="btn-file" style={{ padding: '10px', position: 'relative' }}>
-                                        {/* <i className="fa fa-paperclip" style={{ fontSize: '24px' }}></i> */}
-                                        {/* <input type="file" className="file" /> */}
+
                                     </div>
                                     <input
                                         className="form-control message-user"
