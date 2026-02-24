@@ -9,34 +9,34 @@ import { API_URL, APP_PREFIX_PATH } from '../../constant/constant'
 import { decode } from 'base-64'
 import Swal from 'sweetalert2';
 
-export default function Addunavailability() {
+export default function AddPropertyUnavailability() {
   const { owner_id } = useParams()
   const [errors, setErrors] = useState({})
   const [alertModal, setAlertModal] = useState(false)
   const { t } = useContext(TranslatorContext)
   const [dateSelected, setdateSelected] = useState('')
-  const [boatData, setBoatData] = useState([])
-  const [selectedBoatId, setSelectedBoat] = useState('')
-  const [tripOpenTime, setTripOpenTime] = useState('')
-  const [tripCloseTime, setTripCloseTime] = useState('')
+  const [propertyData, setPropertyData] = useState([])
+  const [selectedPropertyId, setSelectedProperty] = useState('')
+  const [fromTime, setFromTime] = useState('')
+  const [toTime, setToTime] = useState('')
   const [availabilityType, setAvailabilityType] = useState('1') // Default to selected time
   const navigate = useNavigate()
 
   const handleSubmit = () => {
     let newErrors = {}
 
-    if (!selectedBoatId) {
-      newErrors.selectedBoatId = 'Please Select Boat'
+    if (!selectedPropertyId) {
+      newErrors.selectedPropertyId = 'Please Select Property'
     }
     if (!dateSelected) {
       newErrors.dateSelected = 'Please Enter Date'
     }
     if (availabilityType === '1') {
-      if (!tripOpenTime) {
-        newErrors.tripOpenTime = 'Please Select From Time'
+      if (!fromTime) {
+        newErrors.fromTime = 'Please Select From Time'
       }
-      if (!tripCloseTime) {
-        newErrors.tripCloseTime = 'Please Select To Time'
+      if (!toTime) {
+        newErrors.toTime = 'Please Select To Time'
       }
     }
 
@@ -47,18 +47,14 @@ export default function Addunavailability() {
 
     const formData = new FormData()
     formData.append('user_id', decode(owner_id))
-    formData.append('boat_id', selectedBoatId)
+    formData.append('property_id', selectedPropertyId)
     formData.append('date', dateSelected)
     formData.append('type', availabilityType)
-    formData.append('entity_type', 0)
+    formData.append('entity_type', '1') // 1 for property
 
     if (availabilityType === '1') {
-      formData.append('from_time', tripOpenTime)
-      formData.append('to_time', tripCloseTime)
-    } else {
-      // For full day, set default times or leave empty based on your API requirements
-      formData.append('from_time', '00:00:00')
-      formData.append('to_time', '23:59:59')
+      formData.append('from_time', fromTime)
+      formData.append('to_time', toTime)
     }
 
     axios
@@ -70,9 +66,8 @@ export default function Addunavailability() {
             setAlertModal(false)
             navigate(APP_PREFIX_PATH + `/owner-view/${owner_id}`)
           }, 2000)
-        }
-        else if (response.data.key === 'exist') {
-          setErrors(prev => ({ ...prev, email: response.data.msg }))
+        } else if (response.data.key) {
+          setErrors(prev => ({ ...prev, [response.data.key]: response.data.msg }))
         } else {
           Swal.fire({
             title: 'Error!',
@@ -83,23 +78,29 @@ export default function Addunavailability() {
         }
       })
       .catch(error => {
-        console.error('Error adding unavailability:', error)
+        console.error('Error adding property unavailability:', error)
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to add unavailability',
+          icon: 'error',
+          confirmButtonText: 'OK',
+        });
       })
   }
 
-  const fetchBoatData = () => {
+  const fetchPropertyData = () => {
     axios
-      .get(API_URL + `/fetch_boat_data_by_trip?user_id=${decode(owner_id)}`)
+      .get(API_URL + `/fetch_property_data_by_id?user_id=${decode(owner_id)}`)
       .then(response => {
-        setBoatData(response.data.boat_arr || [])
+        setPropertyData(response.data.data || [])
       })
       .catch(error => {
-        console.error('Error fetching boat data:', error)
+        console.error('Error fetching property data:', error)
       })
   }
 
   useEffect(() => {
-    fetchBoatData()
+    fetchPropertyData()
   }, [])
 
   return (
@@ -108,7 +109,7 @@ export default function Addunavailability() {
         <Col xl={12}>
           <div className='mc-card'>
             <div className='mc-breadcrumb'>
-              <h3 className='mc-breadcrumb-title'>{t('Add Unavailability')}</h3>
+              <h3 className='mc-breadcrumb-title'>{t('Add Property Unavailability')}</h3>
               <ul className='mc-breadcrumb-list'>
                 <li className='mc-breadcrumb-item'>
                   <Link
@@ -127,7 +128,15 @@ export default function Addunavailability() {
                   </Link>
                 </li>
                 <li className='mc-breadcrumb-item'>
-                  {t('Add Unavailability')}
+                  <Link
+                    to={`${APP_PREFIX_PATH + `/owner-view/${owner_id}`}`}
+                    className='mc-breadcrumb-link'
+                  >
+                    {t('owner details')}
+                  </Link>
+                </li>
+                <li className='mc-breadcrumb-item'>
+                  {t('Add Property Unavailability')}
                 </li>
               </ul>
             </div>
@@ -137,29 +146,29 @@ export default function Addunavailability() {
         <div className='container'>
           <div className='row m-2'>
             <div className='col-md-6'>
-              <label htmlFor='boat' className='form-label'>
-                Boat
+              <label htmlFor='property' className='form-label'>
+                Property
               </label>
               <Form.Select
-                id='boat'
-                value={selectedBoatId}
+                id='property'
+                value={selectedPropertyId}
                 onChange={e => {
-                  setSelectedBoat(e.target.value)
-                  setErrors(prev => ({ ...prev, selectedBoatId: '' }))
+                  setSelectedProperty(e.target.value)
+                  setErrors(prev => ({ ...prev, selectedPropertyId: '' }))
                 }}
-                isInvalid={!!errors.selectedBoatId}
+                isInvalid={!!errors.selectedPropertyId}
               >
                 <option value='' disabled>
-                  {t('Select Boat')}
+                  {t('Select Property')}
                 </option>
-                {boatData.map(boat => (
-                  <option key={boat.boat_id} value={boat.boat_id}>
-                    {boat.boat_name_english}
+                {propertyData.map(property => (
+                  <option key={property.property_id} value={property.property_id}>
+                    {property.property_name_english}
                   </option>
                 ))}
               </Form.Select>
               <Form.Control.Feedback type='invalid'>
-                {errors.selectedBoatId}
+                {errors.selectedPropertyId}
               </Form.Control.Feedback>
             </div>
             <div className='col-md-6'>
@@ -220,40 +229,40 @@ export default function Addunavailability() {
           {availabilityType === '1' && (
             <div className='row m-2'>
               <div className='col-md-6'>
-                <label htmlFor='tripOpenTime' className='form-label'>
+                <label htmlFor='fromTime' className='form-label'>
                   From Time
                 </label>
                 <Form.Control
                   type='time'
-                  id='tripOpenTime'
-                  value={tripOpenTime}
+                  id='fromTime'
+                  value={fromTime}
                   onChange={e => {
-                    setTripOpenTime(e.target.value)
-                    setErrors(prev => ({ ...prev, tripOpenTime: '' }))
+                    setFromTime(e.target.value)
+                    setErrors(prev => ({ ...prev, fromTime: '' }))
                   }}
-                  isInvalid={!!errors.tripOpenTime}
+                  isInvalid={!!errors.fromTime}
                 />
                 <Form.Control.Feedback type='invalid'>
-                  {errors.tripOpenTime}
+                  {errors.fromTime}
                 </Form.Control.Feedback>
               </div>
 
               <div className='col-md-6'>
-                <label htmlFor='tripCloseTime' className='form-label'>
+                <label htmlFor='toTime' className='form-label'>
                   To Time
                 </label>
                 <Form.Control
                   type='time'
-                  id='tripCloseTime'
-                  value={tripCloseTime}
+                  id='toTime'
+                  value={toTime}
                   onChange={e => {
-                    setTripCloseTime(e.target.value)
-                    setErrors(prev => ({ ...prev, tripCloseTime: '' }))
+                    setToTime(e.target.value)
+                    setErrors(prev => ({ ...prev, toTime: '' }))
                   }}
-                  isInvalid={!!errors.tripCloseTime}
+                  isInvalid={!!errors.toTime}
                 />
                 <Form.Control.Feedback type='invalid'>
-                  {errors.tripCloseTime}
+                  {errors.toTime}
                 </Form.Control.Feedback>
               </div>
             </div>
@@ -274,7 +283,7 @@ export default function Addunavailability() {
               check_circle
             </i>
             <h3>Confirmation</h3>
-            <p>Unavailability has been Added successfully.</p>
+            <p>Property Unavailability has been Added successfully.</p>
           </div>
         </Modal>
       </PageLayout>

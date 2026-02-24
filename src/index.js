@@ -46,6 +46,10 @@ import FaqPage from "./pages/main/FaqPage";
 import ViewFaq from "./pages/main/ViewFaq";
 import HelpAndSupport from "./pages/main/HelpAndSupport";
 import ManagePropertyAdvertisement from "./pages/main/ManagePropertyAdvertisement";
+import EditPropertyAdvertisement from "./pages/main/EditPropertyAdvertisement";
+import AddProperty from "./pages/main/AddProperty";
+import EditProperty from "./pages/main/EditProperty";
+import AddPropertyUnavailability from "./pages/main/AddPropertyUnavailability";
 
 const router = createBrowserRouter([
 
@@ -115,9 +119,13 @@ const router = createBrowserRouter([
     { path: APP_PREFIX_PATH + "/earning-tabular-report", element: <EarningTabularReport /> },
     { path: APP_PREFIX_PATH + "/add-staff/:user_id", element: <AddStaff /> },
     { path: APP_PREFIX_PATH + "/add-boat/:owner_id", element: <AddBoat /> },
+    { path: APP_PREFIX_PATH + "/add-property-unavailability/:owner_id", element: <AddPropertyUnavailability /> },
     { path: APP_PREFIX_PATH + "/edit-boat/:boat_id", element: <EditBoat /> },
     { path: APP_PREFIX_PATH + "/add-trip/:user_id", element: <AddTrip /> },
+    { path: APP_PREFIX_PATH + "/add-property/:user_id", element: <AddProperty /> },
+    { path: APP_PREFIX_PATH + "/edit-property/:property_id", element: <EditProperty /> },
     { path: APP_PREFIX_PATH + "/add-property-advertisement/:user_id", element: <ManagePropertyAdvertisement /> },
+    { path: APP_PREFIX_PATH + "/edit-property-advertisement/:user_id/:property_ad_id", element: <EditPropertyAdvertisement /> },
     { path: APP_PREFIX_PATH + "/edit-trip/:trip_id", element: <EditTrip /> },
     { path: APP_PREFIX_PATH + "/edit-staff/:user_id", element: <EditStaff /> },
     { path: APP_PREFIX_PATH + "/add-unavailability/:owner_id", element: <Addunavailability /> },

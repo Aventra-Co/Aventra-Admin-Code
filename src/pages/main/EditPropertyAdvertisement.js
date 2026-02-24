@@ -9,18 +9,19 @@ import PageLayout from '../../layouts/PageLayout'
 import axios from 'axios'
 import './UserProfilePage.css'
 import { decode, encode } from 'base-64'
-import { API_URL, APP_PREFIX_PATH } from '../../constant/constant'
+import { API_URL, APP_PREFIX_PATH, IMAGE_PATH } from '../../constant/constant'
 import Select from 'react-select';
 import Swal from 'sweetalert2';
 
-export default function ManagePropertyAdvertisement() {
-  const { user_id } = useParams()
+export default function EditPropertyAdvertisement() {
+  const { property_ad_id, user_id } = useParams()
   const [alertModal, setAlertModal] = useState(false)
   const [ownerError, setOwnerError] = useState({})
   const { t } = useContext(TranslatorContext)
 
   // Form State
   const [formData, setFormData] = useState({
+    property_ad_id: '',
     property_id: '',
     guard_name_english: '',
     guard_name_arabic: '',
@@ -55,6 +56,7 @@ export default function ManagePropertyAdvertisement() {
 
   // Loading states
   const [loading, setLoading] = useState({
+    advertisement: true,
     amenities: true,
     countries: true,
     destinations: true,
@@ -68,8 +70,10 @@ export default function ManagePropertyAdvertisement() {
   const [cityDetails, setCityDetails] = useState([])
   const [destinationDetails, setDestinationDetails] = useState([])
   const [propertyDetails, setPropertyDetails] = useState([])
-  const [images, setImages] = useState([])
-  const [coverImage, setCoverImage] = useState(null)
+  const [existingImages, setExistingImages] = useState([])
+  const [existingCoverImage, setExistingCoverImage] = useState(null)
+  const [newImages, setNewImages] = useState([])
+  const [newCoverImage, setNewCoverImage] = useState(null)
   const [latitude, setLatitude] = useState('')
   const [longitude, setLongitude] = useState('')
   const [LocError, setLocError] = useState('')
@@ -119,21 +123,113 @@ export default function ManagePropertyAdvertisement() {
     }
   }
 
-  // Handle image upload
+  // Handle new image upload
   const handleImageChange = event => {
     const files = Array.from(event.target.files)
-    setImages(files)
+    setNewImages(files)
     setOwnerError(prev => ({ ...prev, image: '' }))
   }
 
-  // Handle cover image upload
+  // Handle new cover image upload
   const handleCoverImageChange = event => {
     const file = event.target.files[0]
-    setCoverImage(file)
+    setNewCoverImage(file)
     setOwnerError(prev => ({ ...prev, coverImage: '' }))
   }
 
-  // Fetch initial data
+  // Remove existing image
+  const handleRemoveExistingImage = (imageId) => {
+    setExistingImages(prev => prev.filter(img => img.property_image_id !== imageId))
+  }
+
+  // Remove existing cover image
+  const handleRemoveExistingCover = () => {
+    setExistingCoverImage(null)
+  }
+
+  // Fetch advertisement data
+  useEffect(() => {
+    const fetchAdvertisementData = async () => {
+      try {
+        console.log('Fetching advertisement data for ID:', decode(property_ad_id));
+        
+        const response = await axios.get(`${API_URL}/view_property_advertisements?property_ad_id=${decode(property_ad_id)}`)
+        
+        console.log('Advertisement response:', response.data);
+
+        if (response.data.success && response.data.data) {
+          const data = response.data.data;
+          
+          // Set form data
+          setFormData({
+            property_ad_id: data.property_ad_id,
+            property_id: data.property_id,
+            guard_name_english: data.guard_name_english || '',
+            guard_name_arabic: data.guard_name_arabic || '',
+            guard_number: data.guard_number || '',
+            gender: data.gender !== undefined ? data.gender.toString() : '',
+            country_id: data.country_id || '',
+            city_id: data.city_id || '',
+            destination_id: data.destination_id || '',
+            address: data.address || '',
+            max_adult: data.max_adult || '',
+            max_child: data.max_child || '',
+            description_english: data.description_english || '',
+            description_arabic: data.description_arabic || '',
+            description_french: data.description_french || '',
+            description_italian: data.description_italian || '',
+            description_korean: data.description_korean || '',
+            one_day_price: data.one_day_price || '',
+            one_day_active: data.one_day_active === 1,
+            weekday_price: data.weekday_price || '',
+            weekday_active: data.weekday_active === 1,
+            weekend_price: data.weekend_price || '',
+            weekend_active: data.weekend_active === 1,
+            full_week_price: data.full_week_price || '',
+            full_week_active: data.full_week_active === 1,
+            discount_percentage: data.discount_percentage || '',
+            coupon_code: data.coupon_code || '',
+            coupon_discount: data.coupon_discount || '',
+            free_cancel_days: data.free_cancel_days || '',
+            pet_friendly: data.pet_friendly !== undefined ? data.pet_friendly.toString() : '',
+            selectedAmenities: data.amenities || []
+          })
+
+          // Set location data
+          setLatitude(data.latitude || '')
+          setLongitude(data.longitude || '')
+
+          // Set images
+          if (data.images && data.images.length > 0) {
+            const cover = data.images.find(img => img.is_cover === 1)
+            const sideImages = data.images.filter(img => img.is_cover === 0)
+            
+            if (cover) {
+              setExistingCoverImage(cover)
+            }
+            setExistingImages(sideImages)
+          }
+
+          setLoading(prev => ({ ...prev, advertisement: false }))
+        }
+      } catch (error) {
+        console.error('Error fetching advertisement:', error)
+        setLoading(prev => ({ ...prev, advertisement: false }))
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to load advertisement data',
+          icon: 'error',
+          confirmButtonText: 'OK',
+        })
+      }
+    }
+
+    if (property_ad_id) {
+      fetchAdvertisementData();
+    }
+  }, [property_ad_id])
+
+  // Fetch initial data (amenities, countries, destinations, properties)
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
@@ -156,7 +252,7 @@ export default function ManagePropertyAdvertisement() {
         console.log('Destinations response:', destinationsRes.data);
         console.log('Properties response:', propertiesRes.data);
 
-        // Set amenities - the data is in the 'data' property directly
+        // Set amenities
         if (amenitiesRes.data && amenitiesRes.data.data && Array.isArray(amenitiesRes.data.data)) {
           setAmenities(amenitiesRes.data.data);
           setLoading(prev => ({ ...prev, amenities: false }));
@@ -226,7 +322,6 @@ export default function ManagePropertyAdvertisement() {
             setCityDetails([]);
           }
           setLoading(prev => ({ ...prev, cities: false }));
-          handleInputChange('city_id', '')
         })
         .catch(error => {
           console.error('Error fetching cities:', error)
@@ -236,7 +331,6 @@ export default function ManagePropertyAdvertisement() {
     } else {
       setCityDetails([])
       setLoading(prev => ({ ...prev, cities: false }));
-      handleInputChange('city_id', '')
     }
   }, [formData.country_id])
 
@@ -365,13 +459,18 @@ export default function ManagePropertyAdvertisement() {
       isValid = false
     }
 
-    // Image validation
-    if (!coverImage) {
+    // Image validation - at least one image should exist (either existing or new)
+    const hasExistingCover = existingCoverImage !== null
+    const hasExistingImages = existingImages.length > 0
+    const hasNewCover = newCoverImage !== null
+    const hasNewImages = newImages.length > 0
+
+    if (!hasExistingCover && !hasNewCover) {
       errors.coverImage = 'Please select cover image'
       isValid = false
     }
 
-    if (!images || images.length === 0) {
+    if (!hasExistingImages && !hasNewImages) {
       errors.image = 'Please select at least one side image'
       isValid = false
     }
@@ -390,6 +489,7 @@ export default function ManagePropertyAdvertisement() {
     const formDataObj = new FormData()
 
     // Append all form fields
+    formDataObj.append('property_ad_id', formData.property_ad_id)
     formDataObj.append('property_id', formData.property_id)
     formDataObj.append('user_id', decode(user_id))
     formDataObj.append('guard_name_english', formData.guard_name_english)
@@ -432,18 +532,24 @@ export default function ManagePropertyAdvertisement() {
       formDataObj.append('amenity_arr', JSON.stringify(formData.selectedAmenities))
     }
 
-    // Add images
-    images.forEach(img => {
+    // Add existing image IDs to keep (optional - backend might need this)
+    if (existingImages.length > 0) {
+      const existingImageIds = existingImages.map(img => img.property_image_id)
+      formDataObj.append('existing_image_ids', JSON.stringify(existingImageIds))
+    }
+
+    // Add new images
+    newImages.forEach(img => {
       formDataObj.append('image', img)
     })
 
-    // Add cover image
-    if (coverImage) {
-      formDataObj.append('coverImage', coverImage)
+    // Add new cover image
+    if (newCoverImage) {
+      formDataObj.append('coverImage', newCoverImage)
     }
 
     // Submit to API
-    axios.post(API_URL + '/add_advertisement_property_admin', formDataObj)
+    axios.post(API_URL + '/edit_advertisement_property_admin', formDataObj)
       .then(response => {
         if (response.data.success) {
           setAlertModal(true)
@@ -465,9 +571,26 @@ export default function ManagePropertyAdvertisement() {
         }
       })
       .catch(error => {
-        console.error('Error submitting advertisement:', error)
-        setOwnerError(prev => ({ ...prev, formError: 'Failed to submit advertisement' }))
+        console.error('Error updating advertisement:', error)
+        setOwnerError(prev => ({ ...prev, formError: 'Failed to update advertisement' }))
       })
+  }
+
+  if (loading.advertisement) {
+    return (
+      <PageLayout>
+        <Col xl={12}>
+          <div className="mc-card">
+            <div className="text-center p-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+              <p className="mt-3">Loading advertisement data...</p>
+            </div>
+          </div>
+        </Col>
+      </PageLayout>
+    )
   }
 
   return (
@@ -475,7 +598,7 @@ export default function ManagePropertyAdvertisement() {
       <Col xl={12}>
         <div className='mc-card'>
           <div className='mc-breadcrumb'>
-            <h3 className='mc-breadcrumb-title'>{t('Add Property Advertisement')}</h3>
+            <h3 className='mc-breadcrumb-title'>{t('Edit Property Advertisement')}</h3>
             <ul className='mc-breadcrumb-list'>
               <li className='mc-breadcrumb-item'>
                 <Link to={`${APP_PREFIX_PATH + '/dashboard'}`} className='mc-breadcrumb-link'>
@@ -487,7 +610,7 @@ export default function ManagePropertyAdvertisement() {
                   {t('manage owner')}
                 </Link>
               </li>
-              <li className='mc-breadcrumb-item'>{t('Add Property Advertisement')}</li>
+              <li className='mc-breadcrumb-item'>{t('Edit Property Advertisement')}</li>
             </ul>
           </div>
         </div>
@@ -497,9 +620,28 @@ export default function ManagePropertyAdvertisement() {
         {/* Image Upload Section */}
         <div className='row m-2'>
           <div className='col-md-6'>
-            <label htmlFor='coverImage' className='form-label'>
-              Please upload cover pics *
+            <label className='form-label'>
+              Cover Image *
             </label>
+            {existingCoverImage && (
+              <div className="mb-3">
+                <div className="d-flex align-items-center gap-3">
+                  <img 
+                    src={`${IMAGE_PATH}${existingCoverImage.image_path}`} 
+                    alt="Cover" 
+                    style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                    className="border rounded"
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-danger"
+                    onClick={handleRemoveExistingCover}
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            )}
             <Form.Control
               type='file'
               onChange={handleCoverImageChange}
@@ -508,11 +650,38 @@ export default function ManagePropertyAdvertisement() {
             <Form.Control.Feedback type='invalid'>
               {ownerError.coverImage}
             </Form.Control.Feedback>
+            {existingCoverImage && (
+              <small className="text-muted">Upload new cover image to replace existing one</small>
+            )}
           </div>
           <div className='col-md-6'>
-            <label htmlFor='images' className='form-label'>
-              Please upload Side pics *
+            <label className='form-label'>
+              Side Images *
             </label>
+            {existingImages.length > 0 && (
+              <div className="mb-3">
+                <div className="d-flex flex-wrap gap-3">
+                  {existingImages.map(img => (
+                    <div key={img.property_image_id} className="position-relative">
+                      <img 
+                        src={`${IMAGE_PATH}${img.image_path}`} 
+                        alt="Side" 
+                        style={{ width: '80px', height: '80px', objectFit: 'cover' }}
+                        className="border rounded"
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-danger position-absolute top-0 end-0"
+                        style={{ transform: 'translate(50%, -50%)' }}
+                        onClick={() => handleRemoveExistingImage(img.property_image_id)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             <Form.Control
               type='file'
               multiple
@@ -522,6 +691,9 @@ export default function ManagePropertyAdvertisement() {
             <Form.Control.Feedback type='invalid'>
               {ownerError.image}
             </Form.Control.Feedback>
+            {existingImages.length > 0 && (
+              <small className="text-muted">Upload new images to add more (existing ones will be kept)</small>
+            )}
           </div>
         </div>
 
@@ -750,6 +922,8 @@ export default function ManagePropertyAdvertisement() {
                 selectProps={{
                   onChange: handleLocationChange,
                   placeholder: 'Search Location',
+                  defaultValue: formData.address ? { label: formData.address, value: formData.address } : null,
+                  value: formData.address ? { label: formData.address, value: formData.address } : null,
                   noOptionsMessage: () => null,
                   loadingMessage: () => null,
                 }}
@@ -834,7 +1008,7 @@ export default function ManagePropertyAdvertisement() {
         </div>
 
         {/* Additional Languages (Optional) */}
-        {/* <div className='row m-2'>
+        <div className='row m-2'>
           <div className='col-md-4'>
             <label htmlFor='description_french' className='form-label'>
               Description in French
@@ -871,7 +1045,7 @@ export default function ManagePropertyAdvertisement() {
               onChange={e => handleInputChange('description_korean', e.target.value)}
             />
           </div>
-        </div> */}
+        </div>
 
         {/* Coupon Section */}
         <div className='row m-2'>
@@ -1156,7 +1330,7 @@ export default function ManagePropertyAdvertisement() {
               }}
               onClick={handleSubmit}
             >
-              SUBMIT
+              UPDATE
             </button>
           </div>
         </div>
@@ -1170,7 +1344,7 @@ export default function ManagePropertyAdvertisement() {
           </i>
           <h3>Confirmation</h3>
           <br />
-          <p>Property advertisement has been created successfully.</p>
+          <p>Property advertisement has been updated successfully.</p>
           <Modal.Footer></Modal.Footer>
         </div>
       </Modal>

@@ -14,10 +14,11 @@ import LabelFieldComponent from '../../components/fields/LabelFieldComponent'
 import AddIcon from '@mui/icons-material/Add'
 import Swal from 'sweetalert2'
 import { Helmet } from 'react-helmet-async'
-// import { ButtonComponent } from "../elements";
+
 export default function ViewOwner() {
   const { t } = useContext(TranslatorContext)
   const [content, setContent] = useState(0)
+  const [unavailabilitySubTab, setUnavailabilitySubTab] = useState('boat') // 'boat' or 'property'
   const { user_id } = useParams()
   const [loading, setLoading] = useState(false)
   const [Data, setData] = useState('')
@@ -27,9 +28,13 @@ export default function ViewOwner() {
 
   const [staff, setStaff] = useState([])
   const [boat, setboat] = useState([])
+  const [properties, setProperties] = useState([])
+  const [propertyAdvertisements, setPropertyAdvertisements] = useState([])
   const [trips, settrips] = useState([])
   const [Ratings, setRatings] = useState([])
-  const [unavailability, setUnavailability] = useState([])
+  const [boatUnavailability, setBoatUnavailability] = useState([])
+  const [propertyUnavailability, setPropertyUnavailability] = useState([])
+  const [loadingUnavailability, setLoadingUnavailability] = useState(false)
   const [bookings, setBookings] = useState([])
   const [loadingBookings, setLoadingBookings] = useState(true)
 
@@ -40,13 +45,22 @@ export default function ViewOwner() {
   const contentTypes = {
     staff: 0,
     boat: 1,
-    trip: 2,
-    ratings: 3,
-    unavailability: 4,
-    bookings: 5
+    property: 2,
+    propertyAdvertisement: 3,
+    trip: 4,
+    ratings: 5,
+    unavailability: 6,
+    bookings: 7
   }
+
   const handleButtonClick = contentType => {
     setContent(contentTypes[contentType])
+    setSearchTerm('')
+  }
+
+  const handleUnavailabilitySubTabChange = (subTab) => {
+    setUnavailabilitySubTab(subTab)
+    setSearchTerm('')
   }
 
   const handleStaffDelete = userId => {
@@ -103,7 +117,67 @@ export default function ViewOwner() {
               )
               Swal.fire('Deleted!', 'The Boat has been deleted.', 'success')
             } else {
-              Swal.fire('Error', 'Failed to delete sBoat.', 'error')
+              Swal.fire('Error', 'Failed to delete Boat.', 'error')
+            }
+          })
+          .catch(error => {
+            Swal.fire('Error', 'An error occurred while deleting.', 'error')
+          })
+      }
+    })
+  }
+
+  const handlePropertyDelete = property_id => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Want to delete this Property?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+      dangerMode: true
+    }).then(result => {
+      if (result.isConfirmed) {
+        axios
+          .post(API_URL + `/delete_property`, { property_id: property_id })
+          .then(response => {
+            if (response.data.success) {
+              setProperties(prevProperties =>
+                prevProperties.filter(property => property.property_id !== property_id)
+              )
+              Swal.fire('Deleted!', 'The Property has been deleted.', 'success')
+            } else {
+              Swal.fire('Error', 'Failed to delete Property.', 'error')
+            }
+          })
+          .catch(error => {
+            Swal.fire('Error', 'An error occurred while deleting.', 'error')
+          })
+      }
+    })
+  }
+
+  const handlePropertyAdvertisementDelete = property_ad_id => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Want to delete this Property Advertisement?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+      dangerMode: true
+    }).then(result => {
+      if (result.isConfirmed) {
+        axios
+          .post(API_URL + `/delete_property_advertisement`, { property_ad_id: property_ad_id })
+          .then(response => {
+            if (response.data.success) {
+              setPropertyAdvertisements(prevAds =>
+                prevAds.filter(ad => ad.property_ad_id !== property_ad_id)
+              )
+              Swal.fire('Deleted!', 'The Property Advertisement has been deleted.', 'success')
+            } else {
+              Swal.fire('Error', 'Failed to delete Property Advertisement.', 'error')
             }
           })
           .catch(error => {
@@ -143,11 +217,10 @@ export default function ViewOwner() {
     })
   }
 
-
-  const handleUnavailabilityDelete = unavailability_id => {
+  const handleBoatUnavailabilityDelete = (unavailability_id) => {
     Swal.fire({
       title: 'Are you sure?',
-      text: 'Want to delete this Unavailability?',
+      text: 'Want to delete this Boat Unavailability?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Delete',
@@ -159,10 +232,40 @@ export default function ViewOwner() {
           .post(API_URL + `/delete_unavailability`, { unavailability_id: unavailability_id })
           .then(response => {
             if (response.data.success) {
-              setUnavailability(prevTrips =>
-                prevTrips.filter(trip => trip.unavailability_id !== unavailability_id)
+              setBoatUnavailability(prev => 
+                prev.filter(item => item.unavailability_id !== unavailability_id)
               )
-              Swal.fire('Deleted!', 'The Unavailability has been deleted.', 'success')
+              Swal.fire('Deleted!', 'The Boat Unavailability has been deleted.', 'success')
+            } else {
+              Swal.fire('Error', 'Failed to delete Unavailability.', 'error')
+            }
+          })
+          .catch(error => {
+            Swal.fire('Error', 'An error occurred while deleting.', 'error')
+          })
+      }
+    })
+  }
+
+  const handlePropertyUnavailabilityDelete = (unavailability_id) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Want to delete this Property Unavailability?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+      dangerMode: true
+    }).then(result => {
+      if (result.isConfirmed) {
+        axios
+          .post(API_URL + `/delete_unavailability`, { unavailability_id: unavailability_id })
+          .then(response => {
+            if (response.data.success) {
+              setPropertyUnavailability(prev => 
+                prev.filter(item => item.unavailability_id !== unavailability_id)
+              )
+              Swal.fire('Deleted!', 'The Property Unavailability has been deleted.', 'success')
             } else {
               Swal.fire('Error', 'Failed to delete Unavailability.', 'error')
             }
@@ -189,15 +292,38 @@ export default function ViewOwner() {
       })
   }
 
-  const OwnerUnavailability = () => {
+  const fetchBoatUnavailability = () => {
+    setLoadingUnavailability(true)
     axios
-      .get(API_URL + `/fetch_staff_trips_unavailability?user_id=${user_id}`)
+      .get(API_URL + `/get_unavailability_admin?user_id=${decode(user_id)}&entity_type=0`)
       .then(response => {
         if (response.data.success) {
-          setUnavailability(response.data.unavailability || [])
+          setBoatUnavailability(response.data.unavailability || [])
         }
+        setLoadingUnavailability(false)
       })
-      .catch()
+      .catch(error => {
+        console.error('Error fetching boat unavailability:', error)
+        setBoatUnavailability([])
+        setLoadingUnavailability(false)
+      })
+  }
+
+  const fetchPropertyUnavailability = () => {
+    setLoadingUnavailability(true)
+    axios
+      .get(API_URL + `/get_unavailability_admin?user_id=${decode(user_id)}&entity_type=1`)
+      .then(response => {
+        if (response.data.success) {
+          setPropertyUnavailability(response.data.unavailability || [])
+        }
+        setLoadingUnavailability(false)
+      })
+      .catch(error => {
+        console.error('Error fetching property unavailability:', error)
+        setPropertyUnavailability([])
+        setLoadingUnavailability(false)
+      })
   }
 
   const fetchOwnerRelatedData = () => {
@@ -222,6 +348,33 @@ export default function ViewOwner() {
       .catch()
   }
 
+  const fetchProperties = () => {
+    axios
+      .get(API_URL + `/fetch_property_data_by_id?user_id=${decode(user_id)}`)
+      .then(response => {
+        if (response.data.success) {
+          setProperties(response.data.data || [])
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching properties:', error)
+        setProperties([])
+      })
+  }
+
+  const fetchPropertyAdvertisements = () => {
+    axios
+      .get(API_URL + `/get_all_owner_advertisements?user_id=${decode(user_id)}`)
+      .then(response => {
+        if (response.data.success) {
+          setPropertyAdvertisements(response.data.data || [])
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching property advertisements:', error)
+        setPropertyAdvertisements([])
+      })
+  }
 
   const fetchBookings = async () => {
     try {
@@ -243,7 +396,10 @@ export default function ViewOwner() {
   useEffect(() => {
     getData()
     fetchOwnerRelatedData()
-    OwnerUnavailability()
+    fetchProperties()
+    fetchPropertyAdvertisements()
+    fetchBoatUnavailability()
+    fetchPropertyUnavailability()
     fetchBookings()
   }, [])
 
@@ -296,6 +452,36 @@ export default function ViewOwner() {
     )
   })
 
+  const filteredProperties = properties.filter(property => {
+    const lowercasedTerm = searchTerm.toLowerCase()
+    return (
+      (property.property_name_english &&
+        String(property.property_name_english)
+          .toLowerCase()
+          .includes(lowercasedTerm)) ||
+      (property.property_id &&
+        String(property.property_id).toLowerCase().includes(lowercasedTerm))
+    )
+  })
+
+  const filteredPropertyAdvertisements = propertyAdvertisements.filter(ad => {
+    const lowercasedTerm = searchTerm.toLowerCase()
+    return (
+      (ad.property_name_english &&
+        String(ad.property_name_english).toLowerCase().includes(lowercasedTerm)) ||
+      (ad.guard_name_english &&
+        String(ad.guard_name_english).toLowerCase().includes(lowercasedTerm)) ||
+      (ad.address &&
+        String(ad.address).toLowerCase().includes(lowercasedTerm)) ||
+      (ad.one_day_price &&
+        String(ad.one_day_price).toLowerCase().includes(lowercasedTerm)) ||
+      (ad.createtime &&
+        String(ad.createtime).toLowerCase().includes(lowercasedTerm)) ||
+      (ad.random_booking_id &&
+        String(ad.random_booking_id).toLowerCase().includes(lowercasedTerm))
+    )
+  })
+
   const filteredtrips = trips.filter(user => {
     const lowercasedTerm = searchTerm.toLowerCase()
     return (
@@ -309,8 +495,6 @@ export default function ViewOwner() {
         String(user.captain_name_english)
           .toLowerCase()
           .includes(lowercasedTerm)) ||
-      // (user.destination_english && String(user.destination_english).toLowerCase().includes(lowercasedTerm)) ||
-      // (user.trip_name_english && String(user.trip_name_english).toLowerCase().includes(lowercasedTerm)) ||
       (user.random_id &&
         String(user.random_id).toLowerCase().includes(lowercasedTerm)) ||
       (user.createtime &&
@@ -347,23 +531,39 @@ export default function ViewOwner() {
     )
   })
 
-  const filteredUnavailability = unavailability.filter(user => {
+  const filteredBoatUnavailability = boatUnavailability.filter(item => {
     const lowercasedTerm = searchTerm.toLowerCase()
     return (
-      (user.to_time &&
-        String(user.to_time).toLowerCase().includes(lowercasedTerm)) ||
-      (user.from_time &&
-        String(user.from_time).toLowerCase().includes(lowercasedTerm)) ||
-      (user.boat_name_english &&
-        String(user.boat_name_english)
-          .toLowerCase()
-          .includes(lowercasedTerm)) ||
-      (user.date && String(user.date).toLowerCase().includes(lowercasedTerm)) ||
-      String(user.type == 0 ? 'Full Day' : 'Selected Hours')
+      (item.to_time &&
+        String(item.to_time).toLowerCase().includes(lowercasedTerm)) ||
+      (item.from_time &&
+        String(item.from_time).toLowerCase().includes(lowercasedTerm)) ||
+      (item.entity_name &&
+        String(item.entity_name).toLowerCase().includes(lowercasedTerm)) ||
+      (item.date && String(item.date).toLowerCase().includes(lowercasedTerm)) ||
+      String(item.type == 0 ? 'Full Day' : 'Selected Hours')
         .toLowerCase()
         .includes(lowercasedTerm) ||
-      (user.createtime &&
-        String(user.createtime).toLowerCase().includes(lowercasedTerm))
+      (item.createtime &&
+        String(item.createtime).toLowerCase().includes(lowercasedTerm))
+    )
+  })
+
+  const filteredPropertyUnavailability = propertyUnavailability.filter(item => {
+    const lowercasedTerm = searchTerm.toLowerCase()
+    return (
+      (item.to_time &&
+        String(item.to_time).toLowerCase().includes(lowercasedTerm)) ||
+      (item.from_time &&
+        String(item.from_time).toLowerCase().includes(lowercasedTerm)) ||
+      (item.entity_name &&
+        String(item.entity_name).toLowerCase().includes(lowercasedTerm)) ||
+      (item.date && String(item.date).toLowerCase().includes(lowercasedTerm)) ||
+      String(item.type == 0 ? 'Full Day' : 'Selected Hours')
+        .toLowerCase()
+        .includes(lowercasedTerm) ||
+      (item.createtime &&
+        String(item.createtime).toLowerCase().includes(lowercasedTerm))
     )
   })
 
@@ -602,10 +802,9 @@ export default function ViewOwner() {
                   }}
                 >
                   <button
-                    className={`btn btn-outline-success me-2 mb-2 btn-content ${content === contentTypes.staff ? 'btn-active' : ''
-                      }`}
+                    type="button"
+                    className={`btn btn-outline-success me-2 mb-2 btn-content ${content === contentTypes.staff ? 'btn-active' : ''}`}
                     style={{ width: '15rem' }}
-                    type='button'
                     onClick={() => {
                       handleButtonClick('staff')
                       setSearchTerm('')
@@ -614,10 +813,9 @@ export default function ViewOwner() {
                     {t('Staff')}
                   </button>
                   <button
-                    className={`btn btn-outline-success me-2 mb-2 btn-content ${content === contentTypes.boat ? 'btn-active' : ''
-                      }`}
+                    type="button"
+                    className={`btn btn-outline-success me-2 mb-2 btn-content ${content === contentTypes.boat ? 'btn-active' : ''}`}
                     style={{ width: '15rem' }}
-                    type='button'
                     onClick={() => {
                       handleButtonClick('boat')
                       setSearchTerm('')
@@ -626,10 +824,31 @@ export default function ViewOwner() {
                     {t('Boat')}
                   </button>
                   <button
-                    className={`btn btn-outline-success me-2  mb-2 btn-content ${content === contentTypes.trip ? 'btn-active' : ''
-                      }`}
+                    type="button"
+                    className={`btn btn-outline-success me-2  mb-2 btn-content ${content === contentTypes.property ? 'btn-active' : ''}`}
                     style={{ width: '15rem' }}
-                    type='button'
+                    onClick={() => {
+                      handleButtonClick('property')
+                      setSearchTerm('')
+                    }}
+                  >
+                    {t('Property')}
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn btn-outline-success me-2  mb-2 btn-content ${content === contentTypes.propertyAdvertisement ? 'btn-active' : ''}`}
+                    style={{ width: '15rem' }}
+                    onClick={() => {
+                      handleButtonClick('propertyAdvertisement')
+                      setSearchTerm('')
+                    }}
+                  >
+                    {t('Property Advertisement')}
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn btn-outline-success me-2  mb-2 btn-content ${content === contentTypes.trip ? 'btn-active' : ''}`}
+                    style={{ width: '15rem' }}
                     onClick={() => {
                       handleButtonClick('trip')
                       setSearchTerm('')
@@ -638,10 +857,9 @@ export default function ViewOwner() {
                     {t('Trips')}
                   </button>
                   <button
-                    className={`btn btn-outline-success me-2  mb-2 btn-content ${content === contentTypes.ratings ? 'btn-active' : ''
-                      }`}
+                    type="button"
+                    className={`btn btn-outline-success me-2  mb-2 btn-content ${content === contentTypes.ratings ? 'btn-active' : ''}`}
                     style={{ width: '15rem' }}
-                    type='button'
                     onClick={() => {
                       handleButtonClick('ratings')
                       setSearchTerm('')
@@ -650,12 +868,9 @@ export default function ViewOwner() {
                     {t('ratings')}
                   </button>
                   <button
-                    className={`btn btn-outline-success me-2  mb-2 btn-content ${content === contentTypes.unavailability
-                      ? 'btn-active'
-                      : ''
-                      }`}
+                    type="button"
+                    className={`btn btn-outline-success me-2  mb-2 btn-content ${content === contentTypes.unavailability ? 'btn-active' : ''}`}
                     style={{ width: '15rem' }}
-                    type='button'
                     onClick={() => {
                       handleButtonClick('unavailability')
                       setSearchTerm('')
@@ -664,12 +879,9 @@ export default function ViewOwner() {
                     {t('Unavailability')}
                   </button>
                   <button
-                    className={`btn btn-outline-success me-2 mb-2 btn-content ${content === contentTypes.bookings
-                      ? 'btn-active'
-                      : ''
-                      }`}
+                    type="button"
+                    className={`btn btn-outline-success me-2 mb-2 btn-content ${content === contentTypes.bookings ? 'btn-active' : ''}`}
                     style={{ width: '15rem' }}
-                    type='button'
                     onClick={() => {
                       handleButtonClick('bookings')
                       setSearchTerm('')
@@ -706,6 +918,7 @@ export default function ViewOwner() {
                     <Col style={{ textAlign: 'right', marginBottom: '5px' }}>
                       <Link to={APP_PREFIX_PATH + `/add-staff/${user_id}`}>
                         <button
+                          type="button"
                           style={{
                             background: '#2b77e5',
                             padding: '7px 13px',
@@ -729,7 +942,6 @@ export default function ViewOwner() {
                                 <p>{t('sno')}</p>
                               </div>
                             </th>
-
                             <th>{t('Action')}</th>
                             <th>{t('image')}</th>
                             <th>{t('User Name')}</th>
@@ -851,6 +1063,7 @@ export default function ViewOwner() {
                     <Col style={{ textAlign: 'right', marginBottom: '5px' }}>
                       <Link to={APP_PREFIX_PATH + `/add-boat/${user_id}`}>
                         <button
+                          type="button"
                           style={{
                             background: '#2b77e5',
                             padding: '7px 13px',
@@ -876,8 +1089,6 @@ export default function ViewOwner() {
                               </div>
                             </th>
                             <th>{t('Action')}</th>
-
-                            {/* <th>{t('image')}</th> */}
                             <th>{t('Boat Name')}</th>
                             <th>{t('Boat Brand')}</th>
                             <th>{t('Boat Registration No.')}</th>
@@ -899,8 +1110,6 @@ export default function ViewOwner() {
                                   </div>
                                 </td>
                                 <td>
-                                  {/* <AnchorComponent to={`${APP_PREFIX_PATH}/view-staff/${encode(item.user_id)}`} title="View" className="material-icons view">visibility</AnchorComponent> */}
-
                                   <AnchorComponent
                                     to={`${APP_PREFIX_PATH}/edit-boat/${encode(
                                       item.boat_id
@@ -921,24 +1130,6 @@ export default function ViewOwner() {
                                     delete
                                   </AnchorComponent>
                                 </td>
-                                {/* <td title={item.boat_name_english}>
-                                  <div className='mc-table-profile'>
-                                    <img
-                                      src={
-                                        item.image
-                                          ? `${IMAGE_PATH}${item.image}`
-                                          : `${IMAGE_PATH}boat.webp`
-                                      }
-                                      alt='Profile'
-                                      style={{
-                                        width: '50px',
-                                        height: '50px',
-                                        borderRadius: '50%',
-                                        objectFit: 'cover'
-                                      }}
-                                    />
-                                  </div>
-                                </td> */}
                                 <td>{item.boat_name_english || 'NA'}</td>
                                 <td>{item.boat_brand || 'NA'}</td>
                                 <td>{item.boat_registration_number || 'NA'}</td>
@@ -947,7 +1138,6 @@ export default function ViewOwner() {
                                 <td>{item.boat_capacity || 'NA'}</td>
                                 <td>{item.cabins || 'NA'}</td>
                                 <td>{item.toilet || 'NA'}</td>
-
                                 <td>{item.createtime || 'NA'}</td>
                               </tr>
                             ))
@@ -964,7 +1154,232 @@ export default function ViewOwner() {
                   </div>
                 </>
               )}
+
               {content === 2 && (
+                <>
+                  <Row
+                    xs={1}
+                    sm={2}
+                    xl={4}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <Col className='mt-3 '>
+                      <LabelFieldComponent
+                        type='search'
+                        icon='Search'
+                        placeholder={`${t('search_here')}`}
+                        labelDir='label-col'
+                        fieldSize='mb-4 w-100 h-md'
+                        value={searchTerm}
+                        onChange={handleSearch}
+                      />
+                    </Col>
+                    <Col style={{ textAlign: 'right', marginBottom: '5px' }}>
+                      <Link to={APP_PREFIX_PATH + `/add-property/${user_id}`}>
+                        <button
+                          type="button"
+                          style={{
+                            background: '#2b77e5',
+                            padding: '7px 13px',
+                            color: '#fff',
+                            borderRadius: '5px'
+                          }}
+                        >
+                          {' '}
+                          <AddIcon className='me-2' /> {t('Add Property')}{' '}
+                        </button>
+                      </Link>
+                    </Col>
+                  </Row>
+
+                  <div style={{ margin: '1rem' }}>
+                    <div className='mc-table-responsive'>
+                      <table className='mc-table'>
+                        <thead className='mc-table-head primary'>
+                          <tr>
+                            <th>
+                              <div className='mc-table-check'>
+                                <p>{t('sno')}</p>
+                              </div>
+                            </th>
+                            <th>{t('Action')}</th>
+                            <th>{t('Property Name')}</th>
+                            <th>{t('No of Rooms')}</th>
+                            <th>{t('No of Halls')}</th>
+                            <th>{t('No of Washrooms')}</th>
+                            <th>{t('Pool')}</th>
+                            <th>{t('Address')}</th>
+                            <th>{t('createtime')}</th>
+                          </tr>
+                        </thead>
+                        <tbody className='mc-table-body even'>
+                          {filteredProperties && filteredProperties.length > 0 ? (
+                            filteredProperties.map((item, index) => (
+                              <tr key={index}>
+                                <td title='id'>
+                                  <div className='mc-table-check'>
+                                    <p>{index + 1}</p>
+                                  </div>
+                                </td>
+                                <td>
+                                  <AnchorComponent
+                                    to={`${APP_PREFIX_PATH}/edit-property/${encode(
+                                      item.property_id
+                                    )}`}
+                                    title='Edit'
+                                    className='material-icons edit'
+                                  >
+                                    edit
+                                  </AnchorComponent>
+
+                                  <AnchorComponent
+                                    onClick={() =>
+                                      handlePropertyDelete(item.property_id)
+                                    }
+                                    title='Delete'
+                                    className='material-icons delete'
+                                  >
+                                    delete
+                                  </AnchorComponent>
+                                </td>
+                                <td>{item.property_name_english || 'NA'}</td>
+                                <td>{item.no_of_rooms || 'NA'}</td>
+                                <td>{item.no_of_halls || 'NA'}</td>
+                                <td>{item.no_of_washroom || 'NA'}</td>
+                                <td>{item.pool || 'NA'}</td>
+                                <td>{item.property_address || 'NA'}</td>
+                                <td>{item.createtime || 'NA'}</td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan='9' style={{ textAlign: 'center' }}>
+                                No data available
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {content === 3 && (
+                <>
+                  <Row
+                    xs={1}
+                    sm={2}
+                    xl={4}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <Col className='mt-3 '>
+                      <LabelFieldComponent
+                        type='search'
+                        icon='Search'
+                        placeholder={`${t('search_here')}`}
+                        labelDir='label-col'
+                        fieldSize='mb-4 w-100 h-md'
+                        value={searchTerm}
+                        onChange={handleSearch}
+                      />
+                    </Col>
+                    <Col style={{ textAlign: 'right', marginBottom: '5px' }}>
+                      <Link to={APP_PREFIX_PATH + `/add-property-advertisement/${user_id}`}>
+                        <button
+                          type="button"
+                          style={{
+                            background: '#2b77e5',
+                            padding: '7px 13px',
+                            color: '#fff',
+                            borderRadius: '5px'
+                          }}
+                        >
+                          {' '}
+                          <AddIcon className='me-2' /> {t('Add Advertisement')}{' '}
+                        </button>
+                      </Link>
+                    </Col>
+                  </Row>
+
+                  <div style={{ margin: '1rem' }}>
+                    <div className='mc-table-responsive'>
+                      <table className='mc-table'>
+                        <thead className='mc-table-head primary'>
+                          <tr>
+                            <th>
+                              <div className='mc-table-check'>
+                                <p>{t('sno')}</p>
+                              </div>
+                            </th>
+                            <th>{t('Action')}</th>
+                            <th>{t('Property Name')}</th>
+                            <th>{t('Guard Name')}</th>
+                            <th>{t('Address')}</th>
+                            <th>{t('Price (1 Day)')}</th>
+                            <th>{t('createtime')}</th>
+                          </tr>
+                        </thead>
+                        <tbody className='mc-table-body even'>
+                          {filteredPropertyAdvertisements && filteredPropertyAdvertisements.length > 0 ? (
+                            filteredPropertyAdvertisements.map((item, index) => (
+                              <tr key={index}>
+                                <td title='id'>
+                                  <div className='mc-table-check'>
+                                    <p>{index + 1}</p>
+                                  </div>
+                                </td>
+                                <td>
+                                  <AnchorComponent
+                                    to={`${APP_PREFIX_PATH}/edit-property-advertisement/${user_id}/${encode(
+                                      item.property_ad_id
+                                    )}`}
+                                    title='Edit'
+                                    className='material-icons edit'
+                                  >
+                                    edit
+                                  </AnchorComponent>
+
+                                  <AnchorComponent
+                                    onClick={() =>
+                                      handlePropertyAdvertisementDelete(item.property_ad_id)
+                                    }
+                                    title='Delete'
+                                    className='material-icons delete'
+                                  >
+                                    delete
+                                  </AnchorComponent>
+                                </td>
+                                <td>{item.property_name_english || 'NA'}</td>
+                                <td>{item.guard_name_english || 'NA'}</td>
+                                <td>{item.address || 'NA'}</td>
+                                <td>{item.one_day_price ? `${item.one_day_price} KWD` : 'NA'}</td>
+                                <td>{item.createtime || 'NA'}</td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan='7' style={{ textAlign: 'center' }}>
+                                No data available
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {content === 4 && (
                 <>
                   <Row
                     xs={1}
@@ -990,6 +1405,7 @@ export default function ViewOwner() {
                     <Col style={{ textAlign: 'right', marginBottom: '5px' }}>
                       <Link to={APP_PREFIX_PATH + `/add-trip/${user_id}`}>
                         <button
+                          type="button"
                           style={{
                             background: '#2b77e5',
                             padding: '7px 13px',
@@ -1013,12 +1429,9 @@ export default function ViewOwner() {
                                 <p>{t('sno')}</p>
                               </div>
                             </th>
-
                             <th>{t('Action')}</th>
                             <th>{t('trip Image')}</th>
                             <th>{t('Trip Id')}</th>
-                            {/* <th>{t('trip name')}</th> */}
-                            {/* <th>{t('Destination')}</th> */}
                             <th>{t('Boat name')}</th>
                             <th>{t('Captain name')}</th>
                             <th>{t('Price per hours')}</th>
@@ -1035,7 +1448,6 @@ export default function ViewOwner() {
                                   </div>
                                 </td>
                                 <td>
-                                  {' '}
                                   <AnchorComponent
                                     to={`${APP_PREFIX_PATH}/view-trip/${encode(
                                       item.trip_id
@@ -1045,16 +1457,6 @@ export default function ViewOwner() {
                                   >
                                     visibility
                                   </AnchorComponent>
-                                  {/* <AnchorComponent
-                                    to={`${APP_PREFIX_PATH}/edit-trip/${encode(
-                                      item.trip_id
-                                    )}`}
-                                    title='View'
-                                    className='material-icons edit'
-                                  >
-                                    visibility
-                                    
-                                  </AnchorComponent> */}
                                   <AnchorComponent
                                     to={`${APP_PREFIX_PATH}/edit-trip/${encode(
                                       item.trip_id
@@ -1093,8 +1495,6 @@ export default function ViewOwner() {
                                   </div>
                                 </td>
                                 <td>#{item.random_id || 'NA'}</td>
-                                {/* <td>{item.trip_name_english || 'NA'}</td> */}
-                                {/* <td>{item.destination_english || 'NA'}</td> */}
                                 <td>{item.boat_name_english || 'NA'}</td>
                                 <td>{item.captain_name_english || 'NA'}</td>
                                 <td>{item.price_per_hour || 'NA'}</td>
@@ -1103,7 +1503,7 @@ export default function ViewOwner() {
                             ))
                           ) : (
                             <tr>
-                              <td colSpan='7' style={{ textAlign: 'center' }}>
+                              <td colSpan='8' style={{ textAlign: 'center' }}>
                                 No data available
                               </td>
                             </tr>
@@ -1114,7 +1514,8 @@ export default function ViewOwner() {
                   </div>
                 </>
               )}
-              {content === 3 && (
+              
+              {content === 5 && (
                 <>
                   <Row
                     xs={1}
@@ -1185,7 +1586,7 @@ export default function ViewOwner() {
                             ))
                           ) : (
                             <tr>
-                              <td colSpan='7' style={{ textAlign: 'center' }}>
+                              <td colSpan='12' style={{ textAlign: 'center' }}>
                                 No data available
                               </td>
                             </tr>
@@ -1196,29 +1597,41 @@ export default function ViewOwner() {
                   </div>
                 </>
               )}
-              {content === 4 && (
+              
+              {content === 6 && (
                 <>
-                  {/* <Row
-                    xs={1}
-                    sm={2}
-                    xl={4}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
-                    }}
-                  >
-                    <Col className='mt-3'>
-                      <LabelFieldComponent
-                        type='search'
-                        icon='Search'
-                        placeholder={`${t('search_here')}`}
-                        labelDir='label-col'
-                        fieldSize='mb-4 w-100 h-md'
-                        value={searchTerm}
-                        onChange={handleSearch} />
-                    </Col>
-                  </Row> */}
+                  {/* Sub-tabs for Boat/Property Unavailability */}
+                  <div className="mb-3">
+                    <nav className="nav nav-pills nav-fill">
+                      <button
+                        type="button"
+                        className={`nav-link ${unavailabilitySubTab === 'boat' ? 'active' : ''}`}
+                        onClick={() => handleUnavailabilitySubTabChange('boat')}
+                        style={{
+                          backgroundColor: unavailabilitySubTab === 'boat' ? '#19918F' : 'transparent',
+                          color: unavailabilitySubTab === 'boat' ? '#fff' : '#19918F',
+                          border: '1px solid #19918F',
+                          marginRight: '10px',
+                          borderRadius: '5px'
+                        }}
+                      >
+                        Boat Unavailability
+                      </button>
+                      <button
+                        type="button"
+                        className={`nav-link ${unavailabilitySubTab === 'property' ? 'active' : ''}`}
+                        onClick={() => handleUnavailabilitySubTabChange('property')}
+                        style={{
+                          backgroundColor: unavailabilitySubTab === 'property' ? '#19918F' : 'transparent',
+                          color: unavailabilitySubTab === 'property' ? '#fff' : '#19918F',
+                          border: '1px solid #19918F',
+                          borderRadius: '5px'
+                        }}
+                      >
+                        Property Unavailability
+                      </button>
+                    </nav>
+                  </div>
 
                   <Row
                     xs={1}
@@ -1242,97 +1655,191 @@ export default function ViewOwner() {
                       />
                     </Col>
                     <Col style={{ textAlign: 'right', marginBottom: '5px' }}>
-                      <Link to={APP_PREFIX_PATH + `/add-unavailability/${user_id}`}>
-                        <button
-                          style={{
-                            background: '#2b77e5',
-                            padding: '7px 13px',
-                            color: '#fff',
-                            borderRadius: '5px'
-                          }}
-                        >
-                          {' '}
-                          <AddIcon className='me-2' /> {t('Add Unavailability')}{' '}
-                        </button>
-                      </Link>
+                      {unavailabilitySubTab === 'boat' ? (
+                        <Link to={APP_PREFIX_PATH + `/add-unavailability/${user_id}`}>
+                          <button
+                            type="button"
+                            style={{
+                              background: '#2b77e5',
+                              padding: '7px 13px',
+                              color: '#fff',
+                              borderRadius: '5px'
+                            }}
+                          >
+                            {' '}
+                            <AddIcon className='me-2' /> {t('Add Boat Unavailability')}{' '}
+                          </button>
+                        </Link>
+                      ) : (
+                        <Link to={APP_PREFIX_PATH + `/add-property-unavailability/${user_id}`}>
+                          <button
+                            type="button"
+                            style={{
+                              background: '#2b77e5',
+                              padding: '7px 13px',
+                              color: '#fff',
+                              borderRadius: '5px'
+                            }}
+                          >
+                            {' '}
+                            <AddIcon className='me-2' /> {t('Add Property Unavailability')}{' '}
+                          </button>
+                        </Link>
+                      )}
                     </Col>
                   </Row>
+
                   <div style={{ margin: '1rem' }}>
-                    <div className='mc-table-responsive'>
-                      <table className='mc-table'>
-                        <thead className='mc-table-head primary'>
-                          <tr>
-                            <th>
-                              <div className='mc-table-check'>
-                                <p>{t('sno')}</p>
-                              </div>
-                            </th>
-                            <th>{t('Action')}</th>
-                            <th>{t('Date')}</th>
-                            <th>{t('boat name')}</th>
-                            {/* <th>{t('type')}</th> */}
-                            <th>{t('from time')}</th>
-                            <th>{t('to time')}</th>
-                            <th>{t('createtime')}</th>
-                          </tr>
-                        </thead>
-                        <tbody className='mc-table-body even'>
-                          {filteredUnavailability &&
-                            filteredUnavailability.length > 0 ? (
-                            filteredUnavailability.map((item, index) => (
-                              <tr key={index}>
-                                <td title='id'>
+                    {loadingUnavailability ? (
+                      <div className="d-flex justify-content-center py-4">
+                        <div className="spinner-border text-primary" role="status">
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className='mc-table-responsive'>
+                        {unavailabilitySubTab === 'boat' ? (
+                          // Boat Unavailability Table
+                          <table className='mc-table'>
+                            <thead className='mc-table-head primary'>
+                              <tr>
+                                <th>
                                   <div className='mc-table-check'>
-                                    <p>{index + 1}</p>
+                                    <p>{t('sno')}</p>
                                   </div>
-                                </td>
-                                <td>
-                                  {' '}
-                                  <AnchorComponent
-                                    to={`${APP_PREFIX_PATH}/edit-unavailability/${encode(
-                                      item.unavailability_id
-                                    )}`}
-                                    title='Edit'
-                                    className='material-icons edit'
-                                  >
-                                    edit
-                                  </AnchorComponent>
-                                  <AnchorComponent
-                                    onClick={() =>
-                                      handleUnavailabilityDelete(item.unavailability_id)
-                                    }
-                                    title='Delete'
-                                    className='material-icons delete'
-                                  >
-                                    delete
-                                  </AnchorComponent>
-                                </td>
-                                <td>{item.date || 'NA'}</td>
-                                <td>{item.boat_name_english || 'NA'}</td>
-                                {/* <td>
-                                  {item.type == 0
-                                    ? 'Full Day'
-                                    : 'Selected Hours' || 'NA'}
-                                </td> */}
-                                <td>{item.from_time || 'NA'}</td>
-                                <td>{item.to_time || 'NA'}</td>
-                                <td>{item.createtime || 'NA'}</td>
+                                </th>
+                                <th>{t('Action')}</th>
+                                <th>{t('Date')}</th>
+                                <th>{t('Boat Name')}</th>
+                                <th>{t('Type')}</th>
+                                <th>{t('From Time')}</th>
+                                <th>{t('To Time')}</th>
+                                <th>{t('Created')}</th>
                               </tr>
-                            ))
-                          ) : (
-                            <tr>
-                              <td colSpan='7' style={{ textAlign: 'center' }}>
-                                No data available
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
+                            </thead>
+                            <tbody className='mc-table-body even'>
+                              {filteredBoatUnavailability && filteredBoatUnavailability.length > 0 ? (
+                                filteredBoatUnavailability.map((item, index) => (
+                                  <tr key={index}>
+                                    <td title='id'>
+                                      <div className='mc-table-check'>
+                                        <p>{index + 1}</p>
+                                      </div>
+                                    </td>
+                                    <td>
+                                      <AnchorComponent
+                                        to={`${APP_PREFIX_PATH}/edit-unavailability/${encode(
+                                          item.unavailability_id
+                                        )}`}
+                                        title='Edit'
+                                        className='material-icons edit'
+                                      >
+                                        edit
+                                      </AnchorComponent>
+                                      <AnchorComponent
+                                        onClick={() =>
+                                          handleBoatUnavailabilityDelete(item.unavailability_id)
+                                        }
+                                        title='Delete'
+                                        className='material-icons delete'
+                                      >
+                                        delete
+                                      </AnchorComponent>
+                                    </td>
+                                    <td>{item.date || 'NA'}</td>
+                                    <td>{item.entity_name || 'NA'}</td>
+                                    <td>
+                                      {item.type == 0 ? 'Full Day' : 'Selected Hours'}
+                                    </td>
+                                    <td>{item.type == 0 ? '00:00' : item.from_time || 'NA'}</td>
+                                    <td>{item.type == 0 ? '23:59' : item.to_time || 'NA'}</td>
+                                    <td>{item.createtime || 'NA'}</td>
+                                  </tr>
+                                ))
+                              ) : (
+                                <tr>
+                                  <td colSpan='8' style={{ textAlign: 'center' }}>
+                                    No boat unavailability data available
+                                  </td>
+                                </tr>
+                              )}
+                            </tbody>
+                          </table>
+                        ) : (
+                          // Property Unavailability Table
+                          <table className='mc-table'>
+                            <thead className='mc-table-head primary'>
+                              <tr>
+                                <th>
+                                  <div className='mc-table-check'>
+                                    <p>{t('sno')}</p>
+                                  </div>
+                                </th>
+                                <th>{t('Action')}</th>
+                                <th>{t('Date')}</th>
+                                <th>{t('Property Name')}</th>
+                                <th>{t('Type')}</th>
+                                <th>{t('From Time')}</th>
+                                <th>{t('To Time')}</th>
+                                <th>{t('Created')}</th>
+                              </tr>
+                            </thead>
+                            <tbody className='mc-table-body even'>
+                              {filteredPropertyUnavailability && filteredPropertyUnavailability.length > 0 ? (
+                                filteredPropertyUnavailability.map((item, index) => (
+                                  <tr key={index}>
+                                    <td title='id'>
+                                      <div className='mc-table-check'>
+                                        <p>{index + 1}</p>
+                                      </div>
+                                    </td>
+                                    <td>
+                                      <AnchorComponent
+                                        to={`${APP_PREFIX_PATH}/edit-property-unavailability/${encode(
+                                          item.unavailability_id
+                                        )}`}
+                                        title='Edit'
+                                        className='material-icons edit'
+                                      >
+                                        edit
+                                      </AnchorComponent>
+                                      <AnchorComponent
+                                        onClick={() =>
+                                          handlePropertyUnavailabilityDelete(item.unavailability_id)
+                                        }
+                                        title='Delete'
+                                        className='material-icons delete'
+                                      >
+                                        delete
+                                      </AnchorComponent>
+                                    </td>
+                                    <td>{item.date || 'NA'}</td>
+                                    <td>{item.entity_name || 'NA'}</td>
+                                    <td>
+                                      {item.type == 0 ? 'Full Day' : 'Selected Hours'}
+                                    </td>
+                                    <td>{item.type == 0 ? '00:00' : item.from_time || 'NA'}</td>
+                                    <td>{item.type == 0 ? '23:59' : item.to_time || 'NA'}</td>
+                                    <td>{item.createtime || 'NA'}</td>
+                                  </tr>
+                                ))
+                              ) : (
+                                <tr>
+                                  <td colSpan='8' style={{ textAlign: 'center' }}>
+                                    No property unavailability data available
+                                  </td>
+                                </tr>
+                              )}
+                            </tbody>
+                          </table>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </>
               )}
-              {content === 5 && (
+              
+              {content === 7 && (
                 <>
                   <Row
                     xs={1}
@@ -1359,7 +1866,9 @@ export default function ViewOwner() {
                   <div style={{ margin: '1rem' }}>
                     {loadingBookings ? (
                       <div className="d-flex justify-content-center py-4">
-                        <Spinner animation="border" variant="primary" />
+                        <div className="spinner-border text-primary" role="status">
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
                       </div>
                     ) : (
                       <div className='mc-table-responsive'>
@@ -1372,22 +1881,20 @@ export default function ViewOwner() {
                                 </div>
                               </th>
                               <th>{t("user name")}</th>
-                              <th>{t("trip booking id")}</th>
+                              <th>{t("booking id")}</th>
                               <th>{t("owner name")}</th>
-                              <th>{t("trip price (KWD/Hr)")}</th>
+                              <th>{t("price (KWD/Hr)")}</th>
                               <th>{t("Booking Date")}</th>
                               <th>{t("Status")}</th>
                               <th>{t("Cancel Reason")}</th>
-                              <th>{t("Booking Hours")}</th>
+                              <th>{t("Hours")}</th>
                               <th>{t("Booking Time")}</th>
-                              <th>{t("Total Amount (KWD)")}</th>
+                              <th>{t("Total Amount")}</th>
                               <th>{t("transaction ID")}</th>
                               <th>{t("Booked On")}</th>
                             </tr>
                           </thead>
                           <tbody className='mc-table-body even'>
-
-
                             {filteredBookings.length > 0 ? (
                               filteredBookings.map((item, index) => (
                                 <tr key={index}>
@@ -1403,57 +1910,15 @@ export default function ViewOwner() {
                                   <td>{item.ownerName || 'NA'}</td>
                                   <td>{item.price_per_hour || 'NA'}</td>
                                   <td>{item.date || 'NA'}</td>
-                                  {/* <td>
-                                    <p
-                                      style={{
-                                        padding: '4px 12px',
-                                        borderRadius: '999px',
-                                        backgroundColor:
-                                          item.trip_status === 0
-                                            ? '#FFF3CD' // yellow
-                                            : item.trip_status === 1
-                                              ? '#CCE5FF' // blue
-                                              : item.trip_status === 2
-                                                ? '#D4EDDA' // green
-                                                : item.trip_status === 3
-                                                  ? '#F8D7DA' // red
-                                                  : '#E2E3E5',
-                                        color:
-                                          item.trip_status === 0
-                                            ? '#856404'
-                                            : item.trip_status === 1
-                                              ? '#004085'
-                                              : item.trip_status === 2
-                                                ? '#155724'
-                                                : item.trip_status === 3
-                                                  ? '#721c24'
-                                                  : '#383d41',
-                                        fontSize: '14px',
-                                        fontWeight: 500,
-                                        display: 'inline-block',
-                                      }}
-                                    >
-                                      {item.trip_status === 0
-                                        ? 'Pending'
-                                        : item.trip_status === 1
-                                          ? 'Ongoing'
-                                          : item.trip_status === 2
-                                            ? 'Completed'
-                                            : item.trip_status === 3
-                                              ? 'Canceled'
-                                              : 'NA'}
-                                    </p>
-                                  </td> */}
-
                                   <td>
                                     <p
                                       style={{
                                         padding: '4px 12px',
                                         borderRadius: '999px',
                                         backgroundColor:
-                                          item.cancle_status === 0 ? '#D4EDDA' : '#F8D7DA', // green or red
+                                          item.cancle_status === 0 ? '#D4EDDA' : '#F8D7DA',
                                         color:
-                                          item.cancle_status === 0 ? '#155724' : '#721c24', // text color
+                                          item.cancle_status === 0 ? '#155724' : '#721c24',
                                         fontSize: '14px',
                                         fontWeight: 500,
                                         display: 'inline-block',
@@ -1462,15 +1927,13 @@ export default function ViewOwner() {
                                       {item.cancle_status === 0 ? 'Confirmed' : 'Cancelled'}
                                     </p>
                                   </td>
-
                                   <td>{item.cancle_reason || 'NA'}</td>
                                   <td>{item.hours || 'NA'}</td>
                                   <td>{item.booking_time || 'NA'}</td>
                                   <td>{item.total_amount || 'NA'}</td>
-                                  <td>{item.transaction_id || 'NA'} </td>
+                                  <td>{item.transaction_id || 'NA'}</td>
                                   <td>{item.createtime || 'NA'}</td>
                                 </tr>
-
                               ))
                             ) : (
                               <tr>
@@ -1479,8 +1942,6 @@ export default function ViewOwner() {
                                 </td>
                               </tr>
                             )}
-
-
                           </tbody>
                         </table>
                       </div>
