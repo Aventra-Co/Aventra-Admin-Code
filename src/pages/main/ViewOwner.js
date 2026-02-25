@@ -8,12 +8,16 @@ import { encode } from 'base-64'
 import { decode } from 'base-64'
 import { AnchorComponent, ButtonComponent } from '../../components/elements'
 import './UserProfilePage.css'
+import VisibilityIcon from '@mui/icons-material/Visibility'
 import { API_URL, IMAGE_PATH, APP_PREFIX_PATH } from '../../constant/constant'
 import { SyncLoader } from 'react-spinners'
 import LabelFieldComponent from '../../components/fields/LabelFieldComponent'
 import AddIcon from '@mui/icons-material/Add'
 import Swal from 'sweetalert2'
 import { Helmet } from 'react-helmet-async'
+import { 
+  Box
+} from '@mui/material'
 
 export default function ViewOwner() {
   const { t } = useContext(TranslatorContext)
@@ -843,7 +847,7 @@ export default function ViewOwner() {
                       setSearchTerm('')
                     }}
                   >
-                    {t('Property Advertisement')}
+                    {t('Advertisement')}
                   </button>
                   <button
                     type="button"
@@ -1337,7 +1341,7 @@ export default function ViewOwner() {
                                     <p>{index + 1}</p>
                                   </div>
                                 </td>
-                                <td>
+                                {/* <td>
                                   <AnchorComponent
                                     to={`${APP_PREFIX_PATH}/edit-property-advertisement/${user_id}/${encode(
                                       item.property_ad_id
@@ -1357,7 +1361,48 @@ export default function ViewOwner() {
                                   >
                                     delete
                                   </AnchorComponent>
-                                </td>
+                                </td> */}
+
+                                <td>
+  <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+    {/* View Button */}
+    <AnchorComponent
+      to={`${APP_PREFIX_PATH}/view-property-advertisement/${encode(item.property_ad_id)}`}
+      title='View'
+      className='material-icons visibility'
+      style={{ 
+        color: '#1E88E5',
+        fontSize: '20px',
+        cursor: 'pointer',
+        '&:hover': {
+          color: '#0D47A1'
+        }
+      }}
+    >
+      visibility
+    </AnchorComponent>
+
+    {/* Edit Button */}
+    <AnchorComponent
+      to={`${APP_PREFIX_PATH}/edit-property-advertisement/${user_id}/${encode(item.property_ad_id)}`}
+      title='Edit'
+      className='material-icons edit'
+      style={{ color: '#28a745' }}
+    >
+      edit
+    </AnchorComponent>
+
+    {/* Delete Button */}
+    <AnchorComponent
+      onClick={() => handlePropertyAdvertisementDelete(item.property_ad_id)}
+      title='Delete'
+      className='material-icons delete'
+      style={{ color: '#dc3545' }}
+    >
+      delete
+    </AnchorComponent>
+  </Box>
+</td>
                                 <td>{item.property_name_english || 'NA'}</td>
                                 <td>{item.guard_name_english || 'NA'}</td>
                                 <td>{item.address || 'NA'}</td>

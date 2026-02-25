@@ -50,6 +50,7 @@ import EditPropertyAdvertisement from "./pages/main/EditPropertyAdvertisement";
 import AddProperty from "./pages/main/AddProperty";
 import EditProperty from "./pages/main/EditProperty";
 import AddPropertyUnavailability from "./pages/main/AddPropertyUnavailability";
+import ViewPropertyAdvertisement from "./pages/main/ViewPropertyAdvertisement";
 
 const router = createBrowserRouter([
 
@@ -126,6 +127,7 @@ const router = createBrowserRouter([
     { path: APP_PREFIX_PATH + "/edit-property/:property_id", element: <EditProperty /> },
     { path: APP_PREFIX_PATH + "/add-property-advertisement/:user_id", element: <ManagePropertyAdvertisement /> },
     { path: APP_PREFIX_PATH + "/edit-property-advertisement/:user_id/:property_ad_id", element: <EditPropertyAdvertisement /> },
+    { path: APP_PREFIX_PATH + "/view-property-advertisement/:property_ad_id", element: <ViewPropertyAdvertisement /> },
     { path: APP_PREFIX_PATH + "/edit-trip/:trip_id", element: <EditTrip /> },
     { path: APP_PREFIX_PATH + "/edit-staff/:user_id", element: <EditStaff /> },
     { path: APP_PREFIX_PATH + "/add-unavailability/:owner_id", element: <Addunavailability /> },
