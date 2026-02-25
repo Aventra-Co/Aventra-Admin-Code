@@ -51,6 +51,8 @@ import AddProperty from "./pages/main/AddProperty";
 import EditProperty from "./pages/main/EditProperty";
 import AddPropertyUnavailability from "./pages/main/AddPropertyUnavailability";
 import ViewPropertyAdvertisement from "./pages/main/ViewPropertyAdvertisement";
+import ManagePropertyBookingListPage from "./pages/main/ManagePropertyBookingListPage";
+import PropertyAdvertisementListPage from "./pages/main/PropertyAdvertisementListPage";
 
 const router = createBrowserRouter([
 
@@ -84,6 +86,7 @@ const router = createBrowserRouter([
     { path: APP_PREFIX_PATH + "/edit-trip-type/:trip_type_id", element: <EditTripType /> },
     { path: APP_PREFIX_PATH + "/manage-coupon-code", element: <CouponCodeListPage /> },
     { path: APP_PREFIX_PATH + "/manage-trips", element: <TripListPage /> },
+    { path: APP_PREFIX_PATH + "/property-advertisement", element: <PropertyAdvertisementListPage /> },
     { path: APP_PREFIX_PATH + "/view-trip/:trip_id", element: <TripViewPage /> },
     { path: APP_PREFIX_PATH + "/view-faq/:faq_id", element: <ViewFaq /> },
     { path: APP_PREFIX_PATH + "/manage-destination", element: <DestinationListPage /> },
@@ -108,6 +111,7 @@ const router = createBrowserRouter([
     { path: APP_PREFIX_PATH + "/staff-report", element: <StaffTabularReport /> },
     { path: APP_PREFIX_PATH + "/staff-analytical-report", element: <StaffAnalyticalReport /> },
     { path: APP_PREFIX_PATH + "/manage-booking", element: <ManageBookingListPage /> },
+    { path: APP_PREFIX_PATH + "/manage-property-booking", element: <ManagePropertyBookingListPage /> },
     { path: APP_PREFIX_PATH + "/manage-contactus", element: <ContactUsListPage /> },
     { path: APP_PREFIX_PATH + "/user-analytical-report", element: <UserAnalyticalReport /> },
     { path: APP_PREFIX_PATH + "/owner-analytical-report", element: <OwnerAnalyticalReport /> },

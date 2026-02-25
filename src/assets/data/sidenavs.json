@@ -90,6 +90,11 @@
                 "text": "Manage Trips"
             },
             {
+                "path": "/property-advertisement",
+                "icon": "DirectionsBoatIcon",
+                "text": "Property Advertisement"
+            },
+            {
                 "path": "/manage-addons",
                 "icon": "DataSaverOnIcon",
                 "text": "Manage Addons"
@@ -103,6 +108,11 @@
                 "path": "/manage-booking",
                 "icon": "FactCheckIcon",
                 "text": "Manage Booking"
+            },
+            {
+                "path": "/manage-property-booking",
+                "icon": "FactCheckIcon",
+                "text": "Manage Property Booking"
             },
             {
                 "path": "/manage-commision",

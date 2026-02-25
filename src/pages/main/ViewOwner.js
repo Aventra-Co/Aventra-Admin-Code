@@ -1647,7 +1647,7 @@ export default function ViewOwner() {
                 <>
                   {/* Sub-tabs for Boat/Property Unavailability */}
                   <div className="mb-3">
-                    <nav className="nav nav-pills nav-fill">
+                    <nav className="nav nav-pills" style={{ display: 'flex', gap: '10px' }}>
                       <button
                         type="button"
                         className={`nav-link ${unavailabilitySubTab === 'boat' ? 'active' : ''}`}
@@ -1657,7 +1657,11 @@ export default function ViewOwner() {
                           color: unavailabilitySubTab === 'boat' ? '#fff' : '#19918F',
                           border: '1px solid #19918F',
                           marginRight: '10px',
-                          borderRadius: '5px'
+                          borderRadius: '5px',
+                          padding: '10px 16px',  
+        fontSize: '16px',      
+        minHeight: '48px', 
+        // width:'20px'
                         }}
                       >
                         Boat Unavailability
@@ -1670,7 +1674,11 @@ export default function ViewOwner() {
                           backgroundColor: unavailabilitySubTab === 'property' ? '#19918F' : 'transparent',
                           color: unavailabilitySubTab === 'property' ? '#fff' : '#19918F',
                           border: '1px solid #19918F',
-                          borderRadius: '5px'
+                          borderRadius: '5px',
+                          padding: '10px 16px',  
+        fontSize: '16px',      
+        minHeight: '48px',
+        // width:'20px'
                         }}
                       >
                         Property Unavailability

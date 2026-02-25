@@ -107,7 +107,7 @@ export default function ViewPropertyAdvertisement() {
       <PageLayout>
         <div className="text-center py-5">
           <h4>Property advertisement not found</h4>
-          <Link to={`${APP_PREFIX_PATH}/manage-property-advertisements`} className="btn btn-primary mt-3">
+          <Link to={`${APP_PREFIX_PATH}/property-advertisement`} className="btn btn-primary mt-3">
             Back to Property Advertisements
           </Link>
         </div>
@@ -128,7 +128,7 @@ export default function ViewPropertyAdvertisement() {
                 </Link>
               </li>
               <li className='mc-breadcrumb-item'>
-                <Link to={`${APP_PREFIX_PATH}/manage-property-advertisements`} className='mc-breadcrumb-link'>
+                <Link to={`${APP_PREFIX_PATH}/property-advertisement`} className='mc-breadcrumb-link'>
                   {t('property advertisements')}
                 </Link>
               </li>
@@ -139,367 +139,296 @@ export default function ViewPropertyAdvertisement() {
       </Col>
 
       <div className='mc-card p-lg-4'>
-        <Row>
-          <Col xl={4}>
-            <div className='mc-user-group'>
-              <div className=''>
-                <div className=''>
-                  <img
-                    src={
-                      propertyData.images && propertyData.images.length > 0
-                        ? `${IMAGE_PATH}${propertyData.images.find(img => img.is_cover === 1)?.image_path || propertyData.images[0]?.image_path}`
-                        : `${IMAGE_PATH}property-placeholder.jpg`
-                    }
-                    alt='Property'
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      borderRadius: '5%',
-                      cursor: 'pointer'
-                    }}
-                    onClick={() =>
-                      handleImageClick(
-                        propertyData.images && propertyData.images.length > 0
-                          ? `${IMAGE_PATH}${propertyData.images.find(img => img.is_cover === 1)?.image_path || propertyData.images[0]?.image_path}`
-                          : `${IMAGE_PATH}property-placeholder.jpg`
-                      )
-                    }
-                    onKeyDown={e => {
-                      if (e.key === 'Enter') {
-                        handleImageClick(
-                          propertyData.images && propertyData.images.length > 0
-                            ? `${IMAGE_PATH}${propertyData.images.find(img => img.is_cover === 1)?.image_path || propertyData.images[0]?.image_path}`
-                            : `${IMAGE_PATH}property-placeholder.jpg`
-                        )
-                      }
-                    }}
-                    role='button'
-                    tabIndex={0}
-                  />
-
-                  {showImagePopup && (
-                    <div
-                      className='enlarged-image-overlay'
-                      onClick={handleCloseImage}
-                      onKeyDown={e => {
-                        if (e.key === 'Escape') {
-                          handleCloseImage()
-                        }
-                      }}
-                      role='button'
-                      tabIndex={0}
-                    >
-                      <span
-                        className='close-button'
-                        onClick={handleCloseImage}
-                        onKeyDown={e => {
-                          if (e.key === 'Enter') {
-                            handleCloseImage()
-                          }
-                        }}
-                        role='button'
-                        tabIndex={0}
-                      >
-                        &times;
-                      </span>
-                      <img
-                        src={enlargedImage}
-                        alt='Enlarged Property'
-                        className='enlarged-image'
-                        style={{ width: '30rem', height: '30rem' }}
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </Col>
-
-          <Col xl={8}>
-            <h6 className='mc-divide-title mb-0 ms-2'>{t('Property Details')}</h6>
-            <div className='mc-product-view-info-group'>
-              <div className='col-lg-12 content'>
-                <div className='mobile-view'>
-                  {/* Basic Information */}
-                
-
-
+        <h6 className='mc-divide-title mb-3 ms-2'>{t('Property Details')}</h6>
+        <div className='mc-product-view-info-group'>
+          <div className='col-lg-12 content'>
+            <div className='mobile-view'>
+              {/* Two Column Layout for Property Details */}
+              <Row>
+                {/* Left Column */}
+                <Col md={6}>
+                  {/* Property Name (English) */}
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
                       <h6>{t('Property Name (English)')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.property_name_english || 'NA'}
                       </span>
                     </div>
                   </div>
 
+                  {/* Property Name (Arabic) */}
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
                       <h6>{t('Property Name (Arabic)')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.property_name_arabic || 'NA'}
                       </span>
                     </div>
                   </div>
 
-                  {/* Guard Information */}
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
+                      <h6>{t('Owner Name')}:</h6>
+                    </div>
+                    <div className='col-lg-7'>
+                      <span style={{ fontWeight: '400' }}>
+                        {propertyData.name || 'NA'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Guard Name */}
+                  <div className='row mt-2'>
+                    <div className='col-lg-5'>
                       <h6>{t('Guard Name')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.guard_name_english || 'NA'}
                       </span>
                     </div>
                   </div>
 
-                  {/* <div className='row mt-2'>
-                    <div className='col-lg-4'>
-                      <h6>{t('Guard Name (Arabic)')}:</h6>
-                    </div>
-                    <div className='col-lg-8'>
-                      <span style={{ fontWeight: '400' }}>
-                        {propertyData.guard_name_arabic || 'NA'}
-                      </span>
-                    </div>
-                  </div> */}
-
+                  {/* Guard Number */}
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
                       <h6>{t('Guard Number')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
-                        {propertyData.guard_number || 'NA'}
+                        {propertyData.guard_number ? "+965 " + propertyData.guard_number : 'NA'}
                       </span>
                     </div>
                   </div>
 
+                  {/* Guard Gender */}
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
                       <h6>{t('Guard Gender')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {getGenderLabel(propertyData.gender)}
                       </span>
                     </div>
                   </div>
 
-                  {/* Location Information */}
+                  {/* Country */}
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
                       <h6>{t('Country')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.country_name || 'NA'}
                       </span>
                     </div>
                   </div>
 
+                  {/* City */}
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
                       <h6>{t('City')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.city_name || 'NA'}
                       </span>
                     </div>
                   </div>
 
+                  {/* Destination */}
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
                       <h6>{t('Destination')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.destination_name || 'NA'}
                       </span>
                     </div>
                   </div>
 
+                  {/* Address */}
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
                       <h6>{t('Address')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.address || 'NA'}
                       </span>
                     </div>
                   </div>
 
+                 {/* Max Adults */}
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
-                      <h6>{t('Latitude')}:</h6>
-                    </div>
-                    <div className='col-lg-8'>
-                      <span style={{ fontWeight: '400' }}>
-                        {propertyData.latitude || 'NA'}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className='row mt-2'>
-                    <div className='col-lg-4'>
-                      <h6>{t('Longitude')}:</h6>
-                    </div>
-                    <div className='col-lg-8'>
-                      <span style={{ fontWeight: '400' }}>
-                        {propertyData.longitude || 'NA'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Capacity */}
-                  <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
                       <h6>{t('Max Adults')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.max_adult || 'NA'}
                       </span>
                     </div>
                   </div>
 
+                  {/* Max Children */}
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
                       <h6>{t('Max Children')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.max_child || 'NA'}
                       </span>
                     </div>
                   </div>
 
+
+                </Col>
+
+                {/* Right Column */}
+                <Col md={6}>
+             
+
+                 
+
                   {/* Amenities */}
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
                       <h6>{t('Amenities')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.amenity_names_string || 'NA'}
                       </span>
                     </div>
                   </div>
 
-                  {/* Pricing */}
+                  {/* One Day Price */}
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
                       <h6>{t('One Day Price')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.one_day_price ? `${propertyData.one_day_price} KWD` : 'NA'}
                       </span>
                     </div>
                   </div>
 
+                  {/* Weekday Price */}
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
                       <h6>{t('Weekday Price')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.weekday_price ? `${propertyData.weekday_price} KWD` : 'NA'}
                       </span>
                     </div>
                   </div>
 
+                  {/* Weekend Price */}
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
                       <h6>{t('Weekend Price')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.weekend_price ? `${propertyData.weekend_price} KWD` : 'NA'}
                       </span>
                     </div>
                   </div>
 
+                  {/* Full Week Price */}
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
                       <h6>{t('Full Week Price')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.full_week_price ? `${propertyData.full_week_price} KWD` : 'NA'}
                       </span>
                     </div>
                   </div>
 
-                  {/* Discounts & Offers */}
+                  {/* Discount Percentage */}
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
                       <h6>{t('Discount Percentage')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.discount_percentage ? `${propertyData.discount_percentage}%` : 'NA'}
                       </span>
                     </div>
                   </div>
 
+                  {/* Coupon Code */}
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
                       <h6>{t('Coupon Code')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.coupon_code || 'NA'}
                       </span>
                     </div>
                   </div>
 
+                  {/* Coupon Discount */}
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
                       <h6>{t('Coupon Discount')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.coupon_discount ? `${propertyData.coupon_discount}%` : 'NA'}
                       </span>
                     </div>
                   </div>
 
+                  {/* Free Cancel Days */}
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
                       <h6>{t('Free Cancel Days')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.free_cancel_days || 'NA'}
                       </span>
                     </div>
                   </div>
 
+                  {/* Pet Friendly */}
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-5'>
                       <h6>{t('Pet Friendly')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.pet_friendly === 1 ? 'Yes' : 'No'}
                       </span>
                     </div>
                   </div>
+                </Col>
+              </Row>
 
-                  {/* Descriptions */}
+              {/* Descriptions - Full Width Below */}
+              <Row className='mt-4'>
+                <Col md={12}>
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-2'>
                       <h6>{t('Description (English)')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-10'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.description_english || 'NA'}
                       </span>
@@ -507,24 +436,20 @@ export default function ViewPropertyAdvertisement() {
                   </div>
 
                   <div className='row mt-2'>
-                    <div className='col-lg-4'>
+                    <div className='col-lg-2'>
                       <h6>{t('Description (Arabic)')}:</h6>
                     </div>
-                    <div className='col-lg-8'>
+                    <div className='col-lg-10'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.description_arabic || 'NA'}
                       </span>
                     </div>
                   </div>
-
-                 
-
-                 
-                </div>
-              </div>
+                </Col>
+              </Row>
             </div>
-          </Col>
-        </Row>
+          </div>
+        </div>
 
         <Card.Body className='mt-5'>
           <Form>
@@ -692,6 +617,41 @@ export default function ViewPropertyAdvertisement() {
           </Form>
         </Card.Body>
       </div>
+
+      {/* Image Popup Modal */}
+      {showImagePopup && (
+        <div
+          className='enlarged-image-overlay'
+          onClick={handleCloseImage}
+          onKeyDown={e => {
+            if (e.key === 'Escape') {
+              handleCloseImage()
+            }
+          }}
+          role='button'
+          tabIndex={0}
+        >
+          <span
+            className='close-button'
+            onClick={handleCloseImage}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                handleCloseImage()
+              }
+            }}
+            role='button'
+            tabIndex={0}
+          >
+            &times;
+          </span>
+          <img
+            src={enlargedImage}
+            alt='Enlarged Property'
+            className='enlarged-image'
+            style={{ maxWidth: '90%', maxHeight: '90%', objectFit: 'contain' }}
+          />
+        </div>
+      )}
     </PageLayout>
   )
 }
