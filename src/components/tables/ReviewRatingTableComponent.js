@@ -86,6 +86,20 @@ export default function ReviewRatingTableComponent({ thead, tbody }) {
         })
     }
 
+    // Helper function to render stars based on rating value
+    const renderStars = (rating) => {
+        if (!rating || rating === 0) return "NA";
+        
+        const roundedRating = Math.round(rating);
+        const stars = [];
+        
+        for (let i = 0; i < roundedRating; i++) {
+            stars.push(<i key={i} className="material-icons star-icon">star</i>);
+        }
+        
+        return stars;
+    };
+
     return (
         <>
             <Row xs={1} sm={2} xl={4} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -155,99 +169,43 @@ export default function ReviewRatingTableComponent({ thead, tbody }) {
                                 </td>
                                 <td>
                                     <span>
-                                        {item.total_rating ? (
-                                            [...Array(item.total_rating)].map((_, index) => (
-                                                <i key={index} className="material-icons star-icon">star</i>
-                                            ))
-                                        ) : (
-                                            "NA"
-                                        )}
+                                        {renderStars(item.total_rating)}
                                     </span>
                                 </td>
 
-                                {/* <td> <span>{item.captain || 'NA'}</span></td>
-                                <td> <span>{item.clean || 'NA'}</span></td>
-                                <td> <span>{item.time || 'NA'}</span></td>
-                                <td> <span>{item.hospitality || 'NA'}</span></td>
-                                <td> <span>{item.equipment || 'NA'}</span></td>
-                                <td> <span>{item.food || 'NA'}</span></td>
-                                <td> <span>{item.entertainment || 'NA'}</span></td> */}
-
                                 <td>
                                     <span>
-                                        {item.captain ? (
-                                            [...Array(Math.round(item.captain))].map((_, index) => (
-                                                <i key={index} className="material-icons star-icon">star</i>
-                                            ))
-                                        ) : (
-                                            "NA"
-                                        )}
+                                        {renderStars(item.captain)}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        {item.clean ? (
-                                            [...Array(Math.round(item.clean))].map((_, index) => (
-                                                <i key={index} className="material-icons star-icon">star</i>
-                                            ))
-                                        ) : (
-                                            "NA"
-                                        )}
+                                        {renderStars(item.clean)}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        {item.time ? (
-                                            [...Array(Math.round(item.time))].map((_, index) => (
-                                                <i key={index} className="material-icons star-icon">star</i>
-                                            ))
-                                        ) : (
-                                            "NA"
-                                        )}
+                                        {renderStars(item.time)}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        {item.hospitality ? (
-                                            [...Array(Math.round(item.hospitality))].map((_, index) => (
-                                                <i key={index} className="material-icons star-icon">star</i>
-                                            ))
-                                        ) : (
-                                            "NA"
-                                        )}
+                                        {renderStars(item.hospitality)}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        {item.equipment ? (
-                                            [...Array(Math.round(item.equipment))].map((_, index) => (
-                                                <i key={index} className="material-icons star-icon">star</i>
-                                            ))
-                                        ) : (
-                                            "NA"
-                                        )}
+                                        {renderStars(item.equipment)}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        {item.food ? (
-                                            [...Array(Math.round(item.food))].map((_, index) => (
-                                                <i key={index} className="material-icons star-icon">star</i>
-                                            ))
-                                        ) : (
-                                            "NA"
-                                        )}
+                                        {renderStars(item.food)}
                                     </span>
                                 </td>
                                 <td>
                                     <span>
-                                        {item.entertainment ? (
-                                            [...Array(Math.round(item.entertainment))].map((_, index) => (
-                                                <i key={index} className="material-icons star-icon">star</i>
-                                            ))
-                                        ) : (
-                                            "NA"
-                                        )}
+                                        {renderStars(item.entertainment)}
                                     </span>
                                 </td>
 
@@ -301,20 +259,6 @@ export default function ReviewRatingTableComponent({ thead, tbody }) {
                             <div className="review-details">
                                 <p><strong>{t("User Name")}:</strong> {selectedReview.user_name || 'NA'}</p>
                                 <p><strong>{t("Boat Name")}:</strong> {selectedReview.boat_name_english || 'NA'}</p>
-                                {/* <p><strong>{t("Rating")}:</strong> 
-                                    {selectedReview.total_rating ? (
-                                        [...Array(selectedReview.total_rating)].map((_, index) => (
-                                            <i key={index} className="material-icons star-icon">star</i>
-                                        ))
-                                    ) : "NA"}
-                                </p> */}
-                                {/* <p><strong>{t("Time")}:</strong> {selectedReview.time || 'NA'}</p>
-                                <p><strong>{t("Clean")}:</strong> {selectedReview.clean || 'NA'}</p>
-                                <p><strong>{t("Hospitality")}:</strong> {selectedReview.hospitality || 'NA'}</p>
-                                <p><strong>{t("Captain")}:</strong> {selectedReview.captain || 'NA'}</p>
-                                <p><strong>{t("Food")}:</strong> {selectedReview.food || 'NA'}</p>
-                                <p><strong>{t("Entertainment")}:</strong> {selectedReview.food || 'NA'}</p>
-                                <p><strong>{t("Equipment")}:</strong> {selectedReview.food || 'NA'}</p> */}
                                 <p><strong>{t("Total Rating")}:</strong> {selectedReview.total_rating || 'NA'}</p>
                                 <p><strong>{t("Review")}:</strong> {selectedReview.review || 'NA'}</p>
                                 <p><strong>{t("Created Time")}:</strong> {selectedReview.createtime || 'NA'}</p>
@@ -329,3 +273,4 @@ export default function ReviewRatingTableComponent({ thead, tbody }) {
         </>
     );
 }
+

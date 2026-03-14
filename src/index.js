@@ -53,6 +53,7 @@ import AddPropertyUnavailability from "./pages/main/AddPropertyUnavailability";
 import ViewPropertyAdvertisement from "./pages/main/ViewPropertyAdvertisement";
 import ManagePropertyBookingListPage from "./pages/main/ManagePropertyBookingListPage";
 import PropertyAdvertisementListPage from "./pages/main/PropertyAdvertisementListPage";
+import PropertyTypeListPage from "./pages/main/PropertyTypeListPage";
 
 const router = createBrowserRouter([
 
@@ -77,6 +78,7 @@ const router = createBrowserRouter([
     { path: APP_PREFIX_PATH + "/edit-role/:role_id", element: <EditRole /> },
     { path: APP_PREFIX_PATH + "/manage-banner", element: <BannerListPage /> },
     { path: APP_PREFIX_PATH + "/manage-country", element: <CountryListPage /> },
+    { path: APP_PREFIX_PATH + "/manage-property-type", element: <PropertyTypeListPage /> },
     { path: APP_PREFIX_PATH + "/manage-city", element: <CityListPage /> },
     { path: APP_PREFIX_PATH + "/help-and-support", element: <HelpAndSupport /> },
     { path: APP_PREFIX_PATH + "/manage-faq", element: <FaqPage /> },

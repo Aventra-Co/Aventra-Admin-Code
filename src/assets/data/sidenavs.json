@@ -90,8 +90,13 @@
                 "text": "Manage Trips"
             },
             {
+                "path": "/manage-property-type",
+                "icon": "ApartmentIcon",
+                "text": "Manage Property Type"
+            },
+            {
                 "path": "/property-advertisement",
-                "icon": "DirectionsBoatIcon",
+                "icon": "ApartmentIcon",
                 "text": "Property Advertisement"
             },
             {

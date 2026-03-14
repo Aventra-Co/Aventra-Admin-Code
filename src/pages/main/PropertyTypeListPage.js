@@ -9,7 +9,8 @@ import PaginationComponent from "../../components/PaginationComponent";
 import usersData from "../../assets/data/users.json";
 import { APP_PREFIX_PATH } from "../../constant/constant";
 import { Helmet } from "react-helmet-async";
-export default function CountryListPage() {
+import PropertyTypeTableComponent from "../../components/tables/PropertyTypeTableComponent";
+export default function PropertyTypeListPage() {
     const { t } = useContext(TranslatorContext);
     const [currentPage, setCurrentPage] = useState(1);
     const entriesPerPage = 5;
@@ -29,11 +30,11 @@ export default function CountryListPage() {
                 <Col xl={12}>
                     <div className="mc-card">
                         <div className='mc-breadcrumb'>
-                            <h3 className="mc-breadcrumb-title">{t('manage_country')}</h3>
+                            <h3 className="mc-breadcrumb-title">{t('manage property type')}</h3>
                             <ul className="mc-breadcrumb-list">
                                 <li className="mc-breadcrumb-item"><Link to={`${APP_PREFIX_PATH + '/dashboard'}`} className="mc-breadcrumb-link">{t('home')}</Link></li>
                                 <li className="mc-breadcrumb-item"><Link to='#' className="mc-breadcrumb-link">{t('country')}</Link></li>
-                                <li className="mc-breadcrumb-item">{t('country_list')}</li>
+                                <li className="mc-breadcrumb-item">{t('manage property type')}</li>
                             </ul>
                         </div>
                     </div> 
@@ -41,11 +42,11 @@ export default function CountryListPage() {
                 <Col xl={12}>
                     <div className="mc-card">
                         <div className="mc-card-header">
-                            <h4 className="mc-card-title">{t('manage_country')}</h4>
+                            <h4 className="mc-card-title">{t('manage property type')}</h4>
                         </div>
 
 
-                        <CountryTableComponent
+                        <PropertyTypeTableComponent
                             thead={usersData.thead}
                             tbody={currentUsers}
                         />
