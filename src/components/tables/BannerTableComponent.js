@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 import { TranslatorContext } from "../../context/Translator";
-import { Modal, Form } from "react-bootstrap";
+import { Modal, Form, Nav } from "react-bootstrap";
 import { ButtonComponent, AnchorComponent } from "../elements";
 import axios from "axios";
-import Select from 'react-select';
 import { encode } from 'base-64';
 import { API_URL, APP_PREFIX_PATH, IMAGE_PATH } from "../../constant/constant";
 import PaginationComponent from "../PaginationComponent";
@@ -11,10 +10,8 @@ import { Row, Col } from "react-bootstrap";
 import LabelFieldComponent from "../fields/LabelFieldComponent";
 import { Link } from "react-router-dom";
 import AddIcon from '@mui/icons-material/Add';
-import categoryImage from '../../assets/img/category.webp';
 import { SyncLoader } from 'react-spinners'
 import Swal from 'sweetalert2';
-
 
 export default function BannerTableComponent({ thead, tbody }) {
     const { t } = useContext(TranslatorContext);
@@ -35,6 +32,7 @@ export default function BannerTableComponent({ thead, tbody }) {
     const [enlargedImage, setEnlargedImage] = useState(null);
     const [showImagePopup, setShowImagePopup] = useState(false);
     const [ownerName, setownerName] = useState('')
+    const [activeTab, setActiveTab] = useState('boat'); // 'boat' or 'property'
 
     const [searchTerm, setSearchTerm] = useState("");
     const entriesPerPage = 50;
@@ -42,12 +40,13 @@ export default function BannerTableComponent({ thead, tbody }) {
     const indexOfLastEntry = currentPage * entriesPerPage;
     const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
 
-
     const filteredUsers = BannerDetails.filter((user) => {
         const lowercasedTerm = searchTerm.toLowerCase();
         return (
             user.link?.toLowerCase().includes(lowercasedTerm) ||
-            user.createtime?.toLowerCase().includes(lowercasedTerm)
+            user.createtime?.toLowerCase().includes(lowercasedTerm) ||
+            user.l_name?.toLowerCase().includes(lowercasedTerm) ||
+            user.random_id?.toLowerCase().includes(lowercasedTerm)
         );
     });
 
@@ -63,7 +62,7 @@ export default function BannerTableComponent({ thead, tbody }) {
                 setLoading(false)
             })
             .catch((error) => {
-                console.error('Error fetching user details:', error);
+                console.error('Error fetching banner details:', error);
             });
     };
 
@@ -75,10 +74,9 @@ export default function BannerTableComponent({ thead, tbody }) {
                 setownerDetails(response.data.owner_arr || []);
                 setOwners(response.data.owner_arr || []);
                 setLoading(false)
-
             })
             .catch((error) => {
-                console.error('Error fetching user details:', error);
+                console.error('Error fetching owner details:', error);
             });
     };
 
@@ -94,10 +92,25 @@ export default function BannerTableComponent({ thead, tbody }) {
                 setownerTrips(response.data.trip_arr || []);
             })
             .catch((error) => {
-                console.error('Error fetching owner trips :', error);
+                console.error('Error fetching owner trips:', error);
             });
     };
 
+    const [propertyAds, setPropertyAds] = useState([]);
+    const fetchPropertyAds = (userId) => {
+        if (!userId) {
+            setPropertyAds([]);
+            return;
+        }
+
+        axios.get(API_URL + `/get_property_ads?user_id=${userId}`)
+            .then((response) => {
+                setPropertyAds(response.data.property_arr || []);
+            })
+            .catch((error) => {
+                console.error('Error fetching property ads:', error);
+            });
+    };
 
     useEffect(() => {
         fetchBanner();
@@ -105,10 +118,10 @@ export default function BannerTableComponent({ thead, tbody }) {
     }, []);
 
     function formatDate(dateStr) {
+        if (!dateStr) return 'NA';
         const [year, month, day] = dateStr.split("-");
         return `${day}-${month}-${year}`;
     }
-
 
     const handleUserAction = (action, item) => {
         if (action == 'edit') {
@@ -121,13 +134,24 @@ export default function BannerTableComponent({ thead, tbody }) {
             setEndDate(item.end_date)
             setownerName(item.l_name);
             setOwnername1(item.l_name);
+            
             // Set promotion type based on whether user_id exists
             setPromotionType(item.user_id ? 1 : 0);
-            // Fetch trips for the selected owner if it's an owner promotion
-            if (item.user_id) {
-                fetchOwnerTrips(item.user_id);
+            
+            // Set entity type based on item.entity_type
+            if (item.entity_type === 0) {
+                setActiveTab('boat');
+                // Fetch trips for the selected owner if it's an owner promotion
+                if (item.user_id) {
+                    fetchOwnerTrips(item.user_id);
+                }
+            } else if (item.entity_type === 1) {
+                setActiveTab('property');
+                // Fetch property ads for the selected owner
+                if (item.user_id) {
+                    fetchPropertyAds(item.user_id);
+                }
             }
-            // seteditImage(item.image)
         }
         else if (action == 'delete') {
             setAlertModal(true);
@@ -145,7 +169,7 @@ export default function BannerTableComponent({ thead, tbody }) {
         } else {
             // Owner promotion validation
             if (!ownerId) error.ownerId = "Please select an owner";
-            if (!tripId) error.tripId = "Please select a trip";
+            if (!tripId) error.tripId = activeTab === 'boat' ? "Please select a trip" : "Please select a property ad";
         }
 
         if (!startDate) error.startDate = "Please select start date";
@@ -165,12 +189,13 @@ export default function BannerTableComponent({ thead, tbody }) {
         const formData = new FormData();
         formData.append('banner_id', bannerId);
         formData.append('type', promotionType);
+        formData.append('entity_type', activeTab === 'boat' ? 0 : 1);
 
         if (promotionType === 0) {
             formData.append('link', editLink);
         } else {
             formData.append('user_id', ownerId);
-            formData.append('trip_id', tripId);
+            formData.append('trip_id', tripId); // For boat: trip_id, for property: property_ad_id
         }
 
         formData.append('start_date', startDate);
@@ -184,14 +209,13 @@ export default function BannerTableComponent({ thead, tbody }) {
                 setmsg(response.data.msg);
                 fetchBanner();
                 setEditModal(false);
-                // setsuccessModel(true);
                 setStartDate('');
                 setEndDate('');
                 setOwnerId('');
                 setTripId('');
                 setPromotionType(0);
+                setActiveTab('boat');
 
-                // Show success popup
                 Swal.fire({
                     title: 'Success!',
                     text: 'Promotion updated successfully',
@@ -199,13 +223,9 @@ export default function BannerTableComponent({ thead, tbody }) {
                     confirmButtonText: 'OK',
                     confirmButtonColor: '#28a745'
                 });
-
-                // setTimeout(() => setsuccessModel(false), 2000);
             }
         }).catch(error => {
             console.error('Edit failed:', error);
-
-            // Show error popup
             Swal.fire({
                 title: 'Error!',
                 text: error.response?.data?.msg || "Failed to update promotion",
@@ -216,58 +236,37 @@ export default function BannerTableComponent({ thead, tbody }) {
         });
     };
 
-
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
     };
 
-
-
     // Form fields state
-    const [ownerId, setOwnerId] = useState('');                 // For selected owner ID
-    const [startDate, setStartDate] = useState('');            // For start date
-    const [endDate, setEndDate] = useState('');                 // For end date
-    const [categoryImage, setCategoryImage] = useState('');     // For image preview URL
-    const [tripId, setTripId] = useState('');                  // For selected trip ID
-    const [promotionType, setPromotionType] = useState(0);     // 0 for general, 1 for owner promotion
+    const [ownerId, setOwnerId] = useState('');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [tripId, setTripId] = useState('');
+    const [promotionType, setPromotionType] = useState(0);
 
-    // Error handling
-    // const [bannerError, setbannerError] = useState({
-    //   ownerId: '',
-    //   imagelink: '',
-    //   startDate: '',
-    //   endDate: '',
-    //   image: ''
-    // });
-
-
-    // Owners list (if fetching from API)
     const [owners, setOwners] = useState([]);
 
-    // add banner 
     const handleAddBanner = () => {
-        // Validate all fields
         const errors = {};
 
         if (promotionType === 0) {
-            // General promotion validation
             if (!imagelink) errors.imagelink = "Please enter Promotion Link";
         } else {
-            // Owner promotion validation
             if (!ownerId) errors.ownerId = "Please select an owner";
-            if (!tripId) errors.tripId = "Please select a trip";
+            if (!tripId) errors.tripId = activeTab === 'boat' ? "Please select a trip" : "Please select a property ad";
         }
 
         if (!startDate) errors.startDate = "Please select start date";
         if (!endDate) errors.endDate = "Please select end date";
         if (!image) errors.image = "Please select an image";
 
-        // Validate URL format for general promotion
         if (promotionType === 0 && imagelink && !/^(https?:\/\/)/.test(imagelink)) {
             errors.imagelink = "Please enter a valid URL starting with http:// or https://";
         }
 
-        // Validate date range
         if (startDate && endDate && new Date(endDate) <= new Date(startDate)) {
             errors.endDate = "End date must be after start date";
         }
@@ -279,6 +278,7 @@ export default function BannerTableComponent({ thead, tbody }) {
 
         const formData = new FormData();
         formData.append('type', promotionType);
+        formData.append('entity_type', activeTab === 'boat' ? 0 : 1);
 
         if (promotionType === 0) {
             formData.append('link', imagelink);
@@ -306,9 +306,9 @@ export default function BannerTableComponent({ thead, tbody }) {
                 setOwnerId('');
                 setTripId('');
                 setPromotionType(0);
+                setActiveTab('boat');
                 setAddModal(false);
 
-                // Show success popup
                 Swal.fire({
                     title: 'Success!',
                     text: 'Promotion added successfully',
@@ -319,9 +319,6 @@ export default function BannerTableComponent({ thead, tbody }) {
             }
         }).catch(error => {
             console.error('Error adding banner:', error);
-            setmsg(error.response?.data?.msg || "Failed to add promotion");
-
-            // Show error popup
             Swal.fire({
                 title: 'Error!',
                 text: error.response?.data?.msg || "Failed to add promotion",
@@ -345,7 +342,6 @@ export default function BannerTableComponent({ thead, tbody }) {
         }
     };
 
-    // function for delete banner
     const handleDelete = () => {
         axios.post(API_URL + '/delete_banner', { banner_id: bannerId }).then((response) => {
             if (response.data.success) {
@@ -353,7 +349,6 @@ export default function BannerTableComponent({ thead, tbody }) {
                 fetchBanner();
                 setsuccessModel(true);
 
-                // Show success popup
                 Swal.fire({
                     title: 'Success!',
                     text: 'Promotion deleted successfully',
@@ -368,8 +363,6 @@ export default function BannerTableComponent({ thead, tbody }) {
             }
         }).catch(error => {
             console.error('Delete failed:', error);
-
-            // Show error popup
             Swal.fire({
                 title: 'Error!',
                 text: error.response?.data?.msg || "Failed to delete promotion",
@@ -384,20 +377,52 @@ export default function BannerTableComponent({ thead, tbody }) {
         setEnlargedImage(imageUrl);
         setShowImagePopup(true);
     };
+    
     const handleCloseImage = () => {
         setEnlargedImage(null);
         setShowImagePopup(false);
     };
 
+    // Reset form when switching tabs
+    const handleTabChange = (tab) => {
+        setActiveTab(tab);
+        setTripId('');
+        setownerTrips([]);
+        setPropertyAds([]);
+    };
+
+    // Custom tab styles for better design
+    const tabStyle = {
+        navTabs: {
+            borderBottom: '2px solid #dee2e6',
+            marginBottom: '20px',
+            padding: '0 10px'
+        },
+        navItem: {
+            marginBottom: '-2px'
+        },
+        navLink: {
+            border: 'none',
+            borderBottom: '2px solid transparent',
+            color: '#6c757d',
+            fontWeight: '500',
+            padding: '10px 20px',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease'
+        },
+        navLinkActive: {
+            borderBottom: '2px solid #2b77e5',
+            color: '#2b77e5',
+            backgroundColor: 'transparent'
+        }
+    };
 
     return (
         <>
-
             <Row xs={1} sm={2} xl={4} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Col>
                     <LabelFieldComponent
                         type="search"
-                        // label={t('search_by')}
                         icon="Search"
                         placeholder={`${t('search_here')}`}
                         labelDir="label-col"
@@ -407,11 +432,11 @@ export default function BannerTableComponent({ thead, tbody }) {
                     />
                 </Col>
                 <Col style={{ textAlign: 'right', marginBottom: '5px' }}>
-                    <button style={{ background: '#2b77e5', padding: '7px 13px', color: '#fff', borderRadius: '5px' }} onClick={() => setAddModal(true)} > <AddIcon className="me-2" /> {t("Add Promotion")} </button>
+                    <button style={{ background: '#2b77e5', padding: '7px 13px', color: '#fff', borderRadius: '5px' }} onClick={() => setAddModal(true)} > 
+                        <AddIcon className="me-2" /> {t("Add Promotion")} 
+                    </button>
                 </Col>
             </Row>
-
-
 
             {loading ? (
                 <div className="d-flex align-items-center" style={{ height: '40vh' }}>
@@ -430,13 +455,12 @@ export default function BannerTableComponent({ thead, tbody }) {
                                 <th>{t("actions")}</th>
                                 <th>{t("image")}</th>
                                 <th>{t("Promotion Type")}</th>
+                                <th>{t("Entity Type")}</th>
                                 <th>{t("URL")}</th>
                                 <th>{t("owner name")}</th>
                                 <th>{t("Owner Ads")}</th>
                                 <th>{t("Start date")}</th>
                                 <th>{t("End date")}</th>
-
-                                {/* <th>{t("link")}</th> */}
                                 <th>{t("createtime")}</th>
                             </tr>
                         </thead>
@@ -450,8 +474,6 @@ export default function BannerTableComponent({ thead, tbody }) {
                                     </td>
                                     <td>
                                         <div className="mc-table-action">
-
-                                            {/* <AnchorComponent to={`${APP_PREFIX_PATH}/doctor-view/${encode(item.doctor_id)}`} title="View" className="material-icons view">visibility</AnchorComponent> */}
                                             <ButtonComponent title="Edit" className="material-icons edit" onClick={() => { handleUserAction('edit', item) }}>edit</ButtonComponent>
                                             <ButtonComponent type="button" className="material-icons delete" onClick={() => handleUserAction('delete', item)}>delete</ButtonComponent>
                                         </div>
@@ -468,12 +490,10 @@ export default function BannerTableComponent({ thead, tbody }) {
                                                         handleImageClick(item.image ? `${IMAGE_PATH}${item.image}` : `${IMAGE_PATH}Placeholder.webp`);
                                                     }
                                                 }}
-                                                // eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
-                                                role="button" // Add role="button" to indicate interactive element
+                                                role="button"
                                                 tabIndex={0}
                                             />
 
-                                            {/* Enlarged image overlay */}
                                             {showImagePopup && (
                                                 <div
                                                     className="enlarged-image-overlay"
@@ -510,6 +530,13 @@ export default function BannerTableComponent({ thead, tbody }) {
                                     </td>
 
                                     <td>
+                                        <span>
+                                            {item.entity_type === 0 ? "Boat" : 
+                                             item.entity_type === 1 ? "Property" : "NA"}
+                                        </span>
+                                    </td>
+
+                                    <td>
                                         <span>{item.link || 'NA'}</span>
                                     </td>
                                     <td>
@@ -522,7 +549,11 @@ export default function BannerTableComponent({ thead, tbody }) {
                                         )}
                                     </td>
                                     <td>
-                                        <span>{item.random_id || 'NA'}</span>
+                                        <span>
+                                            {item.random_id || 
+                                             item.property_ad_id || 
+                                             (item.entity_type === 1 ? 'Property Ad' : 'NA')}
+                                        </span>
                                     </td>
 
                                     <td>
@@ -532,16 +563,11 @@ export default function BannerTableComponent({ thead, tbody }) {
                                         <span>{formatDate(item.end_date) || 'NA'}</span>
                                     </td>
 
-                                    {/* <td>
-                                        <span>{item.link || 'NA'}</span>
-                                    </td> */}
-
                                     <td>{item.createtime || 'NA'}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
-
 
                     <PaginationComponent
                         totalEntries={filteredUsers.length}
@@ -550,13 +576,13 @@ export default function BannerTableComponent({ thead, tbody }) {
                         onPageChange={handlePageChange}
                     />
 
+                    {/* Edit Modal */}
                     <Modal show={editModal} onHide={() => setEditModal(false)} backdrop="static" size="lg">
                         <Modal.Header closeButton>
                             <Modal.Title>{t('Edit Promotion')}</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
                             <div className="mc-user-modal">
-                                {/* Promotion Type Selection */}
                                 <Form.Group className="mb-3">
                                     <Form.Label>{t('Promotion Type')} <span className="text-danger">*</span></Form.Label>
                                     <div className="d-flex">
@@ -580,7 +606,40 @@ export default function BannerTableComponent({ thead, tbody }) {
                                     </div>
                                 </Form.Group>
 
-                                {/* Owner and Link */}
+                                {/* Tabs for Boat/Property - Always visible */}
+                                <div style={tabStyle.navTabs}>
+                                    <ul className="nav" style={{ display: 'flex', listStyle: 'none', padding: 0, margin: 0 }}>
+                                        <li style={tabStyle.navItem}>
+                                            <div
+                                                style={{
+                                                    ...tabStyle.navLink,
+                                                    ...(activeTab === 'boat' ? tabStyle.navLinkActive : {})
+                                                }}
+                                                onClick={() => handleTabChange('boat')}
+                                                role="button"
+                                                tabIndex={0}
+                                                onKeyDown={(e) => e.key === 'Enter' && handleTabChange('boat')}
+                                            >
+                                                Boat
+                                            </div>
+                                        </li>
+                                        <li style={tabStyle.navItem}>
+                                            <div
+                                                style={{
+                                                    ...tabStyle.navLink,
+                                                    ...(activeTab === 'property' ? tabStyle.navLinkActive : {})
+                                                }}
+                                                onClick={() => handleTabChange('property')}
+                                                role="button"
+                                                tabIndex={0}
+                                                onKeyDown={(e) => e.key === 'Enter' && handleTabChange('property')}
+                                            >
+                                                Property
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+
                                 <div className="row">
                                     {promotionType === 0 ? (
                                         <div className="col-md-12">
@@ -611,20 +670,24 @@ export default function BannerTableComponent({ thead, tbody }) {
                                                             const selectedOwnerId = e.target.value;
                                                             setOwnerId(selectedOwnerId);
                                                             setbannerError(prev => ({ ...prev, ownerId: "" }));
-                                                            // Reset trip selection when owner changes
                                                             setTripId('');
-                                                            // Fetch trips for the selected owner
+                                                            
                                                             if (selectedOwnerId) {
-                                                                fetchOwnerTrips(selectedOwnerId);
+                                                                if (activeTab === 'boat') {
+                                                                    fetchOwnerTrips(selectedOwnerId);
+                                                                } else {
+                                                                    fetchPropertyAds(selectedOwnerId);
+                                                                }
                                                             } else {
                                                                 setownerTrips([]);
+                                                                setPropertyAds([]);
                                                             }
                                                         }}
                                                         isInvalid={!!bannerError.ownerId}
                                                     >
                                                         <option value="">{t('Select Owner')}</option>
                                                         {owners.map(owner => (
-                                                            <option key={owner.user_id} value={owner.user_id} selected={owner.user_id === ownerId}>
+                                                            <option key={owner.user_id} value={owner.user_id}>
                                                                 {owner.l_name}
                                                             </option>
                                                         ))}
@@ -637,7 +700,10 @@ export default function BannerTableComponent({ thead, tbody }) {
 
                                             <div className="col-md-6">
                                                 <Form.Group className="mb-3">
-                                                    <Form.Label>{t('Select Ads')} <span className="text-danger">*</span></Form.Label>
+                                                    <Form.Label>
+                                                        {activeTab === 'boat' ? t('Select Trip') : t('Select Property Ad')} 
+                                                        <span className="text-danger">*</span>
+                                                    </Form.Label>
                                                     <Form.Select
                                                         value={tripId}
                                                         onChange={(e) => {
@@ -647,12 +713,21 @@ export default function BannerTableComponent({ thead, tbody }) {
                                                         isInvalid={!!bannerError.tripId}
                                                         disabled={!ownerId}
                                                     >
-                                                        <option value="">{t('Select Ads')}</option>
-                                                        {ownerTrips.map(trip => (
-                                                            <option key={trip.trip_id} value={trip.trip_id}>
-                                                                {trip.random_id}
-                                                            </option>
-                                                        ))}
+                                                        <option value="">
+                                                            {activeTab === 'boat' ? t('Select Trip') : t('Select Property Ad')}
+                                                        </option>
+                                                        {activeTab === 'boat' 
+                                                            ? ownerTrips.map(trip => (
+                                                                <option key={trip.trip_id} value={trip.trip_id}>
+                                                                    {trip.random_id}
+                                                                </option>
+                                                            ))
+                                                            : propertyAds.map(ad => (
+                                                                <option key={ad.property_ad_id} value={ad.property_ad_id}>
+                                                                    {ad.title || ad.property_ad_id}
+                                                                </option>
+                                                            ))
+                                                        }
                                                     </Form.Select>
                                                     <Form.Control.Feedback type="invalid">
                                                         {bannerError.tripId}
@@ -663,7 +738,6 @@ export default function BannerTableComponent({ thead, tbody }) {
                                     )}
                                 </div>
 
-                                {/* Dates */}
                                 <div className="row">
                                     <div className="col-md-6">
                                         <Form.Group className="mb-3">
@@ -704,7 +778,6 @@ export default function BannerTableComponent({ thead, tbody }) {
                                     </div>
                                 </div>
 
-                                {/* Image Upload - Updated to use standard file input */}
                                 <Form.Group className="mb-3">
                                     <Form.Label>{t('Promotion Image')}</Form.Label>
                                     <Form.Control
@@ -713,12 +786,19 @@ export default function BannerTableComponent({ thead, tbody }) {
                                         accept="image/*"
                                         onChange={(e) => seteditImage(e.target.files[0])}
                                     />
-                                    {/* <small className="text-muted">Leave empty to keep current image</small> */}
                                 </Form.Group>
                             </div>
                         </Modal.Body>
                         <Modal.Footer className="mt-1">
-                            <ButtonComponent type="button" className="btn btn-secondary" onClick={() => { setEditModal(false); setStartDate(''); setEndDate(''); setOwnerId(''); setTripId(''); setPromotionType(0); }}>
+                            <ButtonComponent type="button" className="btn btn-secondary" onClick={() => { 
+                                setEditModal(false); 
+                                setStartDate(''); 
+                                setEndDate(''); 
+                                setOwnerId(''); 
+                                setTripId(''); 
+                                setPromotionType(0);
+                                setActiveTab('boat');
+                            }}>
                                 {t('Cancel')}
                             </ButtonComponent>
                             <ButtonComponent type="button" className="btn btn-success" onClick={handleEditBanner}>
@@ -727,13 +807,13 @@ export default function BannerTableComponent({ thead, tbody }) {
                         </Modal.Footer>
                     </Modal>
 
+                    {/* Add Modal */}
                     <Modal show={AddModal} onHide={() => setAddModal(false)} backdrop="static" size="lg" style={{ marginBottom: '0px' }}>
                         <Modal.Header closeButton style={{ marginBottom: '0px' }}>
                             <Modal.Title style={{ marginBottom: '0px' }}>{t('Add New Promotion')}</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
                             <div className="mc-user-modal">
-                                {/* Promotion Type Selection */}
                                 <Form.Group className="mb-3">
                                     <Form.Label>{t('Promotion Type')} <span className="text-danger">*</span></Form.Label>
                                     <div className="d-flex">
@@ -757,9 +837,40 @@ export default function BannerTableComponent({ thead, tbody }) {
                                     </div>
                                 </Form.Group>
 
+                                {/* Tabs for Boat/Property - Always visible */}
+                                <div style={tabStyle.navTabs}>
+                                    <ul className="nav" style={{ display: 'flex', listStyle: 'none', padding: 0, margin: 0 }}>
+                                        <li style={tabStyle.navItem}>
+                                            <div
+                                                style={{
+                                                    ...tabStyle.navLink,
+                                                    ...(activeTab === 'boat' ? tabStyle.navLinkActive : {})
+                                                }}
+                                                onClick={() => handleTabChange('boat')}
+                                                role="button"
+                                                tabIndex={0}
+                                                onKeyDown={(e) => e.key === 'Enter' && handleTabChange('boat')}
+                                            >
+                                                Boat
+                                            </div>
+                                        </li>
+                                        <li style={tabStyle.navItem}>
+                                            <div
+                                                style={{
+                                                    ...tabStyle.navLink,
+                                                    ...(activeTab === 'property' ? tabStyle.navLinkActive : {})
+                                                }}
+                                                onClick={() => handleTabChange('property')}
+                                                role="button"
+                                                tabIndex={0}
+                                                onKeyDown={(e) => e.key === 'Enter' && handleTabChange('property')}
+                                            >
+                                                Property
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
 
-
-                                {/* Owner and Promotion Link in one row */}
                                 <div className="row">
                                     {promotionType === 0 ? (
                                         <div className="col-md-12">
@@ -791,13 +902,17 @@ export default function BannerTableComponent({ thead, tbody }) {
                                                             const selectedOwnerId = e.target.value;
                                                             setOwnerId(selectedOwnerId);
                                                             setbannerError(prev => ({ ...prev, ownerId: "" }));
-                                                            // Reset trip selection when owner changes
                                                             setTripId('');
-                                                            // Fetch trips for the selected owner
+                                                            
                                                             if (selectedOwnerId) {
-                                                                fetchOwnerTrips(selectedOwnerId);
+                                                                if (activeTab === 'boat') {
+                                                                    fetchOwnerTrips(selectedOwnerId);
+                                                                } else {
+                                                                    fetchPropertyAds(selectedOwnerId);
+                                                                }
                                                             } else {
                                                                 setownerTrips([]);
+                                                                setPropertyAds([]);
                                                             }
                                                         }}
                                                         isInvalid={!!bannerError.ownerId}
@@ -817,7 +932,10 @@ export default function BannerTableComponent({ thead, tbody }) {
 
                                             <div className="col-md-6">
                                                 <Form.Group className="mb-3">
-                                                    <Form.Label>{t('Select Ads')} <span className="text-danger">*</span></Form.Label>
+                                                    <Form.Label>
+                                                        {activeTab === 'boat' ? t('Select Trip') : t('Select Property Ad')} 
+                                                        <span className="text-danger">*</span>
+                                                    </Form.Label>
                                                     <Form.Select
                                                         value={tripId}
                                                         onChange={(e) => {
@@ -827,12 +945,21 @@ export default function BannerTableComponent({ thead, tbody }) {
                                                         isInvalid={!!bannerError.tripId}
                                                         disabled={!ownerId}
                                                     >
-                                                        <option value="">{t('Select Ads')}</option>
-                                                        {ownerTrips.map(trip => (
-                                                            <option key={trip.trip_id} value={trip.trip_id}>
-                                                                {trip.captain_name_english}-{trip.random_id}
-                                                            </option>
-                                                        ))}
+                                                        <option value="">
+                                                            {activeTab === 'boat' ? t('Select Trip') : t('Select Property Ad')}
+                                                        </option>
+                                                        {activeTab === 'boat' 
+                                                            ? ownerTrips.map(trip => (
+                                                                <option key={trip.trip_id} value={trip.trip_id}>
+                                                                    {trip.captain_name_english}-{trip.random_id}
+                                                                </option>
+                                                            ))
+                                                            : propertyAds.map(ad => (
+                                                                <option key={ad.property_ad_id} value={ad.property_ad_id}>
+                                                                    {ad.title || ad.property_ad_id}
+                                                                </option>
+                                                            ))
+                                                        }
                                                     </Form.Select>
                                                     <Form.Control.Feedback type="invalid">
                                                         {bannerError.tripId}
@@ -843,7 +970,6 @@ export default function BannerTableComponent({ thead, tbody }) {
                                     )}
                                 </div>
 
-                                {/* Date Range in one row */}
                                 <div className="row">
                                     <div className="col-md-6">
                                         <Form.Group className="mb-3">
@@ -884,7 +1010,6 @@ export default function BannerTableComponent({ thead, tbody }) {
                                     </div>
                                 </div>
 
-                                {/* Image Upload - Updated to use standard file input */}
                                 <Form.Group className="mb-0">
                                     <Form.Label>{t('Promotion Image')} <span className="text-danger">*</span></Form.Label>
                                     <Form.Control
@@ -897,15 +1022,11 @@ export default function BannerTableComponent({ thead, tbody }) {
                                     <Form.Control.Feedback type="invalid">
                                         {bannerError.image}
                                     </Form.Control.Feedback>
-                                    {/* <small className="text-muted">Max size: 2MB</small> */}
                                 </Form.Group>
-
-
                             </div>
 
-                            {/* Image Preview */}
                             {image && (
-                                <div className="text-center">
+                                <div className="text-center mt-3">
                                     <img
                                         src={URL.createObjectURL(image)}
                                         alt="Banner Preview"
@@ -928,6 +1049,7 @@ export default function BannerTableComponent({ thead, tbody }) {
                                     setOwnerId('');
                                     setTripId('');
                                     setPromotionType(0);
+                                    setActiveTab('boat');
                                     setownerName('')
                                     setbannerError({})
                                 }}
@@ -950,7 +1072,6 @@ export default function BannerTableComponent({ thead, tbody }) {
                             <h3>{t('success')}</h3><br />
                             <p>{msg}</p>
                             <Modal.Footer>
-
                             </Modal.Footer>
                         </div>
                     </Modal>
@@ -965,8 +1086,8 @@ export default function BannerTableComponent({ thead, tbody }) {
                                 <ButtonComponent type="button" className="btn btn-danger" onClick={() => { setAlertModal(false); handleDelete() }}>{t('delete')}</ButtonComponent>
                             </Modal.Footer>
                         </div>
-                    </Modal >
-                </div >
+                    </Modal>
+                </div>
             )}
         </>
     );
