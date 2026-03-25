@@ -105,7 +105,7 @@ export default function BannerTableComponent({ thead, tbody }) {
 
         axios.get(API_URL + `/get_property_ads?user_id=${userId}`)
             .then((response) => {
-                setPropertyAds(response.data.property_arr || []);
+                setPropertyAds(response.data.data || []);
             })
             .catch((error) => {
                 console.error('Error fetching property ads:', error);
@@ -956,7 +956,7 @@ export default function BannerTableComponent({ thead, tbody }) {
                                                             ))
                                                             : propertyAds.map(ad => (
                                                                 <option key={ad.property_ad_id} value={ad.property_ad_id}>
-                                                                    {ad.title || ad.property_ad_id}
+                                                                    {ad.property_name_english || ad.random_booking_id}
                                                                 </option>
                                                             ))
                                                         }

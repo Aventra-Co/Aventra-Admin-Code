@@ -311,13 +311,13 @@ export default function ManagePropertyAdvertisement() {
     }
 
     // Price validation based on active periods
-    if (formData.one_day_active && !formData.one_day_price) {
-      errors.one_day_price = 'Please enter one day price'
-      isValid = false
-    } else if (formData.one_day_price && Number(formData.one_day_price) < 0) {
-      errors.one_day_price = 'Please enter valid price'
-      isValid = false
-    }
+    // if (formData.one_day_active && !formData.one_day_price) {
+    //   errors.one_day_price = 'Please enter one day price'
+    //   isValid = false
+    // } else if (formData.one_day_price && Number(formData.one_day_price) < 0) {
+    //   errors.one_day_price = 'Please enter valid price'
+    //   isValid = false
+    // }
 
     if (formData.weekday_active && !formData.weekday_price) {
       errors.weekday_price = 'Please enter weekday price'
@@ -933,7 +933,7 @@ export default function ManagePropertyAdvertisement() {
         <h4 className='mt-4 mb-3'>Price</h4>
         
         {/* One Day */}
-        <div className='row m-2 align-items-center'>
+        {/* <div className='row m-2 align-items-center'>
           <div className='col-md-6'>
             <Form.Check
               type='checkbox'
@@ -960,7 +960,7 @@ export default function ManagePropertyAdvertisement() {
               {ownerError.one_day_price}
             </Form.Control.Feedback>
           </div>
-        </div>
+        </div> */}
 
         {/* Weekday */}
         <div className='row m-2 align-items-center'>
