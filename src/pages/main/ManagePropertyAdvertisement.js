@@ -40,14 +40,16 @@ export default function ManagePropertyAdvertisement() {
     one_day_price: '',
     one_day_active: false,
     weekday_price: '',
-    weekday_active: false,
+    weekday_active: true,
     weekend_price: '',
-    weekend_active: false,
+    weekend_active: true,
     full_week_price: '',
-    full_week_active: false,
+    full_week_active: true,
     discount_percentage: '',
     coupon_code: '',
     coupon_discount: '',
+    start_date: '',
+    end_date: '',
     free_cancel_days: '',
     pet_friendly: '',
     selectedAmenities: []
@@ -176,9 +178,20 @@ export default function ManagePropertyAdvertisement() {
           setLoading(prev => ({ ...prev, countries: false }));
         }
 
-        // Set destinations
+        // Set destinations and automatically select the first one
         if (destinationsRes.data && destinationsRes.data.destination_arr && Array.isArray(destinationsRes.data.destination_arr)) {
           setDestinationDetails(destinationsRes.data.destination_arr);
+          
+          // Automatically set the first destination ID if available
+          if (destinationsRes.data.destination_arr.length > 0) {
+            const firstDestinationId = destinationsRes.data.destination_arr[0].destination_id;
+            setFormData(prev => ({
+              ...prev,
+              destination_id: firstDestinationId
+            }));
+            console.log('Auto-selected first destination ID:', firstDestinationId);
+          }
+          
           setLoading(prev => ({ ...prev, destinations: false }));
         } else {
           console.error('Unexpected destinations data structure:', destinationsRes.data);
@@ -274,10 +287,11 @@ export default function ManagePropertyAdvertisement() {
       isValid = false
     }
 
-    if (!formData.destination_id) {
-      errors.destination_id = 'Please select destination'
-      isValid = false
-    }
+    // Destination validation removed since it's auto-selected
+    // if (!formData.destination_id) {
+    //   errors.destination_id = 'Please select destination'
+    //   isValid = false
+    // }
 
     if (!formData.city_id) {
       errors.city_id = 'Please select city'
@@ -310,35 +324,27 @@ export default function ManagePropertyAdvertisement() {
       isValid = false
     }
 
-    // Price validation based on active periods
-    // if (formData.one_day_active && !formData.one_day_price) {
-    //   errors.one_day_price = 'Please enter one day price'
-    //   isValid = false
-    // } else if (formData.one_day_price && Number(formData.one_day_price) < 0) {
-    //   errors.one_day_price = 'Please enter valid price'
-    //   isValid = false
-    // }
-
-    if (formData.weekday_active && !formData.weekday_price) {
+    // Price validation - All three prices are now required
+    if (!formData.weekday_price) {
       errors.weekday_price = 'Please enter weekday price'
       isValid = false
-    } else if (formData.weekday_price && Number(formData.weekday_price) < 0) {
+    } else if (Number(formData.weekday_price) < 0) {
       errors.weekday_price = 'Please enter valid price'
       isValid = false
     }
 
-    if (formData.weekend_active && !formData.weekend_price) {
+    if (!formData.weekend_price) {
       errors.weekend_price = 'Please enter weekend price'
       isValid = false
-    } else if (formData.weekend_price && Number(formData.weekend_price) < 0) {
+    } else if (Number(formData.weekend_price) < 0) {
       errors.weekend_price = 'Please enter valid price'
       isValid = false
     }
 
-    if (formData.full_week_active && !formData.full_week_price) {
+    if (!formData.full_week_price) {
       errors.full_week_price = 'Please enter full week price'
       isValid = false
-    } else if (formData.full_week_price && Number(formData.full_week_price) < 0) {
+    } else if (Number(formData.full_week_price) < 0) {
       errors.full_week_price = 'Please enter valid price'
       isValid = false
     }
@@ -348,6 +354,17 @@ export default function ManagePropertyAdvertisement() {
       const codeRegex = /^[A-Za-z0-9]{8}$/
       if (!codeRegex.test(formData.coupon_code)) {
         errors.coupon_code = 'Coupon code must be exactly 8 characters (A-Z, 0-9)'
+        isValid = false
+      }
+      
+      // If coupon code is provided, start_date and end_date are required
+      if (!formData.start_date) {
+        errors.start_date = 'Start date is required when coupon code is provided'
+        isValid = false
+      }
+      
+      if (!formData.end_date) {
+        errors.end_date = 'End date is required when coupon code is provided'
         isValid = false
       }
     }
@@ -410,20 +427,22 @@ export default function ManagePropertyAdvertisement() {
     formDataObj.append('description_italian', formData.description_italian || '')
     formDataObj.append('description_korean', formData.description_korean || '')
 
-    // Price periods
+    // Price periods - All are now active by default
     formDataObj.append('one_day_price', formData.one_day_price || 0)
     formDataObj.append('one_day_active', formData.one_day_active ? 1 : 0)
-    formDataObj.append('weekday_price', formData.weekday_price || 0)
-    formDataObj.append('weekday_active', formData.weekday_active ? 1 : 0)
-    formDataObj.append('weekend_price', formData.weekend_price || 0)
-    formDataObj.append('weekend_active', formData.weekend_active ? 1 : 0)
-    formDataObj.append('full_week_price', formData.full_week_price || 0)
-    formDataObj.append('full_week_active', formData.full_week_active ? 1 : 0)
+    formDataObj.append('weekday_price', formData.weekday_price)
+    formDataObj.append('weekday_active', 1) // Always active
+    formDataObj.append('weekend_price', formData.weekend_price)
+    formDataObj.append('weekend_active', 1) // Always active
+    formDataObj.append('full_week_price', formData.full_week_price)
+    formDataObj.append('full_week_active', 1) // Always active
 
     // Other fields
     formDataObj.append('discount_percentage', formData.discount_percentage || 0)
     formDataObj.append('coupon_code', formData.coupon_code || '')
     formDataObj.append('coupon_discount', formData.coupon_discount || 0)
+    formDataObj.append('start_date', formData.start_date || '')
+    formDataObj.append('end_date', formData.end_date || '')
     formDataObj.append('free_cancel_days', formData.free_cancel_days)
     formDataObj.append('pet_friendly', formData.pet_friendly)
 
@@ -645,7 +664,9 @@ export default function ManagePropertyAdvertisement() {
               {ownerError.country_id}
             </Form.Control.Feedback>
           </div>
-          <div className='col-md-6'>
+          
+          {/* Destination field - Hidden but value is set automatically */}
+          {/* <div className='col-md-6'>
             <label htmlFor='destination_id' className='form-label'>
               Choose destination *
             </label>
@@ -673,7 +694,7 @@ export default function ManagePropertyAdvertisement() {
             <Form.Control.Feedback type='invalid'>
               {ownerError.destination_id}
             </Form.Control.Feedback>
-          </div>
+          </div> */}
         </div>
 
         <div className='row m-2'>
@@ -929,48 +950,47 @@ export default function ManagePropertyAdvertisement() {
           </div>
         </div>
 
-        {/* Price Section */}
-        <h4 className='mt-4 mb-3'>Price</h4>
-        
-        {/* One Day */}
-        {/* <div className='row m-2 align-items-center'>
+        {/* Coupon Date Range */}
+        <div className='row m-2'>
           <div className='col-md-6'>
-            <Form.Check
-              type='checkbox'
-              label='One day (2pm till next day 12 afternoon)'
-              checked={formData.one_day_active}
-              onChange={e => handlePricePeriodChange('one_day_active', e.target.checked)}
+            <label htmlFor='start_date' className='form-label'>
+              Coupon Start Date
+            </label>
+            <Form.Control
+              type='date'
+              value={formData.start_date}
+              onChange={e => handleInputChange('start_date', e.target.value)}
+              isInvalid={!!ownerError.start_date}
             />
+            <Form.Control.Feedback type='invalid'>
+              {ownerError.start_date}
+            </Form.Control.Feedback>
+            <small className="text-muted">Required if coupon code is provided</small>
           </div>
           <div className='col-md-6'>
-            <div className='d-flex align-items-center gap-3'>
-              <span>Price</span>
-              <Form.Control
-                type='number'
-                placeholder='Enter price in KWD'
-                value={formData.one_day_price}
-                onChange={e => handleInputChange('one_day_price', e.target.value)}
-                disabled={!formData.one_day_active}
-                isInvalid={!!ownerError.one_day_price}
-                style={{ maxWidth: '200px' }}
-              />
-              <span>KWD</span>
-            </div>
+            <label htmlFor='end_date' className='form-label'>
+              Coupon End Date
+            </label>
+            <Form.Control
+              type='date'
+              value={formData.end_date}
+              onChange={e => handleInputChange('end_date', e.target.value)}
+              isInvalid={!!ownerError.end_date}
+            />
             <Form.Control.Feedback type='invalid'>
-              {ownerError.one_day_price}
+              {ownerError.end_date}
             </Form.Control.Feedback>
+            <small className="text-muted">Required if coupon code is provided</small>
           </div>
-        </div> */}
+        </div>
 
+        {/* Price Section */}
+        <h4 className='mt-4 mb-3'>Price *</h4>
+        
         {/* Weekday */}
         <div className='row m-2 align-items-center'>
           <div className='col-md-6'>
-            <Form.Check
-              type='checkbox'
-              label='Weekday (Sun-Wed)'
-              checked={formData.weekday_active}
-              onChange={e => handlePricePeriodChange('weekday_active', e.target.checked)}
-            />
+            <Form.Label className='fw-bold'>Weekday (Sun-Wed) *</Form.Label>
           </div>
           <div className='col-md-6'>
             <div className='d-flex align-items-center gap-3'>
@@ -980,9 +1000,9 @@ export default function ManagePropertyAdvertisement() {
                 placeholder='Enter price in KWD'
                 value={formData.weekday_price}
                 onChange={e => handleInputChange('weekday_price', e.target.value)}
-                disabled={!formData.weekday_active}
                 isInvalid={!!ownerError.weekday_price}
                 style={{ maxWidth: '200px' }}
+                min="0"
               />
               <span>KWD</span>
             </div>
@@ -995,12 +1015,7 @@ export default function ManagePropertyAdvertisement() {
         {/* Weekend */}
         <div className='row m-2 align-items-center'>
           <div className='col-md-6'>
-            <Form.Check
-              type='checkbox'
-              label='Weekend (Thu-Sat)'
-              checked={formData.weekend_active}
-              onChange={e => handlePricePeriodChange('weekend_active', e.target.checked)}
-            />
+            <Form.Label className='fw-bold'>Weekend (Thu-Sat) *</Form.Label>
           </div>
           <div className='col-md-6'>
             <div className='d-flex align-items-center gap-3'>
@@ -1010,9 +1025,9 @@ export default function ManagePropertyAdvertisement() {
                 placeholder='Enter price in KWD'
                 value={formData.weekend_price}
                 onChange={e => handleInputChange('weekend_price', e.target.value)}
-                disabled={!formData.weekend_active}
                 isInvalid={!!ownerError.weekend_price}
                 style={{ maxWidth: '200px' }}
+                min="0"
               />
               <span>KWD</span>
             </div>
@@ -1025,12 +1040,7 @@ export default function ManagePropertyAdvertisement() {
         {/* Full Week */}
         <div className='row m-2 align-items-center'>
           <div className='col-md-6'>
-            <Form.Check
-              type='checkbox'
-              label='Full week (Sun-Sat)'
-              checked={formData.full_week_active}
-              onChange={e => handlePricePeriodChange('full_week_active', e.target.checked)}
-            />
+            <Form.Label className='fw-bold'>Full week (Sun-Sat) *</Form.Label>
           </div>
           <div className='col-md-6'>
             <div className='d-flex align-items-center gap-3'>
@@ -1040,9 +1050,9 @@ export default function ManagePropertyAdvertisement() {
                 placeholder='Enter price in KWD'
                 value={formData.full_week_price}
                 onChange={e => handleInputChange('full_week_price', e.target.value)}
-                disabled={!formData.full_week_active}
                 isInvalid={!!ownerError.full_week_price}
                 style={{ maxWidth: '200px' }}
+                min="0"
               />
               <span>KWD</span>
             </div>

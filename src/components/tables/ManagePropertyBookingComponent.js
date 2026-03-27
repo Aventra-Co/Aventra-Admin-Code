@@ -144,7 +144,7 @@ export default function ManagePropertyBookingComponent() {
                                 <th>{t("Property Name")}</th>
                                 <th>{t("Owner Name")}</th>
                                 <th>{t("Guard Name")}</th>
-                                <th>{t("Pricing Type")}</th>
+                                {/* <th>{t("Pricing Type")}</th> */}
                                 <th>{t("Check-in Date")}</th>
                                 <th>{t("Check-out Date")}</th>
                                 <th>{t("Days")}</th>
@@ -178,7 +178,7 @@ export default function ManagePropertyBookingComponent() {
                                             <td>{item.property_name_english || 'NA'}</td>
                                             <td>{item.owner_name || 'NA'}</td>
                                             <td>{item.guard_name || 'NA'}</td>
-                                            <td>
+                                            {/* <td>
                                                 <span
                                                     style={{
                                                         padding: '4px 12px',
@@ -192,7 +192,7 @@ export default function ManagePropertyBookingComponent() {
                                                 >
                                                     {getPricingTypeLabel(item.pricing_type)}
                                                 </span>
-                                            </td>
+                                            </td> */}
                                             <td>{item.checkin_date || 'NA'}</td>
                                             <td>{item.checkout_date || 'NA'}</td>
                                             <td style={{ textAlign: 'center' }}>{item.no_of_days || 'NA'}</td>
