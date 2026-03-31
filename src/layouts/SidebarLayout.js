@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link, matchPath, useLocation } from "react-router-dom";
 import { TranslatorContext } from "../context/Translator";
 import { SidebarContext } from "../context/Sidebar";
@@ -53,6 +53,36 @@ export default function SidebarLayout() {
     const currentPath = pathname;
     const [manualOpenMenuId, setManualOpenMenuId] = useState(null);
     const [activeGroupManuallyClosed, setActiveGroupManuallyClosed] = useState(false);
+    const sidebarRef = useRef(null);
+    const SIDEBAR_SCROLL_STORAGE_KEY = "mc-sidebar-scroll-top";
+
+    const saveSidebarScrollPosition = useCallback(() => {
+        if (!sidebarRef.current) return;
+        sessionStorage.setItem(SIDEBAR_SCROLL_STORAGE_KEY, String(sidebarRef.current.scrollTop));
+    }, [SIDEBAR_SCROLL_STORAGE_KEY]);
+
+    useLayoutEffect(() => {
+        if (!sidebarRef.current) return;
+
+        const savedScrollTop = Number(sessionStorage.getItem(SIDEBAR_SCROLL_STORAGE_KEY));
+        if (!Number.isFinite(savedScrollTop)) return;
+
+        sidebarRef.current.scrollTop = savedScrollTop;
+
+        // Re-apply after paint in case menu expansion/collapse changes layout height.
+        const rafId = window.requestAnimationFrame(() => {
+            if (!sidebarRef.current) return;
+            sidebarRef.current.scrollTop = savedScrollTop;
+        });
+
+        return () => window.cancelAnimationFrame(rafId);
+    }, [SIDEBAR_SCROLL_STORAGE_KEY, currentPath]);
+
+    useEffect(() => {
+        return () => {
+            saveSidebarScrollPosition();
+        };
+    }, [saveSidebarScrollPosition]);
 
     const iconMap = {
         AddHomeWorkRoundedIcon,
@@ -251,7 +281,11 @@ export default function SidebarLayout() {
     };
 
     return (
-        <aside className={`mc-sidebar thin-scrolling ${sidebar && "active"}`}>
+        <aside
+            ref={sidebarRef}
+            className={`mc-sidebar thin-scrolling ${sidebar && "active"}`}
+            onScroll={saveSidebarScrollPosition}
+        >
             {sidenavs?.map((sidenav, sidenavIndex) => (
                 <menu key={sidenavIndex} className="mc-sidebar-menu">
                     <h5 className="mc-sidebar-menu-title">{t(sidenav.title)}</h5>
@@ -275,7 +309,10 @@ export default function SidebarLayout() {
                                             <button
                                                 type="button"
                                                 className={`mc-sidebar-menu-btn ${isSubmenuActive ? "active" : ""}`}
-                                                onClick={() => handleParentToggle(menuId, menuId === activeGroupId)}
+                                                onClick={() => {
+                                                    saveSidebarScrollPosition();
+                                                    handleParentToggle(menuId, menuId === activeGroupId);
+                                                }}
                                                 aria-expanded={isMenuOpen}
                                             >
                                                 {IconComponent && <IconComponent />}
@@ -314,6 +351,7 @@ export default function SidebarLayout() {
                                                                 className={`mc-sidebar-dropdown-link ${isSubActive ? "active" : ""}`}
                                                                 // Fix: prevents scroll on navigation
                                                                 replace
+                                                                onClick={saveSidebarScrollPosition}
                                                             >
                                                                 {SubIconComponent && <SubIconComponent />}
                                                                 {t(submenu.text)}
@@ -329,6 +367,7 @@ export default function SidebarLayout() {
                                             className={`mc-sidebar-menu-btn ${isMenuActive ? "active" : ""}`}
                                             // Fix: prevents scroll on navigation
                                             replace
+                                            onClick={saveSidebarScrollPosition}
                                         >
                                             {IconComponent && <IconComponent />}
                                             <span>{t(menu.text)}</span>
