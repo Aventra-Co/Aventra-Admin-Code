@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useContext, useEffect, useMemo, useState } from "react";
+import { Link, matchPath, useLocation } from "react-router-dom";
 import { TranslatorContext } from "../context/Translator";
 import { SidebarContext } from "../context/Sidebar";
 import sidenavs from "../assets/data/sidenavs.json";
@@ -42,14 +42,17 @@ import DataSaverOnIcon from '@mui/icons-material/DataSaverOn';
 import ControlPointDuplicateIcon from '@mui/icons-material/ControlPointDuplicate';
 import AddLocationIcon from '@mui/icons-material/AddLocation';
 import SpeakerNotesIcon from '@mui/icons-material/SpeakerNotes';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import EditIcon from '@mui/icons-material/Edit';
 
 export default function SidebarLayout() {
     const { t, n, currentLanguage } = useContext(TranslatorContext);
     const { sidebar } = useContext(SidebarContext);
     const location = useLocation();
-    const currentPath = location.pathname;
-
-    const dropdownRefs = useRef([]);
+    const { pathname, search } = location;
+    const currentPath = pathname;
+    const [manualOpenMenuId, setManualOpenMenuId] = useState(null);
+    const [activeGroupManuallyClosed, setActiveGroupManuallyClosed] = useState(false);
 
     const iconMap = {
         AddHomeWorkRoundedIcon,
@@ -87,42 +90,165 @@ export default function SidebarLayout() {
         DataSaverOnIcon,
         ControlPointDuplicateIcon,
         SpeakerNotesIcon,
-        AddLocationIcon
+        AddLocationIcon,
+        VisibilityIcon,
+        EditIcon,
     };
 
-    const handleDropdown = (event) => {
-        const buttonElement = event.currentTarget;
-        const itemElement = buttonElement.parentElement;
-        const isActive = itemElement.classList.contains('active');
-        const allItems = document.querySelectorAll('.mc-sidebar-menu-item');
-        const allDropdowns = document.querySelectorAll('.mc-sidebar-dropdown-list');
+    // Map "detail" pages (View/Add/Edit) back to their list pages in the sidebar.
+    // This keeps the correct sidebar item highlighted and its parent group open.
+    const pathAliases = useMemo(
+        () => ({
+            "/manage-users": ["/user-profile/:user_id"],
+            "/deleted-users": ["/user-profile/:user_id"],
 
-        if (isActive) {
-            itemElement.classList.remove('active');
-            itemElement.querySelector('.mc-sidebar-dropdown-list').style.height = "0px";
-        } else {
-            allItems.forEach(item => item.classList.remove('active'));
-            allDropdowns.forEach(dropdown => dropdown.style.height = "0px");
+            "/manage-owners": [
+                "/add-owner",
+                "/edit-owner/:user_id",
+                "/owner-view/:user_id",
+                "/add-boat/:owner_id",
+                "/edit-boat/:boat_id",
+                "/add-property/:user_id",
+                "/edit-property/:property_id",
+                "/add-unavailability/:owner_id",
+                "/edit-unavailability/:unavailability_id",
+                "/add-property-unavailability/:owner_id",
+            ],
+            "/deleted-owners": ["/owner-view/:user_id"],
 
-            itemElement.classList.add('active');
-            const dropdown = itemElement.querySelector('.mc-sidebar-dropdown-list');
-            dropdown.style.height = dropdown.scrollHeight + "px";
+            "/manage-staff": [
+                "/view-staff/:user_id",
+                "/add-staff/:user_id",
+                "/edit-staff/:user_id",
+            ],
+            "/deleted-staff": ["/view-staff/:user_id"],
+
+            "/manage-role": ["/add-role", "/edit-role/:role_id"],
+
+            "/manage-trip-type": ["/add-trip-type", "/edit-trip-type/:trip_type_id"],
+
+            "/manage-trips": [
+                "/view-trip/:trip_id",
+                "/add-trip/:user_id",
+                "/edit-trip/:trip_id",
+            ],
+
+            "/property-advertisement": [
+                "/add-property-advertisement/:user_id",
+                "/edit-property-advertisement/:user_id/:property_ad_id",
+                "/view-property-advertisement/:property_ad_id",
+            ],
+
+            "/manage-destination": ["/add-destination", "/edit-destination/:destination_id"],
+
+            "/manage-faq": ["/view-faq/:faq_id"],
+
+            "/manage-sub-admin": [
+                "/add-sub-admin",
+                "/edit-sub-admin/:user_id",
+                "/view-sub-admin/:user_id",
+            ],
+
+            "/manage-addons": ["/view-addons/:addon_id"],
+
+            "/manage-food-category": [
+                "/add-food-category",
+                "/edit-food-category/:food_category_id",
+            ],
+
+            "/manage-food-sub-category": [
+                "/add-food-sub-category",
+                "/edit-food-sub-category/:food_sub_category_id",
+            ],
+
+            "/manage-equipments": [
+                "/add-equipment",
+                "/edit-equipment/:equipment_id",
+            ],
+
+            "/manage-activity": [
+                "/add-activity",
+                "/edit-activity/:activity_id",
+            ],
+        }),
+        []
+    );
+
+    const normalizePath = (value) => {
+        if (!value) return "/";
+        const trimmed = value.length > 1 ? value.replace(/\/+$/, "") : value;
+        return trimmed || "/";
+    };
+
+    const buildFullPattern = (pattern) => normalizePath(`${APP_PREFIX_PATH}${pattern}`);
+
+    // Optional URL hint to force the sidebar highlight on shared "detail" pages.
+    // Example: `/user-profile/:id?sidebar=deleted-users` should highlight `/deleted-users` instead of `/manage-users`.
+    const sidebarOverrideBasePath = useMemo(() => {
+        const raw = new URLSearchParams(search || "").get("sidebar");
+        if (!raw) return null;
+
+        const cleaned = raw.trim().replace(/^\/+/, "");
+        if (!cleaned) return null;
+
+        return normalizePath(`/${cleaned}`);
+    }, [search]);
+
+    const isRouteActive = (basePath) => {
+        if (!basePath) return false;
+
+        const normalizedPathname = normalizePath(currentPath);
+
+        // Always allow direct matches.
+        const fullBasePath = buildFullPattern(basePath);
+        const isDirectMatch = !!matchPath({ path: fullBasePath, end: false }, normalizedPathname);
+        if (isDirectMatch) return true;
+
+        // When an override is present, only the overridden base path can use aliases.
+        // When no override is present, we intentionally do NOT apply aliases for `/deleted-*` bases,
+        // otherwise shared detail pages (like `/user-profile/:id`) would activate both "Manage" and "Deleted" items.
+        const isOverrideOnlyAliasBase = typeof basePath === "string" && basePath.startsWith("/deleted-");
+        const allowAliasesForThisBase = sidebarOverrideBasePath
+            ? sidebarOverrideBasePath === basePath
+            : !isOverrideOnlyAliasBase;
+        if (!allowAliasesForThisBase) return false;
+
+        const aliases = pathAliases[basePath] || [];
+        return aliases.some((pattern) => {
+            const fullPattern = buildFullPattern(pattern);
+            return !!matchPath({ path: fullPattern, end: false }, normalizedPathname);
+        });
+    };
+
+    const activeGroupId = useMemo(() => {
+        for (let sidenavIndex = 0; sidenavIndex < sidenavs.length; sidenavIndex += 1) {
+            const sidenav = sidenavs[sidenavIndex];
+            for (let menuIndex = 0; menuIndex < sidenav.menus.length; menuIndex += 1) {
+                const menu = sidenav.menus[menuIndex];
+                if (!menu.submenus?.length) continue;
+
+                const hasActiveChild = menu.submenus.some((submenu) => isRouteActive(submenu.path));
+                if (hasActiveChild) return `${sidenavIndex}-${menuIndex}`;
+            }
         }
-    };
+        return null;
+    }, [currentPath]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
-        sidenavs.forEach((sidenav) => {
-            sidenav.menus.forEach((menu, menuIndex) => {
-                const isSubmenuActive = menu.submenus?.some(
-                    submenu => `${APP_PREFIX_PATH}${submenu.path}` === currentPath
-                );
-                if (isSubmenuActive && dropdownRefs.current[menuIndex]) {
-                    dropdownRefs.current[menuIndex].style.height =
-                        dropdownRefs.current[menuIndex].scrollHeight + "px";
-                }
-            });
-        });
+        // Collapse any manually opened parent group on navigation.
+        // The active group (if any) is still opened automatically from the router path.
+        setManualOpenMenuId(null);
+        setActiveGroupManuallyClosed(false);
     }, [currentPath]);
+
+    const handleParentToggle = (menuId, isActiveGroup) => {
+        if (isActiveGroup) {
+            setActiveGroupManuallyClosed((prev) => !prev);
+            return;
+        }
+
+        setManualOpenMenuId((prev) => (prev === menuId ? null : menuId));
+    };
 
     return (
         <aside className={`mc-sidebar thin-scrolling ${sidebar && "active"}`}>
@@ -132,22 +258,25 @@ export default function SidebarLayout() {
                     <ul className="mc-sidebar-menu-list">
                         {sidenav.menus.map((menu, menuIndex) => {
                             const IconComponent = iconMap[menu.icon];
-                            const isMenuActive = menu.path && `${APP_PREFIX_PATH}${menu.path}` === currentPath;
-                            const isSubmenuActive = menu.submenus?.some(
-                                submenu => `${APP_PREFIX_PATH}${submenu.path}` === currentPath
-                            );
+                            const menuId = `${sidenavIndex}-${menuIndex}`;
+                            const isMenuActive = menu.path ? isRouteActive(menu.path) : false;
+                            const isSubmenuActive = menu.submenus?.some((submenu) => isRouteActive(submenu.path));
+                            const isMenuOpen =
+                                !!menu.submenus?.length &&
+                                ((menuId === activeGroupId && !activeGroupManuallyClosed) || menuId === manualOpenMenuId);
 
                             return (
                                 <li
                                     key={menuIndex}
                                     className={`mc-sidebar-menu-item ${isMenuActive || isSubmenuActive ? "active" : ""}`}
                                 >
-                                    {menu.submenus ? (
+                                    {!!menu.submenus?.length ? (
                                         <>
                                             <button
                                                 type="button"
                                                 className={`mc-sidebar-menu-btn ${isSubmenuActive ? "active" : ""}`}
-                                                onClick={handleDropdown}
+                                                onClick={() => handleParentToggle(menuId, menuId === activeGroupId)}
+                                                aria-expanded={isMenuOpen}
                                             >
                                                 {IconComponent && <IconComponent />}
                                                 <span>{t(menu.text)}</span>
@@ -170,11 +299,11 @@ export default function SidebarLayout() {
 
                                             <ul
                                                 className="mc-sidebar-dropdown-list"
-                                                ref={el => dropdownRefs.current[menuIndex] = el}
-                                                style={{ height: isSubmenuActive ? "auto" : "0px", overflow: "hidden", transition: "height 0.3s ease" }}
+                                                style={{ height: isMenuOpen ? "auto" : "0px", overflow: "hidden", transition: "height 0.3s ease" }}
                                             >
                                                 {menu.submenus.map((submenu, subIndex) => {
-                                                    const isSubActive = `${APP_PREFIX_PATH}${submenu.path}` === currentPath;
+                                                    const isSubActive = isRouteActive(submenu.path);
+                                                    const SubIconComponent = iconMap[submenu.icon];
                                                     return (
                                                         <li
                                                             key={subIndex}
@@ -183,9 +312,10 @@ export default function SidebarLayout() {
                                                             <Link
                                                                 to={`${APP_PREFIX_PATH}${submenu.path}`}
                                                                 className={`mc-sidebar-dropdown-link ${isSubActive ? "active" : ""}`}
-                                                                // 👇 Fix: prevents scroll on navigation
+                                                                // Fix: prevents scroll on navigation
                                                                 replace
                                                             >
+                                                                {SubIconComponent && <SubIconComponent />}
                                                                 {t(submenu.text)}
                                                             </Link>
                                                         </li>
@@ -197,7 +327,7 @@ export default function SidebarLayout() {
                                         <Link
                                             to={`${APP_PREFIX_PATH}${menu.path}`}
                                             className={`mc-sidebar-menu-btn ${isMenuActive ? "active" : ""}`}
-                                            // 👇 Fix: prevents scroll on navigation
+                                            // Fix: prevents scroll on navigation
                                             replace
                                         >
                                             {IconComponent && <IconComponent />}

@@ -121,7 +121,13 @@ export default function DeletedOwnerTableComponent({ thead, tbody }) {
                                     </div>
                                 </td>
                                 <div className="mc-table-action" style={{ marginTop: '20px', marginLeft: '20px' }}>
-                                    <AnchorComponent to={`${APP_PREFIX_PATH}/owner-view/${encode(item.user_id)}`} title="View" className="material-icons view">visibility</AnchorComponent>
+                                    <AnchorComponent
+                                        to={`${APP_PREFIX_PATH}/owner-view/${encode(item.user_id)}?sidebar=deleted-owners`}
+                                        title="View"
+                                        className="material-icons view"
+                                    >
+                                        visibility
+                                    </AnchorComponent>
                                 </div>
                                 <td title={item.name}>
                                     <div className="mc-table-profile">

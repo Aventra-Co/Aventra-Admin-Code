@@ -131,7 +131,13 @@ export default function DeletedUserTableComponent({ thead, tbody }) {
                                 </td>
                                 <td>
                                     <div className="mc-table-action">
-                                        <AnchorComponent to={`${APP_PREFIX_PATH}/user-profile/${encode(item.user_id)}`} title="View" className="material-icons view">visibility</AnchorComponent>
+                                        <AnchorComponent
+                                            to={`${APP_PREFIX_PATH}/user-profile/${encode(item.user_id)}?sidebar=deleted-users`}
+                                            title="View"
+                                            className="material-icons view"
+                                        >
+                                            visibility
+                                        </AnchorComponent>
                                     </div>
                                 </td>
                                 <td title={item.name}>

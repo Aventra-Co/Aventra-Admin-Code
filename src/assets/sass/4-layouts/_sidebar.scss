@@ -199,9 +199,16 @@
     position: relative;
     text-transform: capitalize;
     margin: 6px 0px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     @include transition-linear;
 
     &:hover { color: var(--primaryHEX); }
+
+    svg {
+        font-size: 20px;
+    }
 
     &::before {
         content: "";

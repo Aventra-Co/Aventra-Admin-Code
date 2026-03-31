@@ -120,7 +120,13 @@ export default function DeletedStaffTableComponent({ thead, tbody }) {
                                 <td>
                                     <div className="mc-table-action">
 
-                                        <AnchorComponent to={`${APP_PREFIX_PATH}/view-staff/${encode(item.user_id)}`} title="View" className="material-icons view">visibility</AnchorComponent>
+                                        <AnchorComponent
+                                            to={`${APP_PREFIX_PATH}/view-staff/${encode(item.user_id)}?sidebar=deleted-staff`}
+                                            title="View"
+                                            className="material-icons view"
+                                        >
+                                            visibility
+                                        </AnchorComponent>
                                     </div>
                                 </td>
                                 <td title={item.name}>
