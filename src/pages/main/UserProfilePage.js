@@ -10,11 +10,16 @@ import './UserProfilePage.css';
 import { API_URL, APP_PREFIX_PATH, IMAGE_PATH } from "../../constant/constant";
 import LabelFieldComponent from "../../components/fields/LabelFieldComponent";
 import { encode } from "base-64";
+
 export default function UserProfilePage() {
     const [content, setContent] = useState(0);
     const [searchTerm, setSearchTerm] = useState("");
+    
     const handleButtonClick = (contentType) => {
-        setContent(contentTypes[contentType]);
+        if (contentType === 'trip') setContent(0);
+        if (contentType === 'property') setContent(1);
+        if (contentType === 'ratings') setContent(2);
+        setSearchTerm('');
     };
 
     const handleSearch = (e) => {
@@ -29,89 +34,130 @@ export default function UserProfilePage() {
     const [showImagePopup, setShowImagePopup] = useState(false);
 
     const [tripdetails, settripdetails] = useState([]);
-    // const [consultation, setconsultation] = useState([]);
-
-    const contentTypes = {
-        all: 0,
-        specific: 1
-    };
-
+    const [propertyBookings, setPropertyBookings] = useState([]);
 
     const getData = () => {
         axios.get(API_URL + `/view_user_by_id?user_id=${user_id}`).then((res) => {
             setData(res.data.user_arr[0] || []);
-
         }).catch((error) => {
             console.log(error);
-
         })
-
     }
 
     const TripData = () => {
         axios.get(API_URL + `/fetch_user_trip_details?user_id=${user_id}`).then((res) => {
-            console.log('response', res.data);
-            settripdetails(res.data.trip_arr);
+            console.log('Trip response', res.data);
+            settripdetails(res.data.trip_arr || []);
         }).catch((error) => {
             console.log(error);
+        })
+    }
 
+    const fetchPropertyBookings = () => {
+        axios.get(API_URL + `/fetch_user_property_booking?user_id=${user_id}`).then((res) => {
+            console.log('Property Booking response', res.data);
+            setPropertyBookings(res.data.property_booking_arr || []);
+        }).catch((error) => {
+            console.log(error);
         })
     }
 
     const fetchRatings = () => {
         axios.get(API_URL + `/fetch_user_ratings?user_id=${user_id}`).then((res) => {
-            console.log('response', res.data);
-            setRatings(res.data.rating_arr);
+            console.log('Ratings response', res.data);
+            setRatings(res.data.rating_arr || []);
         }).catch((error) => {
             console.log(error);
-
         })
     }
 
     useEffect(() => {
         getData();
         TripData();
+        fetchPropertyBookings();
         fetchRatings();
     }, [])
+
     const handleImageClick = (imageUrl) => {
         setEnlargedImage(imageUrl);
         setShowImagePopup(true);
     };
+    
     const handleCloseImage = () => {
         setEnlargedImage(null);
         setShowImagePopup(false);
     };
-    const filteredTripdetails = tripdetails.filter((user) => {
+
+    // Filter functions
+    const filteredTripdetails = tripdetails.filter((item) => {
         const lowercasedTerm = searchTerm.toLowerCase();
         return (
-            (user.transaction_id && String(user.transaction_id).toLowerCase().includes(lowercasedTerm)) ||
-            (user.total_amount && String(user.total_amount).toLowerCase().includes(lowercasedTerm)) ||
-            (user.booking_time && String(user.booking_time).toLowerCase().includes(lowercasedTerm)) ||
-            (user.hours && String(user.hours).toLowerCase().includes(lowercasedTerm)) ||
-            (user.date && String(user.date).toLowerCase().includes(lowercasedTerm)) ||
-            (user.trip_name_english && String(user.trip_name_english).toLowerCase().includes(lowercasedTerm)) ||
-            (user.random_booking_id && String(user.random_booking_id).toLowerCase().includes(lowercasedTerm)) ||
-            (user.createtime && String(user.createtime).toLowerCase().includes(lowercasedTerm))
+            (item.transaction_id && String(item.transaction_id).toLowerCase().includes(lowercasedTerm)) ||
+            (item.total_amount && String(item.total_amount).toLowerCase().includes(lowercasedTerm)) ||
+            (item.booking_time && String(item.booking_time).toLowerCase().includes(lowercasedTerm)) ||
+            (item.hours && String(item.hours).toLowerCase().includes(lowercasedTerm)) ||
+            (item.date && String(item.date).toLowerCase().includes(lowercasedTerm)) ||
+            (item.trip_name_english && String(item.trip_name_english).toLowerCase().includes(lowercasedTerm)) ||
+            (item.random_booking_id && String(item.random_booking_id).toLowerCase().includes(lowercasedTerm)) ||
+            (item.createtime && String(item.createtime).toLowerCase().includes(lowercasedTerm))
         );
     });
 
-    const filteredRatings = Ratings.filter((user) => {
+    const filteredPropertyBookings = propertyBookings.filter((item) => {
         const lowercasedTerm = searchTerm.toLowerCase();
         return (
-            (user.review && String(user.review).toLowerCase().includes(lowercasedTerm)) ||
-            (user.entertainment && String(user.entertainment).toLowerCase().includes(lowercasedTerm)) ||
-            (user.equipment && String(user.equipment).toLowerCase().includes(lowercasedTerm)) ||
-            (user.food && String(user.food).toLowerCase().includes(lowercasedTerm)) ||
-            (user.hospitality && String(user.hospitality).toLowerCase().includes(lowercasedTerm)) ||
-            (user.captain && String(user.captain).toLowerCase().includes(lowercasedTerm)) ||
-            (user.captain && String(user.captain).toLowerCase().includes(lowercasedTerm)) ||
-            (user.clean && String(user.clean).toLowerCase().includes(lowercasedTerm)) ||
-            (user.time && String(user.time).toLowerCase().includes(lowercasedTerm)) ||
-            (user.name && String(user.name).toLowerCase().includes(lowercasedTerm)) ||
-            (user.trip_name_english && String(user.trip_name_english).toLowerCase().includes(lowercasedTerm)) ||
-            (user.createtime && String(user.createtime).toLowerCase().includes(lowercasedTerm))
+            (item.booking_random_id && String(item.booking_random_id).toLowerCase().includes(lowercasedTerm)) ||
+            (item.property_name_english && String(item.property_name_english).toLowerCase().includes(lowercasedTerm)) ||
+            (item.transaction_id && String(item.transaction_id).toLowerCase().includes(lowercasedTerm)) ||
+            (item.total_amount && String(item.total_amount).toLowerCase().includes(lowercasedTerm)) ||
+            (item.checkin_date && String(item.checkin_date).toLowerCase().includes(lowercasedTerm)) ||
+            (item.checkout_date && String(item.checkout_date).toLowerCase().includes(lowercasedTerm)) ||
+            (item.createtime && String(item.createtime).toLowerCase().includes(lowercasedTerm))
         );
     });
+
+    const filteredRatings = Ratings.filter((item) => {
+        const lowercasedTerm = searchTerm.toLowerCase();
+        return (
+            (item.review && String(item.review).toLowerCase().includes(lowercasedTerm)) ||
+            (item.entertainment && String(item.entertainment).toLowerCase().includes(lowercasedTerm)) ||
+            (item.equipment && String(item.equipment).toLowerCase().includes(lowercasedTerm)) ||
+            (item.food && String(item.food).toLowerCase().includes(lowercasedTerm)) ||
+            (item.hospitality && String(item.hospitality).toLowerCase().includes(lowercasedTerm)) ||
+            (item.captain && String(item.captain).toLowerCase().includes(lowercasedTerm)) ||
+            (item.clean && String(item.clean).toLowerCase().includes(lowercasedTerm)) ||
+            (item.time && String(item.time).toLowerCase().includes(lowercasedTerm)) ||
+            (item.name && String(item.name).toLowerCase().includes(lowercasedTerm)) ||
+            (item.trip_name_english && String(item.trip_name_english).toLowerCase().includes(lowercasedTerm)) ||
+            (item.createtime && String(item.createtime).toLowerCase().includes(lowercasedTerm))
+        );
+    });
+
+    // Helper function to render status badge
+    const renderBookingStatus = (bookingStatus) => {
+        const statusConfig = {
+            0: { label: 'Pending', bgColor: '#FFF3CD', color: '#856404' },
+            1: { label: 'Ongoing', bgColor: '#CCE5FF', color: '#004085' },
+            2: { label: 'Completed', bgColor: '#D4EDDA', color: '#155724' },
+            3: { label: 'Canceled', bgColor: '#F8D7DA', color: '#721c24' }
+        };
+        
+        const config = statusConfig[bookingStatus] || { label: 'NA', bgColor: '#E2E3E5', color: '#383d41' };
+        
+        return (
+            <span style={{
+                padding: '4px 12px',
+                borderRadius: '999px',
+                backgroundColor: config.bgColor,
+                color: config.color,
+                fontSize: '14px',
+                fontWeight: '500',
+                display: 'inline-block'
+            }}>
+                {config.label}
+            </span>
+        );
+    };
 
     return (
         <PageLayout>
@@ -130,11 +176,9 @@ export default function UserProfilePage() {
             <div className="mc-card p-lg-4">
                 <Row>
                     <Col xl={5}>
-                        {/* <h6 className="mc-divide-title mb-4">{t('user_profile')}</h6> */}
                         <div className="mc-user-group">
                             <div className="">
                                 <div className="">
-
                                     <img
                                         src={Data.image ? `${IMAGE_PATH}${Data.image}` : `${IMAGE_PATH}Placeholder.webp`}
                                         alt="Profile"
@@ -145,12 +189,10 @@ export default function UserProfilePage() {
                                                 handleImageClick(Data.image ? `${IMAGE_PATH}${Data.image}` : `${IMAGE_PATH}Placeholder.webp`);
                                             }
                                         }}
-                                        // eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
-                                        role="button" // Add role="button" to indicate interactive element
-                                        tabIndex={0} // Add tabIndex={0} to make it focusable
+                                        role="button"
+                                        tabIndex={0}
                                     />
 
-                                    {/* Enlarged image overlay */}
                                     {showImagePopup && (
                                         <div
                                             className="enlarged-image-overlay"
@@ -180,148 +222,116 @@ export default function UserProfilePage() {
                                         </div>
                                     )}
                                 </div>
-
                             </div>
                         </div>
                     </Col>
                     <Col xl={7}>
-                        {/* <h6 className="mc-divide-title mb-4">{t('user_details')}</h6> */}
                         <div className="mc-product-view-info-group">
-
                             <div className="col-lg-12 content">
-
                                 <div className="row">
                                     <div className="col-lg-4">
                                         <h6 className="mt-2">
                                             {t('name')} : &nbsp;
                                         </h6>
-
                                     </div>
                                     <div className="col-lg-8">
                                         <span style={{ fontWeight: '400' }}>{Data.name ? Data.name : "NA"}</span>
                                     </div>
-
                                 </div>
                                 <div className="row">
                                     <div className="col-lg-4">
                                         <h6 className="mt-2">
                                             {t('email')} : &nbsp;
                                         </h6>
-
-
                                     </div>
                                     <div className="col-lg-8">
                                         <span style={{ fontWeight: '400' }}>{Data.email ? Data.email : "NA"}</span>
                                     </div>
-
                                 </div>
                                 <div className="row">
                                     <div className="col-lg-4">
                                         <h6 className="mt-2">
                                             {t('Mobile Number')} : &nbsp;
                                         </h6>
-
-
                                     </div>
                                     <div className="col-lg-8">
                                         <span style={{ fontWeight: '400' }}> {Data.mobile ? "+965" + Data.mobile : 'NA'}</span>
                                     </div>
-
                                 </div>
                                 <div className="row">
                                     <div className="col-lg-4">
                                         <h6 className="mt-2">
                                             {t('dob')} : &nbsp;
                                         </h6>
-
                                     </div>
                                     <div className="col-lg-8">
                                         <span style={{ fontWeight: '400' }}>{Data.dob ? Data.dob : 'NA'}</span>
                                     </div>
-
                                 </div>
                                 <div className="row">
                                     <div className="col-lg-4">
                                         <h6 className="mt-2">
                                             {t('Country')} : &nbsp;
                                         </h6>
-
                                     </div>
                                     <div className="col-lg-8">
                                         <span style={{ fontWeight: '400' }}>{Data.country_name ? Data.country_name : 'NA'}</span>
                                     </div>
-
                                 </div>
                                 <div className="row">
                                     <div className="col-lg-4">
                                         <h6 className="mt-2">
                                             {t('City')} : &nbsp;
                                         </h6>
-
                                     </div>
                                     <div className="col-lg-8">
                                         <span style={{ fontWeight: '400' }}>{Data.city_name ? Data.city_name : 'NA'}</span>
                                     </div>
-
                                 </div>
-                                {/* <div className="row">
-                                    <div className="col-lg-4">
-                                        <h6 className="mt-2">
-                                            {t('Address')} : &nbsp;
-                                        </h6>
-
-                                    </div>
-                                    <div className="col-lg-8">
-                                        <span style={{ fontWeight: '400' }}>{Data.address ? Data.address : 'NA'}</span>
-                                    </div>
-
-                                </div> */}
                                 <div className="row">
                                     <div className="col-lg-4">
                                         <h6 className="mt-2">
                                             {t('createdatetime')} : &nbsp;
                                         </h6>
-
                                     </div>
                                     <div className="col-lg-8">
                                         <span style={{ fontWeight: '400' }}>{Data.createtime ? Data.createtime : "NA"}</span>
                                     </div>
-
                                 </div>
-
-
-
-
-
                             </div>
                         </div>
-
-
                     </Col>
-
-
                 </Row>
+                
                 <Card.Body className="mt-5">
                     <Form>
                         <nav className="navbar navbar-expand-lg navbar-light navBar">
                             <div
                                 className="container mobile"
                                 id="container-div"
-                                style={{ marginTop: '-2rem', width: '22rem', borderRadius: '5px', marginLeft: '0rem' }}
+                                style={{ marginTop: '-2rem', width: 'auto', borderRadius: '5px', marginLeft: '0rem', display: 'flex', flexWrap: 'wrap', gap: '10px' }}
                             >
                                 <button
-                                    className={`btn btn-outline-success me-2 mb-2 btn-content ${content === contentTypes.all ? 'btn-active' : ''}`}
-                                    style={{ width: '15rem' }}
+                                    className={`btn btn-outline-success me-2 mb-2 btn-content ${content === 0 ? 'btn-active' : ''}`}
+                                    style={{ width: '12rem' }}
                                     type="button"
-                                    onClick={() => handleButtonClick('all')}
+                                    onClick={() => handleButtonClick('trip')}
                                 >
                                     {t('Trip Booking')}
                                 </button>
                                 <button
-                                    className={`btn btn-outline-success me-2  mb-2 btn-content ${content === contentTypes.specific ? 'btn-active' : ''}`}
-                                    style={{ width: '15rem' }}
+                                    className={`btn btn-outline-success me-2 mb-2 btn-content ${content === 1 ? 'btn-active' : ''}`}
+                                    style={{ width: '12rem' }}
                                     type="button"
-                                    onClick={() => handleButtonClick('specific')}
+                                    onClick={() => handleButtonClick('property')}
+                                >
+                                    {t('Property Booking')}
+                                </button>
+                                <button
+                                    className={`btn btn-outline-success me-2 mb-2 btn-content ${content === 2 ? 'btn-active' : ''}`}
+                                    style={{ width: '12rem' }}
+                                    type="button"
+                                    onClick={() => handleButtonClick('ratings')}
                                 >
                                     {t('Ratings')}
                                 </button>
@@ -342,19 +352,14 @@ export default function UserProfilePage() {
                             </Col>
                         </Row>
 
+                        {/* Trip Booking Tab */}
                         {content === 0 && (
                             <div style={{ margin: '1rem' }}>
                                 <div className="mc-table-responsive">
                                     <table className="mc-table">
                                         <thead className="mc-table-head primary">
                                             <tr>
-                                                <th>
-                                                    <div className="mc-table-check">
-                                                        <p>{t("sno")}</p>
-                                                    </div>
-                                                </th>
-
-
+                                                <th><div className="mc-table-check"><p>{t("sno")}</p></div></th>
                                                 <th>{t("Action")}</th>
                                                 <th>{t("Booking ID")}</th>
                                                 <th>{t("Boat Name")}</th>
@@ -368,63 +373,21 @@ export default function UserProfilePage() {
                                             </tr>
                                         </thead>
                                         <tbody className="mc-table-body even">
-
                                             {filteredTripdetails && filteredTripdetails.length > 0 ? (
-                                                tripdetails.map((item, index) => (
+                                                filteredTripdetails.map((item, index) => (
                                                     <tr key={index}>
-                                                        <td title="id">
-                                                            <div className="mc-table-check">
-                                                                <p>{index + 1}</p>
-                                                            </div>
-                                                        </td>
+                                                        <td title="id"><div className="mc-table-check"><p>{index + 1}</p></div></td>
                                                         <td>
-                                                            <AnchorComponent to={`${APP_PREFIX_PATH}/view-trip/${encode(item.trip_id)}`} title="View" className="material-icons view">visibility</AnchorComponent></td>
+                                                            <AnchorComponent to={`${APP_PREFIX_PATH}/view-trip/${encode(item.trip_id)}`} title="View" className="material-icons view">
+                                                                visibility
+                                                            </AnchorComponent>
+                                                        </td>
                                                         <td>#{item.random_booking_id || 'NA'}</td>
                                                         <td>{item.boat_name_english || 'NA'}</td>
                                                         <td>{item.date || 'NA'}</td>
                                                         <td>{item.hours || 'NA'}</td>
                                                         <td>{item.booking_time || 'NA'}</td>
-                                                        <td>
-                                                            <span
-                                                                style={{
-                                                                    padding: '4px 12px',
-                                                                    borderRadius: '999px',
-                                                                    backgroundColor:
-                                                                        item.trip_status === 0
-                                                                            ? '#FFF3CD' // yellow
-                                                                            : item.trip_status === 1
-                                                                                ? '#CCE5FF' // blue
-                                                                                : item.trip_status === 2
-                                                                                    ? '#D4EDDA' // green
-                                                                                    : item.trip_status === 3
-                                                                                        ? '#F8D7DA' // red
-                                                                                        : '#E2E3E5', // default gray
-                                                                    color:
-                                                                        item.trip_status === 0
-                                                                            ? '#856404'
-                                                                            : item.trip_status === 1
-                                                                                ? '#004085'
-                                                                                : item.trip_status === 2
-                                                                                    ? '#155724'
-                                                                                    : item.trip_status === 3
-                                                                                        ? '#721c24'
-                                                                                        : '#383d41',
-                                                                    fontSize: '14px',
-                                                                    fontWeight: '500',
-                                                                }}
-                                                            >
-                                                                {item.trip_status === 0
-                                                                    ? 'Pending'
-                                                                    : item.trip_status === 1
-                                                                        ? 'Ongoing'
-                                                                        : item.trip_status === 2
-                                                                            ? 'Completed'
-                                                                            : item.trip_status === 3
-                                                                                ? 'Canceled'
-                                                                                : 'NA'}
-                                                            </span>
-                                                        </td>
-
+                                                        <td>{renderBookingStatus(item.trip_status)}</td>
                                                         <td>{item.total_amount || 'NA'}</td>
                                                         <td>{item.transaction_id || 'NA'}</td>
                                                         <td>{item.createtime || 'NA'}</td>
@@ -432,28 +395,83 @@ export default function UserProfilePage() {
                                                 ))
                                             ) : (
                                                 <tr>
-                                                    <td colSpan="5" style={{ textAlign: 'center' }}>No data available</td>
+                                                    <td colSpan="11" style={{ textAlign: 'center' }}>No data available</td>
                                                 </tr>
                                             )}
                                         </tbody>
-
-
                                     </table>
-
                                 </div>
                             </div>
                         )}
+
+                        {/* Property Booking Tab */}
                         {content === 1 && (
                             <div style={{ margin: '1rem' }}>
                                 <div className="mc-table-responsive">
                                     <table className="mc-table">
                                         <thead className="mc-table-head primary">
                                             <tr>
-                                                <th>
-                                                    <div className="mc-table-check">
-                                                        <p>{t("sno")}</p>
-                                                    </div>
-                                                </th>
+                                                <th><div className="mc-table-check"><p>{t("sno")}</p></div></th>
+                                                {/* <th>{t("Action")}</th> */}
+                                                <th>{t("Booking ID")}</th>
+                                                <th>{t("Property Name")}</th>
+                                                <th>{t("Check-in Date")}</th>
+                                                <th>{t("Check-out Date")}</th>
+                                                <th>{t("Total Nights")}</th>
+                                                <th>{t("Max Child")}</th>
+                                                <th>{t("Max Adult")}</th>
+                                                <th>{t("Status")}</th>
+                                                <th>{t("Total Amount")}</th>
+                                                <th>{t("Transaction ID")}</th>
+                                                <th>{t("Booking Date & Time")}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="mc-table-body even">
+                                            {filteredPropertyBookings && filteredPropertyBookings.length > 0 ? (
+                                                filteredPropertyBookings.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td title="id"><div className="mc-table-check"><p>{index + 1}</p></div></td>
+                                                        {/* <td>
+                                                            <AnchorComponent 
+                                                                to={`${APP_PREFIX_PATH}/view-property-booking/${encode(item.property_booking_id)}`} 
+                                                                title="View" 
+                                                                className="material-icons view"
+                                                            >
+                                                                visibility
+                                                            </AnchorComponent>
+                                                        </td> */}
+                                                        <td>#{item.booking_random_id || 'NA'}</td>
+                                                        <td>{item.property_name_english || 'NA'}</td>
+                                                        <td>{item.checkin_date || 'NA'}</td>
+                                                        <td>{item.checkout_date || 'NA'}</td>
+                                                        <td>{item.total_nights || 'NA'}</td>
+                                                        <td>{item.max_child || 'NA'}</td>
+                                                        <td>{item.max_adult || 'NA'}</td>
+                                                        <td>{renderBookingStatus(item.booking_status)}</td>
+                                                        <td>{item.total_amount || 'NA'}</td>
+                                                        <td>{item.transaction_id || 'NA'}</td>
+                                                        <td>{item.createtime || 'NA'}</td>
+                                                    </tr>
+                                                ))
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan="11" style={{ textAlign: 'center' }}>No data available</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Ratings Tab */}
+                        {content === 2 && (
+                            <div style={{ margin: '1rem' }}>
+                                <div className="mc-table-responsive">
+                                    <table className="mc-table">
+                                        <thead className="mc-table-head primary">
+                                            <tr>
+                                                <th><div className="mc-table-check"><p>{t("sno")}</p></div></th>
                                                 <th>{t("Boat Name")}</th>
                                                 <th>{t("Time")}</th>
                                                 <th>{t("Clean")}</th>
@@ -461,7 +479,6 @@ export default function UserProfilePage() {
                                                 <th>{t("Hospitality")}</th>
                                                 <th>{t("Food")}</th>
                                                 <th>{t("Equipment")}</th>
-
                                                 <th>{t("Entertainment")}</th>
                                                 <th>{t("review")}</th>
                                                 <th>{t("createtime")}</th>
@@ -469,13 +486,9 @@ export default function UserProfilePage() {
                                         </thead>
                                         <tbody className="mc-table-body even">
                                             {filteredRatings && filteredRatings.length > 0 ? (
-                                                Ratings.map((item, index) => (
+                                                filteredRatings.map((item, index) => (
                                                     <tr key={index}>
-                                                        <td title="id">
-                                                            <div className="mc-table-check">
-                                                                <p>{index + 1}</p>
-                                                            </div>
-                                                        </td>
+                                                        <td title="id"><div className="mc-table-check"><p>{index + 1}</p></div></td>
                                                         <td>{item.boat_name_english || 'NA'}</td>
                                                         <td>{item.time || 'NA'}</td>
                                                         <td>{item.clean || 'NA'}</td>
@@ -490,17 +503,14 @@ export default function UserProfilePage() {
                                                 ))
                                             ) : (
                                                 <tr>
-                                                    <td colSpan="7" style={{ textAlign: 'center' }}>No data available</td>
+                                                    <td colSpan="11" style={{ textAlign: 'center' }}>No data available</td>
                                                 </tr>
                                             )}
                                         </tbody>
-
-                                    </table >
-
+                                    </table>
                                 </div>
                             </div>
                         )}
-
                     </Form>
                 </Card.Body>
             </div>

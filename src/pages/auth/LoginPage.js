@@ -48,11 +48,11 @@ export default function LoginPage() {
         let hasError = false;
 
         if (!email) {
-            setEmailError(t("enter your email"));
+            setEmailError(t("Enter your email"));
             hasError = true;
         }
         if (!password) {
-            setPasswordError(t("enter your password"));
+            setPasswordError(t("Enter your password"));
             hasError = true;
         }
 
@@ -133,7 +133,7 @@ export default function LoginPage() {
                         icon="email"
                         type="email"
                         classes="w-100 h-sm"
-                        placeholder={t('enter your email')}
+                        placeholder={t('Enter your email')}
                         value={email}
                         onChange={(e) => { setEmail(e.target.value); setEmailError(''); }}
                         maxLength={100}
@@ -149,7 +149,7 @@ export default function LoginPage() {
                         icon="lock"
                         type="password"
                         classes="w-100 h-sm"
-                        placeholder={t('enter your password')}
+                        placeholder={t('Enter your password')}
                         passwordVisible={true}
                         value={password}
                         onChange={(e) => { setPassword(e.target.value); setPasswordError(''); }}

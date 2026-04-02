@@ -28,6 +28,7 @@ export default function AnalyticsPage() {
         boatcount: 0,
         contactusCount: 0,
         earningcount: 0,
+        propertyCount:0
 
 
     });
@@ -139,6 +140,18 @@ export default function AnalyticsPage() {
                                     </div>
 
                                     <p className="card-p mt-0" style={{ fontSize: '25px' }}>{Count.tripcount}</p>
+                                </Link>
+                            </div>
+                        </Col>
+                        <Col xl={3} md={6} sm={12}>
+                            <div className="card6">
+                                <Link to={APP_PREFIX_PATH + "/property-advertisement"} className="w-100">
+                                    <div className="d-flex justify-content-between align-items-center">
+                                        <h3 className="card-heading">{t('Property')}</h3>
+                                        <div><FormatListBulletedIcon style={{ color: 'white', fontSize: "50px" }} /></div>
+                                    </div>
+
+                                    <p className="card-p mt-0" style={{ fontSize: '25px' }}>{Count.propertyCount}</p>
                                 </Link>
                             </div>
                         </Col>

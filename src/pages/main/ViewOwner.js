@@ -1308,7 +1308,7 @@ export default function ViewOwner() {
                           }}
                         >
                           {' '}
-                          <AddIcon className='me-2' /> {t('Add Advertisement')}{' '}
+                          <AddIcon className='me-2' /> {t('Add Property Advertisement')}{' '}
                         </button>
                       </Link>
                     </Col>

@@ -35,11 +35,38 @@ export default function EditProperty() {
   // Loading states
   const [loading, setLoading] = useState({
     page: true,
-    submit: false
+    submit: false,
+    types: true
   })
+  
+  // Property types state
+  const [propertyTypes, setPropertyTypes] = useState([])
   const [error, setError] = useState({})
 
   const navigate = useNavigate()
+
+  // Fetch property types on component mount
+  useEffect(() => {
+    const fetchPropertyTypes = async () => {
+      try {
+        setLoading(prev => ({ ...prev, types: true }))
+        const response = await axios.get(API_URL + '/get_all_property_type')
+        
+        if (response.data.success && response.data.data) {
+          setPropertyTypes(response.data.data)
+        } else {
+          setPropertyTypes([])
+        }
+      } catch (error) {
+        console.error('Error fetching property types:', error)
+        setPropertyTypes([])
+      } finally {
+        setLoading(prev => ({ ...prev, types: false }))
+      }
+    }
+    
+    fetchPropertyTypes()
+  }, [])
 
   // Handle form input changes
   const handleInputChange = (field, value) => {
@@ -289,7 +316,7 @@ export default function EditProperty() {
             </div>
           </div>
 
-          {/* Property Type - Fixed with Integer Values */}
+          {/* Property Type - Dynamic from API */}
           <div className='row m-2'>
             <div className='col-md-12'>
               <label htmlFor='property_type' className='form-label'>
@@ -300,11 +327,22 @@ export default function EditProperty() {
                 value={formData.property_type}
                 onChange={e => handleInputChange('property_type', e.target.value)}
                 isInvalid={!!ownerError.property_type}
+                disabled={loading.types}
               >
-                <option value=''>Select Property Type</option>
-                <option value='1'>Villa</option>
-                <option value='2'>Farm House</option>
-                <option value='3'>Resort</option>
+                <option value=''>
+                  {loading.types ? 'Loading property types...' : 'Select Property Type'}
+                </option>
+                {!loading.types && propertyTypes.length > 0 ? (
+                  propertyTypes.map((type) => (
+                    <option key={type.property_type_id} value={type.property_type_id}>
+                      {type.property_type_name} / {type.property_type_name_arabic}
+                    </option>
+                  ))
+                ) : (
+                  !loading.types && (
+                    <option value='' disabled>No property types available</option>
+                  )
+                )}
               </Form.Select>
               <Form.Control.Feedback type='invalid'>
                 {ownerError.property_type}
@@ -339,7 +377,7 @@ export default function EditProperty() {
               </label>
               <Form.Control
                 type='number'
-                placeholder='Enter number'
+                placeholder='Enter Rooms'
                 value={formData.no_of_rooms}
                 onChange={e => handleInputChange('no_of_rooms', e.target.value)}
                 isInvalid={!!ownerError.no_of_rooms}
@@ -355,7 +393,7 @@ export default function EditProperty() {
               </label>
               <Form.Control
                 type='number'
-                placeholder='Enter number'
+                placeholder='Enter Halls'
                 value={formData.no_of_halls}
                 onChange={e => handleInputChange('no_of_halls', e.target.value)}
                 isInvalid={!!ownerError.no_of_halls}
@@ -371,7 +409,7 @@ export default function EditProperty() {
               </label>
               <Form.Control
                 type='number'
-                placeholder='Enter number'
+                placeholder='Enter Washrooms'
                 value={formData.no_of_washroom}
                 onChange={e => handleInputChange('no_of_washroom', e.target.value)}
                 isInvalid={!!ownerError.no_of_washroom}
@@ -391,7 +429,7 @@ export default function EditProperty() {
               </label>
               <Form.Control
                 type='text'
-                placeholder='e.g., 1 large garden'
+                placeholder='Enter Outdoor Seating'
                 value={formData.outdoor_seating}
                 onChange={e => handleInputChange('outdoor_seating', e.target.value)}
                 isInvalid={!!ownerError.outdoor_seating}
@@ -408,7 +446,7 @@ export default function EditProperty() {
               </label>
               <Form.Control
                 type='text'
-                placeholder='e.g., 1 small water pool in the garden'
+                placeholder='Enter Pool'
                 value={formData.pool}
                 onChange={e => handleInputChange('pool', e.target.value)}
                 isInvalid={!!ownerError.pool}

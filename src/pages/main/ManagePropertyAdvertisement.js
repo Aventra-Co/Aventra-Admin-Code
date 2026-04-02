@@ -428,7 +428,7 @@ export default function ManagePropertyAdvertisement() {
     formDataObj.append('description_korean', formData.description_korean || '')
 
     // Price periods - All are now active by default
-    formDataObj.append('one_day_price', formData.one_day_price || 0)
+    formDataObj.append('one_day_price', formData.one_day_price || 1000000)
     formDataObj.append('one_day_active', formData.one_day_active ? 1 : 0)
     formDataObj.append('weekday_price', formData.weekday_price)
     formDataObj.append('weekday_active', 1) // Always active

@@ -31,9 +31,34 @@ export default function AddProperty() {
 
   // Loading state
   const [loading, setLoading] = useState(false)
+  const [propertyTypes, setPropertyTypes] = useState([])
+  const [loadingTypes, setLoadingTypes] = useState(true)
   const [error, setError] = useState({})
 
   const navigate = useNavigate()
+
+  // Fetch property types on component mount
+  useEffect(() => {
+    const fetchPropertyTypes = async () => {
+      try {
+        setLoadingTypes(true)
+        const response = await axios.get(API_URL + '/get_all_property_type')
+        
+        if (response.data.success && response.data.data) {
+          setPropertyTypes(response.data.data)
+        } else {
+          setPropertyTypes([])
+        }
+      } catch (error) {
+        console.error('Error fetching property types:', error)
+        setPropertyTypes([])
+      } finally {
+        setLoadingTypes(false)
+      }
+    }
+    
+    fetchPropertyTypes()
+  }, [])
 
   // Handle form input changes
   const handleInputChange = (field, value) => {
@@ -117,7 +142,7 @@ export default function AddProperty() {
     // Append all form fields
     formDataObj.append('user_id', decode(user_id))
     formDataObj.append('property_name_english', formData.property_name_english)
-    formDataObj.append('property_type', formData.property_type)
+    formDataObj.append('property_type', formData.property_type) // This will send property_type_id
     formDataObj.append('property_address', formData.property_address)
     formDataObj.append('no_of_rooms', formData.no_of_rooms)
     formDataObj.append('no_of_halls', formData.no_of_halls)
@@ -206,7 +231,7 @@ export default function AddProperty() {
             </div>
           </div>
 
-          {/* Property Type - Fixed with Integer Values */}
+          {/* Property Type - Dynamic from API */}
           <div className='row m-2'>
             <div className='col-md-12'>
               <label htmlFor='property_type' className='form-label'>
@@ -217,11 +242,22 @@ export default function AddProperty() {
                 value={formData.property_type}
                 onChange={e => handleInputChange('property_type', e.target.value)}
                 isInvalid={!!ownerError.property_type}
+                disabled={loadingTypes}
               >
-                <option value=''>Select Property Type</option>
-                <option value='1'>Villa</option>
-                <option value='2'>Farm House</option>
-                <option value='3'>Resort</option>
+                <option value=''>
+                  {loadingTypes ? 'Loading property types...' : 'Select Property Type'}
+                </option>
+                {!loadingTypes && propertyTypes.length > 0 ? (
+                  propertyTypes.map((type) => (
+                    <option key={type.property_type_id} value={type.property_type_id}>
+                      {type.property_type_name} / {type.property_type_name_arabic}
+                    </option>
+                  ))
+                ) : (
+                  !loadingTypes && (
+                    <option value='' disabled>No property types available</option>
+                  )
+                )}
               </Form.Select>
               <Form.Control.Feedback type='invalid'>
                 {ownerError.property_type}
@@ -256,7 +292,7 @@ export default function AddProperty() {
               </label>
               <Form.Control
                 type='number'
-                placeholder='Enter number'
+                placeholder='Enter Rooms'
                 value={formData.no_of_rooms}
                 onChange={e => handleInputChange('no_of_rooms', e.target.value)}
                 isInvalid={!!ownerError.no_of_rooms}
@@ -272,7 +308,7 @@ export default function AddProperty() {
               </label>
               <Form.Control
                 type='number'
-                placeholder='Enter number'
+                placeholder='Enter Halls'
                 value={formData.no_of_halls}
                 onChange={e => handleInputChange('no_of_halls', e.target.value)}
                 isInvalid={!!ownerError.no_of_halls}
@@ -288,7 +324,7 @@ export default function AddProperty() {
               </label>
               <Form.Control
                 type='number'
-                placeholder='Enter number'
+                placeholder='Enter washrooms'
                 value={formData.no_of_washroom}
                 onChange={e => handleInputChange('no_of_washroom', e.target.value)}
                 isInvalid={!!ownerError.no_of_washroom}
@@ -308,7 +344,7 @@ export default function AddProperty() {
               </label>
               <Form.Control
                 type='text'
-                placeholder='e.g., 1 large garden'
+                placeholder='Enter Outdoor Seating'
                 value={formData.outdoor_seating}
                 onChange={e => handleInputChange('outdoor_seating', e.target.value)}
                 isInvalid={!!ownerError.outdoor_seating}
@@ -325,7 +361,7 @@ export default function AddProperty() {
               </label>
               <Form.Control
                 type='text'
-                placeholder='e.g., 1 small water pool in the garden'
+                placeholder='Enter Pool'
                 value={formData.pool}
                 onChange={e => handleInputChange('pool', e.target.value)}
                 isInvalid={!!ownerError.pool}

@@ -3,6 +3,20 @@ import { ref, update, onDisconnect, onChildAdded, onChildChanged, onChildRemoved
 // import { getDatabase, ref, } from 'firebase/database';
 // Initialize Firebase
 
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/database';
+import $ from 'jquery';
+
+const msgProvider = {
+  alert: (title, msg) => {
+    alert(title + ' : ' + msg);
+  }
+};
+
+const URLAPI_img_200X200 = '';
+const error_img_user = '';
+const m_names_sort = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
 // export const db = getFirestore(app);
  
 export const userProvider = {
