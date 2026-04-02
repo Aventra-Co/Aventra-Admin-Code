@@ -29,13 +29,18 @@ export default function PropertyTypeTableComponent({ thead, tbody }) {
     const [propertyTypeNameArabic, setPropertyTypeNameArabic] = useState("");
     const [propertyTypeImageFile, setPropertyTypeImageFile] = useState(null);
     const [propertyTypeImagePreview, setPropertyTypeImagePreview] = useState(null);
+    const [vectorImageFile, setVectorImageFile] = useState(null);
+    const [vectorImagePreview, setVectorImagePreview] = useState(null);
     
     // Edit form states
     const [editPropertyTypeName, setEditPropertyTypeName] = useState("");
     const [editPropertyTypeNameArabic, setEditPropertyTypeNameArabic] = useState("");
     const [editPropertyTypeImageFile, setEditPropertyTypeImageFile] = useState(null);
     const [editPropertyTypeImagePreview, setEditPropertyTypeImagePreview] = useState(null);
+    const [editVectorImageFile, setEditVectorImageFile] = useState(null);
+    const [editVectorImagePreview, setEditVectorImagePreview] = useState(null);
     const [existingImage, setExistingImage] = useState("");
+    const [existingVectorImage, setExistingVectorImage] = useState("");
     
     // Error states
     const [propertyTypeError, setPropertyTypeError] = useState({});
@@ -86,7 +91,9 @@ export default function PropertyTypeTableComponent({ thead, tbody }) {
             setEditPropertyTypeName(item.property_type_name || "");
             setEditPropertyTypeNameArabic(item.property_type_name_arabic || "");
             setExistingImage(item.property_type_image || "");
+            setExistingVectorImage(item.vector_image || "");
             setEditPropertyTypeImagePreview(item.property_type_image ? `${IMAGE_PATH}/${item.property_type_image}` : null);
+            setEditVectorImagePreview(item.vector_image ? `${IMAGE_PATH}/${item.vector_image}` : null);
         } else if (action === 'delete') {
             setAlertModal(true);
             setPropertyTypeId(item.property_type_id);
@@ -129,6 +136,19 @@ export default function PropertyTypeTableComponent({ thead, tbody }) {
         }
     };
 
+    const handleAddVectorImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setVectorImageFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setVectorImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+            setPropertyTypeError((prev) => ({ ...prev, vector_image: "" }));
+        }
+    };
+
     const handleEditImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -139,6 +159,19 @@ export default function PropertyTypeTableComponent({ thead, tbody }) {
             };
             reader.readAsDataURL(file);
             setPropertyTypeError((prev) => ({ ...prev, editPropertyTypeImage: "" }));
+        }
+    };
+
+    const handleEditVectorImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setEditVectorImageFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setEditVectorImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+            setPropertyTypeError((prev) => ({ ...prev, editVectorImage: "" }));
         }
     };
 
@@ -164,6 +197,9 @@ export default function PropertyTypeTableComponent({ thead, tbody }) {
         if (editPropertyTypeImageFile) {
             formData.append('property_type_image', editPropertyTypeImageFile);
         }
+        if (editVectorImageFile) {
+            formData.append('vector_image', editVectorImageFile);
+        }
 
         axios.post(API_URL + '/edit_property_type', formData, {
             headers: {
@@ -176,7 +212,10 @@ export default function PropertyTypeTableComponent({ thead, tbody }) {
                 setEditPropertyTypeNameArabic('');
                 setEditPropertyTypeImageFile(null);
                 setEditPropertyTypeImagePreview(null);
+                setEditVectorImageFile(null);
+                setEditVectorImagePreview(null);
                 setExistingImage('');
+                setExistingVectorImage('');
                 setEditModal(false);
                 setsuccessModel(true);
                 fetchPropertyTypes();
@@ -210,6 +249,9 @@ export default function PropertyTypeTableComponent({ thead, tbody }) {
         if (!propertyTypeImageFile) {
             error.property_type_image = "Please select an image";
         }
+        if (!vectorImageFile) {
+            error.vector_image = "Please select a vector image";
+        }
         
         if (Object.keys(error).length > 0) {
             setPropertyTypeError(error);
@@ -220,6 +262,7 @@ export default function PropertyTypeTableComponent({ thead, tbody }) {
         formData.append('property_type_name', propertyTypeName);
         formData.append('property_type_name_arabic', propertyTypeNameArabic);
         formData.append('property_type_image', propertyTypeImageFile);
+        formData.append('vector_image', vectorImageFile);
 
         axios.post(API_URL + '/add_property_type', formData, {
             headers: {
@@ -232,6 +275,8 @@ export default function PropertyTypeTableComponent({ thead, tbody }) {
                 setPropertyTypeNameArabic('');
                 setPropertyTypeImageFile(null);
                 setPropertyTypeImagePreview(null);
+                setVectorImageFile(null);
+                setVectorImagePreview(null);
                 fetchPropertyTypes();
                 setAddModal(false);
                 setsuccessModel(true);
@@ -257,6 +302,8 @@ export default function PropertyTypeTableComponent({ thead, tbody }) {
         setPropertyTypeNameArabic('');
         setPropertyTypeImageFile(null);
         setPropertyTypeImagePreview(null);
+        setVectorImageFile(null);
+        setVectorImagePreview(null);
     };
 
     const resetEditModal = () => {
@@ -266,7 +313,10 @@ export default function PropertyTypeTableComponent({ thead, tbody }) {
         setEditPropertyTypeNameArabic('');
         setEditPropertyTypeImageFile(null);
         setEditPropertyTypeImagePreview(null);
+        setEditVectorImageFile(null);
+        setEditVectorImagePreview(null);
         setExistingImage('');
+        setExistingVectorImage('');
     };
 
     return (
@@ -306,6 +356,7 @@ export default function PropertyTypeTableComponent({ thead, tbody }) {
                                 </th>
                                 <th>{t("actions")}</th>
                                 <th>{t("Image")}</th>
+                                <th>{t("Vector Image")}</th>
                                 <th>{t("Property Type Name")}</th>
                                 <th>{t("Property Type Name Arabic")}</th>
                                 <th>{t("createtime")}</th>
@@ -348,6 +399,17 @@ export default function PropertyTypeTableComponent({ thead, tbody }) {
                                             <span>NA</span>
                                         )}
                                     </td>
+                                    <td style={{ textAlign: 'center' }}>
+                                        {item.vector_image ? (
+                                            <img 
+                                                src={`${IMAGE_PATH}/${item.vector_image}`} 
+                                                alt={item.property_type_name}
+                                                style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px' }}
+                                            />
+                                        ) : (
+                                            <span>NA</span>
+                                        )}
+                                    </td>
                                     <td>
                                         <span>{item.property_type_name || 'NA'}</span>
                                     </td>
@@ -372,8 +434,6 @@ export default function PropertyTypeTableComponent({ thead, tbody }) {
                         <div className="mc-user-modal">
                             <h4 className="mb-3">{t('Edit Property Type')}</h4>
                             
-                            
-
                             <Form.Group className="form-group mb-4 ml-2">
                                 <Form.Label>{t('Property Type Name')}</Form.Label>
                                 <Form.Control
@@ -411,31 +471,38 @@ export default function PropertyTypeTableComponent({ thead, tbody }) {
                                 </Form.Control.Feedback>
                             </Form.Group>
 
-                            {/* Image Preview */}
-                            <div className="text-center mb-3">
+                            {/* Property Type Image Preview */}
+                            {/* <div className="text-center mb-3">
+                                <label className="fw-bold">Property Type Image</label>
                                 {editPropertyTypeImagePreview ? (
-                                    <img 
-                                        src={editPropertyTypeImagePreview} 
-                                        alt="Preview" 
-                                        style={{ width: '100px', height: '100px', marginTop:'3px', objectFit: 'cover', borderRadius: '80px' }}
-                                    />
+                                    <div>
+                                        <img 
+                                            src={editPropertyTypeImagePreview} 
+                                            alt="Preview" 
+                                            style={{ width: '100px', height: '100px', marginTop: '3px', objectFit: 'cover', borderRadius: '8px' }}
+                                        />
+                                    </div>
                                 ) : existingImage ? (
-                                    <img 
-                                        src={`${IMAGE_PATH}/${existingImage}`} 
-                                        alt="Current" 
-                                        style={{ width: '100px', height: '100px', marginTop:'3px', objectFit: 'cover', borderRadius: '80px' }}
-                                    />
+                                    <div>
+                                        <img 
+                                            src={`${IMAGE_PATH}/${existingImage}`} 
+                                            alt="Current" 
+                                            style={{ width: '100px', height: '100px', marginTop: '3px', objectFit: 'cover', borderRadius: '8px' }}
+                                        />
+                                    </div>
                                 ) : (
-                                    <img 
-                                        src={propertyTypeImage} 
-                                        alt="Default" 
-                                        style={{ width: '100px', height: '100px', marginTop:'3px', objectFit: 'cover', borderRadius: '80px' }}
-                                    />
+                                    <div>
+                                        <img 
+                                            src={propertyTypeImage} 
+                                            alt="Default" 
+                                            style={{ width: '100px', height: '100px', marginTop: '3px', objectFit: 'cover', borderRadius: '8px' }}
+                                        />
+                                    </div>
                                 )}
-                            </div>
+                            </div> */}
 
                             <Form.Group className="form-group mb-4 ml-2">
-                                <Form.Label>{t('Vector Image')}</Form.Label>
+                                <Form.Label>{t('Property Type Image')}</Form.Label>
                                 <Form.Control
                                     type="file"
                                     accept="image/*"
@@ -447,6 +514,52 @@ export default function PropertyTypeTableComponent({ thead, tbody }) {
                                 </Form.Text>
                                 <Form.Control.Feedback type="invalid">
                                     {propertyTypeError.editPropertyTypeImage}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+
+                            {/* Vector Image Preview */}
+                            {/* <div className="text-center mb-3">
+                                <label className="fw-bold">Vector Image</label>
+                                {editVectorImagePreview ? (
+                                    <div>
+                                        <img 
+                                            src={editVectorImagePreview} 
+                                            alt="Vector Preview" 
+                                            style={{ width: '100px', height: '100px', marginTop: '3px', objectFit: 'cover', borderRadius: '8px' }}
+                                        />
+                                    </div>
+                                ) : existingVectorImage ? (
+                                    <div>
+                                        <img 
+                                            src={`${IMAGE_PATH}/${existingVectorImage}`} 
+                                            alt="Current Vector" 
+                                            style={{ width: '100px', height: '100px', marginTop: '3px', objectFit: 'cover', borderRadius: '8px' }}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <img 
+                                            src={propertyTypeImage} 
+                                            alt="Default Vector" 
+                                            style={{ width: '100px', height: '100px', marginTop: '3px', objectFit: 'cover', borderRadius: '8px' }}
+                                        />
+                                    </div>
+                                )}
+                            </div> */}
+
+                            <Form.Group className="form-group mb-4 ml-2">
+                                <Form.Label>{t('Vector Image')}</Form.Label>
+                                <Form.Control
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleEditVectorImageChange}
+                                    isInvalid={!!propertyTypeError.editVectorImage}
+                                />
+                                <Form.Text className="text-muted">
+                                    Recommended size: 200px x 200px (Max: 2MB)
+                                </Form.Text>
+                                <Form.Control.Feedback type="invalid">
+                                    {propertyTypeError.editVectorImage}
                                 </Form.Control.Feedback>
                             </Form.Group>
                             
@@ -465,8 +578,6 @@ export default function PropertyTypeTableComponent({ thead, tbody }) {
                     <Modal show={AddModal} onHide={resetAddModal} backdrop="static" size="lg">
                         <div className="mc-user-modal">
                             <h4 className="mb-3">{t('Add Property Type')}</h4>
-
-                            
 
                             <Form.Group className="form-group mb-4 ml-2">
                                 <Form.Label>{t('Property Type Name')} *</Form.Label>
@@ -506,7 +617,7 @@ export default function PropertyTypeTableComponent({ thead, tbody }) {
                             </Form.Group>
 
                             <Form.Group className="form-group mb-4 ml-2">
-                                <Form.Label>{t('Vector Image')} *</Form.Label>
+                                <Form.Label>{t('Property Type Image')} *</Form.Label>
                                 <Form.Control
                                     type="file"
                                     accept="image/*"
@@ -514,10 +625,26 @@ export default function PropertyTypeTableComponent({ thead, tbody }) {
                                     isInvalid={!!propertyTypeError.property_type_image}
                                 />
                                 <Form.Text className="text-muted">
-        Recommended size: 200px x 200px (Max: 2MB)
-    </Form.Text>
+                                    Recommended size: 200px x 200px (Max: 2MB)
+                                </Form.Text>
                                 <Form.Control.Feedback type="invalid">
                                     {propertyTypeError.property_type_image}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+
+                            <Form.Group className="form-group mb-4 ml-2">
+                                <Form.Label>{t('Vector Image')} *</Form.Label>
+                                <Form.Control
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleAddVectorImageChange}
+                                    isInvalid={!!propertyTypeError.vector_image}
+                                />
+                                <Form.Text className="text-muted">
+                                    Recommended size: 200px x 200px (Max: 2MB)
+                                </Form.Text>
+                                <Form.Control.Feedback type="invalid">
+                                    {propertyTypeError.vector_image}
                                 </Form.Control.Feedback>
                             </Form.Group>
                             
@@ -547,7 +674,7 @@ export default function PropertyTypeTableComponent({ thead, tbody }) {
                         <div className="mc-alert-modal">
                             <i className="material-icons">new_releases</i>
                             <h3>{t("delete property type")}</h3>
-                            <p>{t("property type deleted")}</p>
+                            <p>{t("Are you sure you want to delete this property type?")}</p>
                             <Modal.Footer>
                                 <ButtonComponent type="button" className="btn btn-secondary" onClick={() => setAlertModal(false)}>
                                     {t('close')}
