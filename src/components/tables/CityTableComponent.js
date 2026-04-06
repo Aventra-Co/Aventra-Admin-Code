@@ -3,14 +3,13 @@ import { TranslatorContext } from "../../context/Translator";
 import { Modal, Form } from "react-bootstrap";
 import { ButtonComponent } from "../elements";
 import axios from "axios";
-import { API_URL } from "../../constant/constant";
+import { API_URL, IMAGE_PATH } from "../../constant/constant";
 import PaginationComponent from "../PaginationComponent";
 import { Row, Col } from "react-bootstrap";
 import LabelFieldComponent from "../fields/LabelFieldComponent";
 import AddIcon from '@mui/icons-material/Add';
 import CityImage from '../../assets/img/city.webp';
 import { SyncLoader } from 'react-spinners'
-
 
 export default function CityTableComponent({ thead, tbody }) {
     const { t } = useContext(TranslatorContext);
@@ -30,13 +29,22 @@ export default function CityTableComponent({ thead, tbody }) {
     const [editcountryName, seteditcountryName] = useState("");
     const [editcityName, seteditcityName] = useState("");
     const [editcityNameArabic, seteditcityNameArabic] = useState("");
-    const [countryError, setcountryError] = useState("");
+    const [countryError, setcountryError] = useState({});
+    
+    // Image states for add
+    const [cityImageFile, setCityImageFile] = useState(null);
+    const [cityImagePreview, setCityImagePreview] = useState(null);
+    
+    // Image states for edit
+    const [editCityImageFile, setEditCityImageFile] = useState(null);
+    const [editCityImagePreview, setEditCityImagePreview] = useState(null);
+    const [existingCityImage, setExistingCityImage] = useState("");
+    
     const [searchTerm, setSearchTerm] = useState("");
     const entriesPerPage = 50;
 
     const indexOfLastEntry = currentPage * entriesPerPage;
     const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
-
 
     const filteredUsers = CityDetails.filter((user) => {
         const lowercasedTerm = searchTerm.toLowerCase();
@@ -46,7 +54,6 @@ export default function CityTableComponent({ thead, tbody }) {
             user.createtime?.toLowerCase().includes(lowercasedTerm)
         );
     });
-
 
     const currentUsers = filteredUsers.slice(indexOfFirstEntry, indexOfLastEntry);
 
@@ -65,17 +72,14 @@ export default function CityTableComponent({ thead, tbody }) {
     };
 
     const fetchCountryDetails = () => {
-
         axios.get(API_URL + "/fetch_coutry_list")
             .then((response) => {
                 setCountryDetails(response.data.country_arr || []);
-
             })
             .catch((error) => {
                 console.error('Error fetching user details:', error);
             });
     };
-
 
     useEffect(() => {
         fetchCityDetails();
@@ -83,13 +87,14 @@ export default function CityTableComponent({ thead, tbody }) {
     }, []);
 
     const handleUserAction = (action, item) => {
-
         if (action === 'edit') {
             setEditModal(true);
             setcityId(item.city_id);
             seteditcountryName(item.country_id);
             seteditcityName(item.city_name);
             seteditcityNameArabic(item.city_name_arabic);
+            setExistingCityImage(item.city_image || "");
+            setEditCityImagePreview(item.city_image ? `${IMAGE_PATH}/${item.city_image}` : null);
         }
         else if (action === 'delete') {
             setAlertModal(true);
@@ -108,12 +113,36 @@ export default function CityTableComponent({ thead, tbody }) {
                     setsuccessModel(false);
                 }, 2000);
             }
-
         }).catch((error) => {
             console.log(error);
-
         })
     }
+
+    const handleAddImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setCityImageFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setCityImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+            setcountryError((prev) => ({ ...prev, city_image: "" }));
+        }
+    };
+
+    const handleEditImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setEditCityImageFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setEditCityImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+            setcountryError((prev) => ({ ...prev, editCityImage: "" }));
+        }
+    };
 
     const handleEditCity = () => {
         let error = {}
@@ -136,6 +165,10 @@ export default function CityTableComponent({ thead, tbody }) {
         formData.append('country_id', editcountryName)
         formData.append('city_name', editcityName)
         formData.append('city_name_arabic', editcityNameArabic)
+        
+        if (editCityImageFile) {
+            formData.append('city_image', editCityImageFile);
+        }
 
         axios.post(API_URL + '/edit_city', formData, {
             headers: {
@@ -155,20 +188,15 @@ export default function CityTableComponent({ thead, tbody }) {
             setTimeout(() => {
                 setsuccessModel(false);
             }, 2000);
-
-
-
         })
-            .catch(error => {
-
-                console.error('Error updating clinic:', error);
-            });
+        .catch(error => {
+            console.error('Error updating city:', error);
+        });
     };
 
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
     };
-
 
     const handleAddCity = () => {
         let error = {}
@@ -181,17 +209,19 @@ export default function CityTableComponent({ thead, tbody }) {
         if (!cityNameArabic) {
             error.cityNameArabic = "Please enter city name arabic"
         }
+        if (!cityImageFile) {
+            error.city_image = "Please select a city image";
+        }
         if (Object.keys(error).length > 0) {
             setcountryError(error)
             return
         }
 
-
-
         const formData = new FormData();
         formData.append('country_id', countryName)
         formData.append('city_name', cityName)
         formData.append('city_name_arabic', cityNameArabic)
+        formData.append('city_image', cityImageFile)
 
         axios.post(API_URL + '/add_city', formData, {
             headers: {
@@ -207,30 +237,48 @@ export default function CityTableComponent({ thead, tbody }) {
             setmsg(response.data.msg)
             setcountryName('')
             setcityName('')
+            setcityNameArabic('')
+            setCityImageFile(null)
+            setCityImagePreview(null)
             fetchCityDetails();
             setAddModal(false);
             setsuccessModel(true);
             setTimeout(() => {
                 setsuccessModel(false);
             }, 2000);
-
-
-
         })
-            .catch(error => {
+        .catch(error => {
+            console.error('Error adding city:', error);
+        });
+    };
 
-                console.error('Error updating clinic:', error);
-            });
+    const resetAddModal = () => {
+        setAddModal(false);
+        setcountryError({});
+        setcountryName('');
+        setcityName('');
+        setcityNameArabic('');
+        setCityImageFile(null);
+        setCityImagePreview(null);
+    };
+
+    const resetEditModal = () => {
+        setEditModal(false);
+        setcountryError({});
+        seteditcountryName('');
+        seteditcityName('');
+        seteditcityNameArabic('');
+        setEditCityImageFile(null);
+        setEditCityImagePreview(null);
+        setExistingCityImage('');
     };
 
     return (
         <>
-
             <Row xs={1} sm={2} xl={4} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Col>
                     <LabelFieldComponent
                         type="search"
-                        // label={t('search_by')}
                         icon="Search"
                         placeholder={`${t('search_here')}`}
                         labelDir="label-col"
@@ -240,11 +288,11 @@ export default function CityTableComponent({ thead, tbody }) {
                     />
                 </Col>
                 <Col style={{ textAlign: 'right', marginBottom: '5px' }}>
-                    <button style={{ background: '#2b77e5', padding: '7px 13px', color: '#fff', borderRadius: '5px' }} onClick={() => setAddModal(true)} > <AddIcon className="me-2" /> {t("Add City")} </button>
+                    <button style={{ background: '#2b77e5', padding: '7px 13px', color: '#fff', borderRadius: '5px' }} onClick={() => setAddModal(true)} > 
+                        <AddIcon className="me-2" /> {t("Add City")} 
+                    </button>
                 </Col>
             </Row>
-
-
 
             {loading ? (
                 <div className="d-flex align-items-center" style={{ height: '40vh' }}>
@@ -261,6 +309,7 @@ export default function CityTableComponent({ thead, tbody }) {
                                     </div>
                                 </th>
                                 <th>{t("actions")}</th>
+                                <th>{t("City Image")}</th>
                                 <th>{t("Country name")}</th>
                                 <th>{t("City name")}</th>
                                 <th>{t("City name arabic")}</th>
@@ -277,12 +326,24 @@ export default function CityTableComponent({ thead, tbody }) {
                                     </td>
                                     <td>
                                         <div className="mc-table-action">
-
-                                            {/* <AnchorComponent to={`${APP_PREFIX_PATH}/doctor-view/${encode(item.doctor_id)}`} title="View" className="material-icons view">visibility</AnchorComponent> */}
                                             <ButtonComponent title="Edit" className="material-icons edit" onClick={() => { handleUserAction('edit', item) }}>edit</ButtonComponent>
-                                            {/* <ButtonComponent title="Block" className="material-icons block" onClick={() => handleUserAction('block', item.user_id, item.active_flag)}>block</ButtonComponent> */}
                                             <ButtonComponent type="button" className="material-icons delete" onClick={() => handleUserAction('delete', item)}>delete</ButtonComponent>
                                         </div>
+                                    </td>
+                                    <td style={{ textAlign: 'center' }}>
+                                        {item.city_image ? (
+                                            <img 
+                                                src={`${IMAGE_PATH}/${item.city_image}`} 
+                                                alt={item.city_name}
+                                                style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px' }}
+                                            />
+                                        ) : (
+                                            <img 
+                                                src={CityImage} 
+                                                alt="Default"
+                                                style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px' }}
+                                            />
+                                        )}
                                     </td>
                                     <td><span>{item.country_name || 'NA'}</span></td>
                                     <td><span>{item.city_name || 'NA'}</span></td>
@@ -293,7 +354,6 @@ export default function CityTableComponent({ thead, tbody }) {
                         </tbody>
                     </table>
 
-
                     <PaginationComponent
                         totalEntries={filteredUsers.length}
                         entriesPerPage={entriesPerPage}
@@ -301,12 +361,51 @@ export default function CityTableComponent({ thead, tbody }) {
                         onPageChange={handlePageChange}
                     />
 
-                    <Modal show={editModal} onHide={() => setEditModal(false)}>
+                    {/* Edit Modal */}
+                    <Modal show={editModal} onHide={resetEditModal} size="lg">
                         <div className="mc-user-modal">
-                            <img
-                                src={CityImage}
-                                alt="Profile"
-                            />
+                            <h4 className="mb-5">{t('Edit City')}</h4>
+                            
+                            {/* Image Preview */}
+                            <div className="text-center mb-3">
+                                {editCityImagePreview ? (
+                                    <img 
+                                        src={editCityImagePreview} 
+                                        alt="Preview" 
+                                        style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
+                                    />
+                                ) : existingCityImage ? (
+                                    <img 
+                                        src={`${IMAGE_PATH}/${existingCityImage}`} 
+                                        alt="Current" 
+                                        style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
+                                    />
+                                ) : (
+                                    <img 
+                                        src={CityImage} 
+                                        alt="Default" 
+                                        style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
+                                    />
+                                )}
+                            </div>
+
+                            <Form.Group className="form-group mb-4 ml-2">
+                                <Form.Label>{t('City Image')}</Form.Label>
+                                <Form.Control
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleEditImageChange}
+                                    isInvalid={!!countryError.editCityImage}
+                                />
+                                <Form.Text className="text-muted">
+                                    Upload new image to replace existing one (optional)<br />
+                                    Recommended size: 200px x 200px (Max: 2MB)
+                                </Form.Text>
+                                <Form.Control.Feedback type="invalid">
+                                    {countryError.editCityImage}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+
                             <Form.Group className="form-group mb-4 ml-2">
                                 <Form.Label>{t('Country')}</Form.Label>
                                 <Form.Select
@@ -324,7 +423,6 @@ export default function CityTableComponent({ thead, tbody }) {
                                             {country.country_name}
                                         </option>
                                     ))}
-
                                 </Form.Select>
                                 <Form.Control.Feedback type="invalid">
                                     {countryError.editcountryName}
@@ -368,7 +466,7 @@ export default function CityTableComponent({ thead, tbody }) {
                             </Form.Group>
 
                             <Modal.Footer>
-                                <ButtonComponent type="button" className="btn btn-secondary" onClick={() => { setEditModal(false); setcountryError('') }}>
+                                <ButtonComponent type="button" className="btn btn-secondary" onClick={resetEditModal}>
                                     {t('close_popup')}
                                 </ButtonComponent>
                                 <ButtonComponent type="button" className="btn btn-success" onClick={handleEditCity}>
@@ -376,16 +474,48 @@ export default function CityTableComponent({ thead, tbody }) {
                                 </ButtonComponent>
                             </Modal.Footer>
                         </div>
-                    </Modal >
+                    </Modal>
 
-                    <Modal show={AddModal} onHide={() => setAddModal(false)} backdrop="static">
+                    {/* Add Modal */}
+                    <Modal show={AddModal} onHide={resetAddModal} backdrop="static" size="lg">
                         <div className="mc-user-modal">
-                            <img
-                                src={CityImage}
-                                alt="Profile"
-                            />
+                            <h4 className="mb-3">{t('Add New City')}</h4>
+                            
+                            {/* Image Preview */}
+                            {/* <div className="text-center mb-3">
+                                {cityImagePreview ? (
+                                    <img 
+                                        src={cityImagePreview} 
+                                        alt="Preview" 
+                                        style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
+                                    />
+                                ) : (
+                                    <img 
+                                        src={CityImage} 
+                                        alt="Default" 
+                                        style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
+                                    />
+                                )}
+                            </div> */}
+
                             <Form.Group className="form-group mb-4 ml-2">
-                                <Form.Label>{t('Country')}</Form.Label>
+                                <Form.Label>{t('City Image')} <span className="text-danger">*</span></Form.Label>
+                                <Form.Control
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleAddImageChange}
+                                    isInvalid={!!countryError.city_image}
+                                />
+                                <Form.Text className="text-muted">
+                                    Recommended size: 200px x 200px (Max: 2MB)
+                                </Form.Text>
+                                <Form.Control.Feedback type="invalid">
+                                    {countryError.city_image}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+
+                            <Form.Group className="form-group mb-4 ml-2">
+                                <Form.Label>{t('Country')} <span className="text-danger">*</span></Form.Label>
                                 <Form.Select
                                     value={countryName}
                                     onChange={(e) => {
@@ -401,7 +531,6 @@ export default function CityTableComponent({ thead, tbody }) {
                                             {country.country_name}
                                         </option>
                                     ))}
-
                                 </Form.Select>
                                 <Form.Control.Feedback type="invalid">
                                     {countryError.countryName}
@@ -409,7 +538,7 @@ export default function CityTableComponent({ thead, tbody }) {
                             </Form.Group>
 
                             <Form.Group className="form-group mb-4 ml-2">
-                                <Form.Label>{t('City')}</Form.Label>
+                                <Form.Label>{t('City')} <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
                                     type="text"
                                     placeholder={t('Enter city name')}
@@ -427,7 +556,7 @@ export default function CityTableComponent({ thead, tbody }) {
                             </Form.Group>
 
                             <Form.Group className="form-group mb-4 ml-2">
-                                <Form.Label>{t('City Arabic')}</Form.Label>
+                                <Form.Label>{t('City Arabic')} <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
                                     type="text"
                                     placeholder={t('Enter city name arabic')}
@@ -444,9 +573,8 @@ export default function CityTableComponent({ thead, tbody }) {
                                 </Form.Control.Feedback>
                             </Form.Group>
 
-
                             <Modal.Footer>
-                                <ButtonComponent type="button" className="btn btn-secondary" onClick={() => { setAddModal(false); setcountryError(''); setcountryName(''); setcityName('') }}>
+                                <ButtonComponent type="button" className="btn btn-secondary" onClick={resetAddModal}>
                                     {t('close_popup')}
                                 </ButtonComponent>
                                 <ButtonComponent type="button" className="btn btn-success" onClick={handleAddCity}>
@@ -454,7 +582,7 @@ export default function CityTableComponent({ thead, tbody }) {
                                 </ButtonComponent>
                             </Modal.Footer>
                         </div>
-                    </Modal >
+                    </Modal>
 
                     <Modal show={successModel} onHide={() => setsuccessModel(false)}>
                         <div className="mc-alert-modal">
@@ -462,7 +590,6 @@ export default function CityTableComponent({ thead, tbody }) {
                             <h3>{t('success')}</h3><br />
                             <p>{msg}</p>
                             <Modal.Footer>
-
                             </Modal.Footer>
                         </div>
                     </Modal>
@@ -477,8 +604,8 @@ export default function CityTableComponent({ thead, tbody }) {
                                 <ButtonComponent type="button" className="btn btn-danger" onClick={() => { setAlertModal(false); CityDelete(); }}>{t('delete')}</ButtonComponent>
                             </Modal.Footer>
                         </div>
-                    </Modal >
-                </div >
+                    </Modal>
+                </div>
             )}
         </>
     );

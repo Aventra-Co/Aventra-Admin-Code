@@ -27,7 +27,7 @@ export default function BannerTableComponent({ thead, tbody }) {
     const [imagelink, setImageLink] = useState('')
     const [editImage, seteditImage] = useState(null)
     const [editLink, seteditLink] = useState('')
-    const [bannerError, setbannerError] = useState('')
+    const [bannerError, setbannerError] = useState({})
     const [msg, setmsg] = useState('')
     const [enlargedImage, setEnlargedImage] = useState(null);
     const [showImagePopup, setShowImagePopup] = useState(false);
@@ -42,11 +42,33 @@ export default function BannerTableComponent({ thead, tbody }) {
 
     const filteredUsers = BannerDetails.filter((user) => {
         const lowercasedTerm = searchTerm.toLowerCase();
+        
+        // Helper function to get promotion type text
+        const getPromotionTypeText = (type) => {
+            return type == 0 ? "general" : "owner";
+        };
+        
+        // Helper function to get entity type text
+        const getEntityTypeText = (entityType) => {
+            return entityType === 0 ? "boat" : "property";
+        };
+        
+        // Format dates for search (convert from YYYY-MM-DD to DD-MM-YYYY for search)
+        const formatDateForSearch = (dateStr) => {
+            if (!dateStr) return '';
+            const [year, month, day] = dateStr.split("-");
+            return `${day}-${month}-${year}`;
+        };
+        
         return (
-            user.link?.toLowerCase().includes(lowercasedTerm) ||
-            user.createtime?.toLowerCase().includes(lowercasedTerm) ||
-            user.l_name?.toLowerCase().includes(lowercasedTerm) ||
-            user.random_id?.toLowerCase().includes(lowercasedTerm)
+            (user.link && user.link.toLowerCase().includes(lowercasedTerm)) ||
+            (user.createtime && user.createtime.toLowerCase().includes(lowercasedTerm)) ||
+            (user.l_name && user.l_name.toLowerCase().includes(lowercasedTerm)) ||
+            (user.random_id && String(user.random_id).toLowerCase().includes(lowercasedTerm)) ||
+            (user.type !== undefined && getPromotionTypeText(user.type).includes(lowercasedTerm)) ||
+            (user.entity_type !== undefined && getEntityTypeText(user.entity_type).includes(lowercasedTerm)) ||
+            (user.start_date && formatDateForSearch(user.start_date).includes(lowercasedTerm)) ||
+            (user.end_date && formatDateForSearch(user.end_date).includes(lowercasedTerm))
         );
     });
 
@@ -526,7 +548,7 @@ export default function BannerTableComponent({ thead, tbody }) {
                                     </td>
 
                                     <td>
-                                        <span>{item.type == 0 ? "General" : "Owner" || 'NA'}</span>
+                                        <span>{item.type == 0 ? "General" : "Owner"}</span>
                                     </td>
 
                                     <td>
@@ -577,7 +599,7 @@ export default function BannerTableComponent({ thead, tbody }) {
                     />
 
                     {/* Edit Modal */}
-                    <Modal show={editModal} onHide={() => setEditModal(false)} backdrop="static" size="lg">
+                    {/* <Modal show={editModal} onHide={() => setEditModal(false)} backdrop="static" size="lg">
                         <Modal.Header closeButton>
                             <Modal.Title>{t('Edit Promotion')}</Modal.Title>
                         </Modal.Header>
@@ -606,7 +628,6 @@ export default function BannerTableComponent({ thead, tbody }) {
                                     </div>
                                 </Form.Group>
 
-                                {/* Tabs for Boat/Property - Always visible */}
                                 <div style={tabStyle.navTabs}>
                                     <ul className="nav" style={{ display: 'flex', listStyle: 'none', padding: 0, margin: 0 }}>
                                         <li style={tabStyle.navItem}>
@@ -805,7 +826,291 @@ export default function BannerTableComponent({ thead, tbody }) {
                                 {t('Update')}
                             </ButtonComponent>
                         </Modal.Footer>
-                    </Modal>
+                    </Modal> */}
+
+                    {/* Edit Modal */}
+<Modal show={editModal} onHide={() => setEditModal(false)} backdrop="static" size="lg">
+    <Modal.Header closeButton>
+        <Modal.Title>{t('Edit Promotion')}</Modal.Title>
+    </Modal.Header>
+    <Modal.Body>
+        <div className="mc-user-modal">
+           
+
+            <Form.Group className="mb-3">
+                <Form.Label>{t('Promotion Type')} <span className="text-danger">*</span></Form.Label>
+                <div className="d-flex">
+                    <Form.Check
+                        inline
+                        type="radio"
+                        label={t('General Promotion')}
+                        name="promotionType"
+                        checked={promotionType === 0}
+                        onChange={() => setPromotionType(0)}
+                        className="me-4"
+                    />
+                    <Form.Check
+                        inline
+                        type="radio"
+                        label={t('Owner Promotion')}
+                        name="promotionType"
+                        checked={promotionType === 1}
+                        onChange={() => setPromotionType(1)}
+                    />
+                </div>
+            </Form.Group>
+
+            {/* Tabs for Boat/Property - Always visible */}
+            <div style={tabStyle.navTabs}>
+                <ul className="nav" style={{ display: 'flex', listStyle: 'none', padding: 0, margin: 0 }}>
+                    <li style={tabStyle.navItem}>
+                        <div
+                            style={{
+                                ...tabStyle.navLink,
+                                ...(activeTab === 'boat' ? tabStyle.navLinkActive : {})
+                            }}
+                            onClick={() => handleTabChange('boat')}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => e.key === 'Enter' && handleTabChange('boat')}
+                        >
+                            Boat
+                        </div>
+                    </li>
+                    <li style={tabStyle.navItem}>
+                        <div
+                            style={{
+                                ...tabStyle.navLink,
+                                ...(activeTab === 'property' ? tabStyle.navLinkActive : {})
+                            }}
+                            onClick={() => handleTabChange('property')}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => e.key === 'Enter' && handleTabChange('property')}
+                        >
+                            Property
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div className="row">
+                {promotionType === 0 ? (
+                    <div className="col-md-12">
+                        <Form.Group className="mb-3">
+                            <Form.Label>{t('Promotion Link')} <span className="text-danger">*</span></Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={editLink}
+                                onChange={(e) => {
+                                    seteditLink(e.target.value);
+                                    setbannerError(prev => ({ ...prev, editLink: "" }));
+                                }}
+                                isInvalid={!!bannerError.editLink}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {bannerError.editLink}
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                    </div>
+                ) : (
+                    <>
+                        <div className="col-md-6">
+                            <Form.Group className="mb-3">
+                                <Form.Label>{t('Select Owner')} <span className="text-danger">*</span></Form.Label>
+                                <Form.Select
+                                    value={ownerId}
+                                    onChange={(e) => {
+                                        const selectedOwnerId = e.target.value;
+                                        setOwnerId(selectedOwnerId);
+                                        setbannerError(prev => ({ ...prev, ownerId: "" }));
+                                        setTripId('');
+                                        
+                                        if (selectedOwnerId) {
+                                            if (activeTab === 'boat') {
+                                                fetchOwnerTrips(selectedOwnerId);
+                                            } else {
+                                                fetchPropertyAds(selectedOwnerId);
+                                            }
+                                        } else {
+                                            setownerTrips([]);
+                                            setPropertyAds([]);
+                                        }
+                                    }}
+                                    isInvalid={!!bannerError.ownerId}
+                                >
+                                    <option value="">{t('Select Owner')}</option>
+                                    {owners.map(owner => (
+                                        <option key={owner.user_id} value={owner.user_id}>
+                                            {owner.l_name}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                                <Form.Control.Feedback type="invalid">
+                                    {bannerError.ownerId}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                        </div>
+
+                        <div className="col-md-6">
+                            <Form.Group className="mb-3">
+                                <Form.Label>
+                                    {activeTab === 'boat' ? t('Select Trip') : t('Select Property Ad')} 
+                                    <span className="text-danger">*</span>
+                                </Form.Label>
+                                <Form.Select
+                                    value={tripId}
+                                    onChange={(e) => {
+                                        setTripId(e.target.value);
+                                        setbannerError(prev => ({ ...prev, tripId: "" }));
+                                    }}
+                                    isInvalid={!!bannerError.tripId}
+                                    disabled={!ownerId}
+                                >
+                                    <option value="">
+                                        {activeTab === 'boat' ? t('Select Trip') : t('Select Property Ad')}
+                                    </option>
+                                    {activeTab === 'boat' 
+                                        ? ownerTrips.map(trip => (
+                                            <option key={trip.trip_id} value={trip.trip_id}>
+                                                {trip.random_id}
+                                            </option>
+                                        ))
+                                        : propertyAds.map(ad => (
+                                            <option key={ad.property_ad_id} value={ad.property_ad_id}>
+                                                {ad.title || ad.property_ad_id}
+                                            </option>
+                                        ))
+                                    }
+                                </Form.Select>
+                                <Form.Control.Feedback type="invalid">
+                                    {bannerError.tripId}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                        </div>
+                    </>
+                )}
+            </div>
+
+            <div className="row">
+                <div className="col-md-6">
+                    <Form.Group className="mb-3">
+                        <Form.Label>{t('Start Date')} <span className="text-danger">*</span></Form.Label>
+                        <Form.Control
+                            type="date"
+                            value={startDate}
+                            min={new Date().toISOString().split('T')[0]}
+                            onChange={(e) => {
+                                setStartDate(e.target.value);
+                                setbannerError(prev => ({ ...prev, startDate: "" }));
+                            }}
+                            isInvalid={!!bannerError.startDate}
+                        />
+                        <Form.Control.Feedback type="invalid">
+                            {bannerError.startDate}
+                        </Form.Control.Feedback>
+                    </Form.Group>
+                </div>
+
+                <div className="col-md-6">
+                    <Form.Group className="mb-3">
+                        <Form.Label>{t('End Date')} <span className="text-danger">*</span></Form.Label>
+                        <Form.Control
+                            type="date"
+                            value={endDate}
+                            min={startDate || new Date().toISOString().split('T')[0]}
+                            onChange={(e) => {
+                                setEndDate(e.target.value);
+                                setbannerError(prev => ({ ...prev, endDate: "" }));
+                            }}
+                            isInvalid={!!bannerError.endDate}
+                        />
+                        <Form.Control.Feedback type="invalid">
+                            {bannerError.endDate}
+                        </Form.Control.Feedback>
+                    </Form.Group>
+                </div>
+            </div>
+
+             {/* Image Preview Section */}
+            <div className="d-flex justify-content-start mt-5">
+                {editImage ? (
+                    <img 
+                        src={URL.createObjectURL(editImage)} 
+                        alt="New Preview" 
+                        style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '50px', marginBottom: '1px' }}
+                    />
+                ) : (() => {
+                    // Find the current banner image from BannerDetails
+                    const currentBanner = BannerDetails.find(banner => banner.banner_id === bannerId);
+                    const currentImage = currentBanner?.image;
+                    return currentImage ? (
+                        <img 
+                            src={`${IMAGE_PATH}${currentImage}`} 
+                            alt="Current Banner" 
+                            style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '50px', marginBottom: '1px' }}
+                        />
+                    ) : (
+                        <div style={{ 
+                            width: '100px', 
+                            height: '100px', 
+                            backgroundColor: '#f0f0f0', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'start',
+                            borderRadius: '50px',
+                            margin: '0px'
+                        }}>
+                            <span style={{ color: '#999' }}>No Image</span>
+                        </div>
+                    );
+                })()}
+           
+            </div>
+
+            <Form.Group className="mb-3">
+                <Form.Label>{t('Promotion Image')}</Form.Label>
+                <Form.Control
+                    type="file"
+                    className="form-control"
+                    accept="image/*"
+                    onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                            seteditImage(file);
+                            setbannerError(prev => ({ ...prev, editImage: "" }));
+                        }
+                    }}
+                    isInvalid={!!bannerError.editImage}
+                />
+                <Form.Text className="text-muted">
+                    Recommended size: 100px x 100px (Max: 2MB)
+                </Form.Text>
+                <Form.Control.Feedback type="invalid">
+                    {bannerError.editImage}
+                </Form.Control.Feedback>
+            </Form.Group>
+        </div>
+    </Modal.Body>
+    <Modal.Footer className="mt-1">
+        <ButtonComponent type="button" className="btn btn-secondary" onClick={() => { 
+            setEditModal(false); 
+            setStartDate(''); 
+            setEndDate(''); 
+            setOwnerId(''); 
+            setTripId(''); 
+            setPromotionType(0);
+            setActiveTab('boat');
+            seteditImage(null);
+            setbannerError({});
+        }}>
+            {t('Cancel')}
+        </ButtonComponent>
+        <ButtonComponent type="button" className="btn btn-success" onClick={handleEditBanner}>
+            {t('Update')}
+        </ButtonComponent>
+    </Modal.Footer>
+</Modal>
 
                     {/* Add Modal */}
                     <Modal show={AddModal} onHide={() => setAddModal(false)} backdrop="static" size="lg" style={{ marginBottom: '0px' }}>
@@ -1010,6 +1315,17 @@ export default function BannerTableComponent({ thead, tbody }) {
                                     </div>
                                 </div>
 
+                                     {image && (
+                                <div className="text-center mt-5">
+                                    <img
+                                        src={URL.createObjectURL(image)}
+                                        alt="Banner Preview"
+                                        className="img-fluid rounded"
+                                        style={{ maxHeight: '100px', borderRadius:'50px' }}
+                                    />
+                                </div>
+                            )}
+
                                 <Form.Group className="mb-0">
                                     <Form.Label>{t('Promotion Image')} <span className="text-danger">*</span></Form.Label>
                                     <Form.Control
@@ -1023,18 +1339,13 @@ export default function BannerTableComponent({ thead, tbody }) {
                                         {bannerError.image}
                                     </Form.Control.Feedback>
                                 </Form.Group>
+                                <Form.Text className="text-muted">
+                    Recommended size: 100px X 100px (Max: 2MB)
+                </Form.Text>
                             </div>
+                           
 
-                            {image && (
-                                <div className="text-center mt-3">
-                                    <img
-                                        src={URL.createObjectURL(image)}
-                                        alt="Banner Preview"
-                                        className="img-fluid rounded"
-                                        style={{ maxHeight: '100px' }}
-                                    />
-                                </div>
-                            )}
+                       
                         </Modal.Body>
                         <Modal.Footer className="mt-1">
                             <ButtonComponent

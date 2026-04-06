@@ -9,16 +9,23 @@ import { AnchorComponent } from "../../components/elements";
 import './UserProfilePage.css';
 import { API_URL, APP_PREFIX_PATH, IMAGE_PATH } from "../../constant/constant";
 import LabelFieldComponent from "../../components/fields/LabelFieldComponent";
-import { encode } from "base-64";
+import { encode, decode } from "base-64";
 
 export default function UserProfilePage() {
     const [content, setContent] = useState(0);
+    const [ratingTab, setRatingTab] = useState('boat'); // 'boat' or 'property'
     const [searchTerm, setSearchTerm] = useState("");
     
     const handleButtonClick = (contentType) => {
         if (contentType === 'trip') setContent(0);
         if (contentType === 'property') setContent(1);
         if (contentType === 'ratings') setContent(2);
+        setRatingTab('boat'); // Reset rating tab when switching to ratings
+        setSearchTerm('');
+    };
+
+    const handleRatingTabClick = (tab) => {
+        setRatingTab(tab);
         setSearchTerm('');
     };
 
@@ -29,7 +36,8 @@ export default function UserProfilePage() {
     const { t } = useContext(TranslatorContext)
     const { user_id } = useParams();
     const [Data, setData] = useState('');
-    const [Ratings, setRatings] = useState([]);
+    const [boatRatings, setBoatRatings] = useState([]);
+    const [propertyRatings, setPropertyRatings] = useState([]);
     const [enlargedImage, setEnlargedImage] = useState(null);
     const [showImagePopup, setShowImagePopup] = useState(false);
 
@@ -62,10 +70,19 @@ export default function UserProfilePage() {
         })
     }
 
-    const fetchRatings = () => {
+    const fetchBoatRatings = () => {
         axios.get(API_URL + `/fetch_user_ratings?user_id=${user_id}`).then((res) => {
-            console.log('Ratings response', res.data);
-            setRatings(res.data.rating_arr || []);
+            console.log('Boat Ratings response', res.data);
+            setBoatRatings(res.data.rating_arr || []);
+        }).catch((error) => {
+            console.log(error);
+        })
+    }
+
+    const fetchPropertyRatings = () => {
+        axios.get(API_URL + `/fetch_all_user_property_rating_review?user_id=${decode(user_id)}`).then((res) => {
+            console.log('Property Ratings response', res.data);
+            setPropertyRatings(res.data.rating_arr || []);
         }).catch((error) => {
             console.log(error);
         })
@@ -75,7 +92,8 @@ export default function UserProfilePage() {
         getData();
         TripData();
         fetchPropertyBookings();
-        fetchRatings();
+        fetchBoatRatings();
+        fetchPropertyRatings();
     }, [])
 
     const handleImageClick = (imageUrl) => {
@@ -116,7 +134,7 @@ export default function UserProfilePage() {
         );
     });
 
-    const filteredRatings = Ratings.filter((item) => {
+    const filteredBoatRatings = boatRatings.filter((item) => {
         const lowercasedTerm = searchTerm.toLowerCase();
         return (
             (item.review && String(item.review).toLowerCase().includes(lowercasedTerm)) ||
@@ -129,6 +147,19 @@ export default function UserProfilePage() {
             (item.time && String(item.time).toLowerCase().includes(lowercasedTerm)) ||
             (item.name && String(item.name).toLowerCase().includes(lowercasedTerm)) ||
             (item.trip_name_english && String(item.trip_name_english).toLowerCase().includes(lowercasedTerm)) ||
+            (item.createtime && String(item.createtime).toLowerCase().includes(lowercasedTerm))
+        );
+    });
+
+    const filteredPropertyRatings = propertyRatings.filter((item) => {
+        const lowercasedTerm = searchTerm.toLowerCase();
+        return (
+            (item.review && String(item.review).toLowerCase().includes(lowercasedTerm)) ||
+            (item.clean && String(item.clean).toLowerCase().includes(lowercasedTerm)) ||
+            (item.arrangements && String(item.arrangements).toLowerCase().includes(lowercasedTerm)) ||
+            (item.total_rating && String(item.total_rating).toLowerCase().includes(lowercasedTerm)) ||
+            (item.user_name && String(item.user_name).toLowerCase().includes(lowercasedTerm)) ||
+            (item.property_name_english && String(item.property_name_english).toLowerCase().includes(lowercasedTerm)) ||
             (item.createtime && String(item.createtime).toLowerCase().includes(lowercasedTerm))
         );
     });
@@ -157,6 +188,20 @@ export default function UserProfilePage() {
                 {config.label}
             </span>
         );
+    };
+
+    // Helper function to render stars
+    const renderStars = (rating) => {
+        if (!rating || rating === 0) return "NA";
+        
+        const roundedRating = Math.round(rating);
+        const stars = [];
+        
+        for (let i = 0; i < roundedRating; i++) {
+            stars.push(<i key={i} className="material-icons star-icon" style={{ fontSize: '18px', color: '#ffc107' }}>star</i>);
+        }
+        
+        return stars;
     };
 
     return (
@@ -412,7 +457,6 @@ export default function UserProfilePage() {
                                         <thead className="mc-table-head primary">
                                             <tr>
                                                 <th><div className="mc-table-check"><p>{t("sno")}</p></div></th>
-                                                {/* <th>{t("Action")}</th> */}
                                                 <th>{t("Booking ID")}</th>
                                                 <th>{t("Property Name")}</th>
                                                 <th>{t("Check-in Date")}</th>
@@ -431,15 +475,6 @@ export default function UserProfilePage() {
                                                 filteredPropertyBookings.map((item, index) => (
                                                     <tr key={index}>
                                                         <td title="id"><div className="mc-table-check"><p>{index + 1}</p></div></td>
-                                                        {/* <td>
-                                                            <AnchorComponent 
-                                                                to={`${APP_PREFIX_PATH}/view-property-booking/${encode(item.property_booking_id)}`} 
-                                                                title="View" 
-                                                                className="material-icons view"
-                                                            >
-                                                                visibility
-                                                            </AnchorComponent>
-                                                        </td> */}
                                                         <td>#{item.booking_random_id || 'NA'}</td>
                                                         <td>{item.property_name_english || 'NA'}</td>
                                                         <td>{item.checkin_date || 'NA'}</td>
@@ -455,7 +490,7 @@ export default function UserProfilePage() {
                                                 ))
                                             ) : (
                                                 <tr>
-                                                    <td colSpan="11" style={{ textAlign: 'center' }}>No data available</td>
+                                                    <td colSpan="12" style={{ textAlign: 'center' }}>No data available</td>
                                                 </tr>
                                             )}
                                         </tbody>
@@ -464,51 +499,124 @@ export default function UserProfilePage() {
                             </div>
                         )}
 
-                        {/* Ratings Tab */}
+                        {/* Ratings Tab with nested Boat and Property tabs */}
                         {content === 2 && (
                             <div style={{ margin: '1rem' }}>
-                                <div className="mc-table-responsive">
-                                    <table className="mc-table">
-                                        <thead className="mc-table-head primary">
-                                            <tr>
-                                                <th><div className="mc-table-check"><p>{t("sno")}</p></div></th>
-                                                <th>{t("Boat Name")}</th>
-                                                <th>{t("Time")}</th>
-                                                <th>{t("Clean")}</th>
-                                                <th>{t("Captain")}</th>
-                                                <th>{t("Hospitality")}</th>
-                                                <th>{t("Food")}</th>
-                                                <th>{t("Equipment")}</th>
-                                                <th>{t("Entertainment")}</th>
-                                                <th>{t("review")}</th>
-                                                <th>{t("createtime")}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="mc-table-body even">
-                                            {filteredRatings && filteredRatings.length > 0 ? (
-                                                filteredRatings.map((item, index) => (
-                                                    <tr key={index}>
-                                                        <td title="id"><div className="mc-table-check"><p>{index + 1}</p></div></td>
-                                                        <td>{item.boat_name_english || 'NA'}</td>
-                                                        <td>{item.time || 'NA'}</td>
-                                                        <td>{item.clean || 'NA'}</td>
-                                                        <td>{item.captain || 'NA'}</td>
-                                                        <td>{item.hospitality || 'NA'}</td>
-                                                        <td>{item.food || 'NA'}</td>
-                                                        <td>{item.equipment || 'NA'}</td>
-                                                        <td>{item.entertainment || 'NA'}</td>
-                                                        <td>{item.review || 'NA'}</td>
-                                                        <td>{item.createtime || 'NA'}</td>
-                                                    </tr>
-                                                ))
-                                            ) : (
+                                {/* Nested Tab Navigation for Ratings */}
+                                <nav className="navbar navbar-expand-lg navbar-light navBar">
+                                    <div
+                                        className="container mobile"
+                                        id="container-div"
+                                        style={{ marginTop: '0rem', width: 'auto', borderRadius: '5px', marginLeft: '0rem', display: 'flex', flexWrap: 'wrap', gap: '10px' }}
+                                    >
+                                        <button
+                                            className={`btn btn-outline-primary me-2 mb-2 btn-content ${ratingTab === 'boat' ? 'btn-active' : ''}`}
+                                            style={{ width: '10rem', backgroundColor: ratingTab === 'boat' ? '#19918F' : 'transparent', color: ratingTab === 'boat' ? '#fff' : '#19918F', borderColor: '#19918F' }}
+                                            type="button"
+                                            onClick={() => handleRatingTabClick('boat')}
+                                        >
+                                            {t('Boat Rating')}
+                                        </button>
+                                        <button
+                                            className={`btn btn-outline-primary me-2 mb-2 btn-content ${ratingTab === 'property' ? 'btn-active' : ''}`}
+                                            style={{ width: '10rem', backgroundColor: ratingTab === 'property' ? '#19918F' : 'transparent', color: ratingTab === 'property' ? '#fff' : '#19918F', borderColor: '#19918F' }}
+                                            type="button"
+                                            onClick={() => handleRatingTabClick('property')}
+                                        >
+                                            {t('Property Rating')}
+                                        </button>
+                                    </div>
+                                </nav>
+
+                                {/* Boat Rating Table */}
+                                {ratingTab === 'boat' && (
+                                    <div className="mc-table-responsive" style={{ marginTop: '1rem' }}>
+                                        <table className="mc-table">
+                                            <thead className="mc-table-head primary">
                                                 <tr>
-                                                    <td colSpan="11" style={{ textAlign: 'center' }}>No data available</td>
+                                                    <th><div className="mc-table-check"><p>{t("sno")}</p></div></th>
+                                                    <th>{t("Boat Name")}</th>
+                                                    <th>{t("Time")}</th>
+                                                    <th>{t("Clean")}</th>
+                                                    <th>{t("Captain")}</th>
+                                                    <th>{t("Hospitality")}</th>
+                                                    <th>{t("Food")}</th>
+                                                    <th>{t("Equipment")}</th>
+                                                    <th>{t("Entertainment")}</th>
+                                                    <th>{t("Total Rating")}</th>
+                                                    <th>{t("review")}</th>
+                                                    <th>{t("createtime")}</th>
                                                 </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                            </thead>
+                                            <tbody className="mc-table-body even">
+                                                {filteredBoatRatings && filteredBoatRatings.length > 0 ? (
+                                                    filteredBoatRatings.map((item, index) => (
+                                                        <tr key={index}>
+                                                            <td title="id"><div className="mc-table-check"><p>{index + 1}</p></div></td>
+                                                            <td>{item.trip_name_english || item.boat_name_english || 'NA'}</td>
+                                                            <td>{renderStars(item.time)}</td>
+                                                            <td>{renderStars(item.clean)}</td>
+                                                            <td>{renderStars(item.captain)}</td>
+                                                            <td>{renderStars(item.hospitality)}</td>
+                                                            <td>{renderStars(item.food)}</td>
+                                                            <td>{renderStars(item.equipment)}</td>
+                                                            <td>{renderStars(item.entertainment)}</td>
+                                                            <td>{renderStars(item.total_rating)}</td>
+                                                            <td>{item.review || 'NA'}</td>
+                                                            <td>{item.createtime || 'NA'}</td>
+                                                        </tr>
+                                                    ))
+                                                ) : (
+                                                    <tr>
+                                                        <td colSpan="12" style={{ textAlign: 'center' }}>No data available</td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+
+                                {/* Property Rating Table */}
+                                {ratingTab === 'property' && (
+                                    <div className="mc-table-responsive" style={{ marginTop: '1rem' }}>
+                                        <table className="mc-table">
+                                            <thead className="mc-table-head primary">
+                                                <tr>
+                                                    <th><div className="mc-table-check"><p>{t("sno")}</p></div></th>
+                                                    <th>{t("User Name")}</th>
+                                                    <th>{t("Property Name")}</th>
+                                                    <th>{t("Owner Name")}</th>
+                                                    <th>{t("Clean")}</th>
+                                                    <th>{t("Arrangements")}</th>
+                                                    <th>{t("Total Rating")}</th>
+                                                    <th>{t("review")}</th>
+                                                    <th>{t("createtime")}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="mc-table-body even">
+                                                {filteredPropertyRatings && filteredPropertyRatings.length > 0 ? (
+                                                    filteredPropertyRatings.map((item, index) => (
+                                                        <tr key={index}>
+                                                            <td title="id"><div className="mc-table-check"><p>{index + 1}</p></div></td>
+                                                            <td>{item.user_name || 'NA'}</td>
+                                                            <td>{item.property_name_english || 'NA'}</td>
+                                                            <td>{item.owner_name || 'NA'}</td>
+                                                            <td>{renderStars(item.clean)}</td>
+                                                            <td>{renderStars(item.arrangements)}</td>
+                                                            <td>{renderStars(item.total_rating)}</td>
+                                                            <td>{item.review || 'NA'}</td>
+                                                            <td>{item.createtime || 'NA'}</td>
+                                                        </tr>
+                                                    ))
+                                                ) : (
+                                                    <tr>
+                                                        <td colSpan="9" style={{ textAlign: 'center' }}>No data available</td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </Form>

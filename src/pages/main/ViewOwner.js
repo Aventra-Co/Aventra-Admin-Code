@@ -1297,21 +1297,24 @@ export default function ViewOwner() {
                       />
                     </Col>
                     <Col style={{ textAlign: 'right', marginBottom: '5px' }}>
-                      <Link to={APP_PREFIX_PATH + `/add-property-advertisement/${user_id}`}>
-                        <button
-                          type="button"
-                          style={{
-                            background: '#2b77e5',
-                            padding: '7px 13px',
-                            color: '#fff',
-                            borderRadius: '5px'
-                          }}
-                        >
-                          {' '}
-                          <AddIcon className='me-2' /> {t('Add Property Advertisement')}{' '}
-                        </button>
-                      </Link>
-                    </Col>
+  <Link to={APP_PREFIX_PATH + `/add-property-advertisement/${user_id}`}>
+    <button
+      type="button"
+      style={{
+        background: '#2b77e5',
+        padding: '7px 13px',
+        color: '#fff',
+        borderRadius: '5px',
+        whiteSpace: 'nowrap', // Prevents text from wrapping
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '8px'
+      }}
+    >
+      <AddIcon className='me-2' /> {t('Add Property Advertisement')}
+    </button>
+  </Link>
+</Col>
                   </Row>
 
                   <div style={{ margin: '1rem' }}>
@@ -1328,7 +1331,7 @@ export default function ViewOwner() {
                             <th>{t('Property Name')}</th>
                             <th>{t('Guard Name')}</th>
                             <th>{t('Address')}</th>
-                            <th>{t('Price (1 Day)')}</th>
+                            <th>{t('Price')}</th>
                             <th>{t('createtime')}</th>
                           </tr>
                         </thead>
@@ -1406,7 +1409,7 @@ export default function ViewOwner() {
                                 <td>{item.property_name_english || 'NA'}</td>
                                 <td>{item.guard_name_english || 'NA'}</td>
                                 <td>{item.address || 'NA'}</td>
-                                <td>{item.one_day_price ? `${item.one_day_price} KWD` : 'NA'}</td>
+                                <td>{item.lowest_price ? `${item.lowest_price} KWD` : 'NA'}</td>
                                 <td>{item.createtime || 'NA'}</td>
                               </tr>
                             ))

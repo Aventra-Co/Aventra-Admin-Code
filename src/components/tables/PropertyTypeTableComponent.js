@@ -471,7 +471,7 @@ export default function PropertyTypeTableComponent({ thead, tbody }) {
                                 </Form.Control.Feedback>
                             </Form.Group>
 
-                            {/* Property Type Image Preview */}
+                            {/* Property Type Image Preview */}0
                             {/* <div className="text-center mb-3">
                                 <label className="fw-bold">Property Type Image</label>
                                 {editPropertyTypeImagePreview ? (
