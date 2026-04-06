@@ -1275,7 +1275,7 @@ export default function ViewOwner() {
 
               {content === 3 && (
                 <>
-                  <Row
+                  {/* <Row
                     xs={1}
                     sm={2}
                     xl={4}
@@ -1305,7 +1305,7 @@ export default function ViewOwner() {
         padding: '7px 13px',
         color: '#fff',
         borderRadius: '5px',
-        whiteSpace: 'nowrap', // Prevents text from wrapping
+        whiteSpace: 'nowrap',
         display: 'inline-flex',
         alignItems: 'center',
         gap: '8px'
@@ -1315,7 +1315,53 @@ export default function ViewOwner() {
     </button>
   </Link>
 </Col>
-                  </Row>
+                  </Row> */}
+
+                  
+<div
+  style={{
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: '10px',
+    marginTop: '12px',
+    marginBottom: '4px',
+  }}
+>
+  <div style={{ flex: '1 1 200px', minWidth: '180px', maxWidth: '400px' }}>
+    <LabelFieldComponent
+      type='search'
+      icon='Search'
+      placeholder={`${t('search_here')}`}
+      labelDir='label-col'
+      fieldSize='mb-4 w-100 h-md'
+      value={searchTerm}
+      onChange={handleSearch}
+    />
+  </div>
+  <div style={{ flexShrink: 0, marginBottom: '5px' }}>
+    <Link to={APP_PREFIX_PATH + `/add-property-advertisement/${user_id}`}>
+      <button
+        type="button"
+        style={{
+          background: '#2b77e5',
+          padding: '7px 13px',
+          color: '#fff',
+          borderRadius: '5px',
+          whiteSpace: 'nowrap',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '6px',
+          border: 'none',
+          cursor: 'pointer',
+        }}
+      >
+        <AddIcon style={{ fontSize: '18px' }} /> {t('Add Property Advertisement')}
+      </button>
+    </Link>
+  </div>
+</div>
 
                   <div style={{ margin: '1rem' }}>
                     <div className='mc-table-responsive'>
