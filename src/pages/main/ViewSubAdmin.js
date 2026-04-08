@@ -8,6 +8,7 @@ import './UserProfilePage.css';
 import { API_URL, APP_PREFIX_PATH, IMAGE_PATH } from '../../constant/constant';
 import { decode } from 'base-64';
 import { Helmet } from 'react-helmet-async';
+
 export default function ViewSubAdmin() {
     const { t } = useContext(TranslatorContext);
     const { user_id } = useParams();
@@ -17,8 +18,6 @@ export default function ViewSubAdmin() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Permission mapping from IDs to names
-    // Updated permission mapping from IDs to names
     const permissionMap = {
         1: "manage users",
         2: "Manage Owners",
@@ -41,7 +40,10 @@ export default function ViewSubAdmin() {
         19: "manage contactus",
         20: "tabular report",
         21: "analytical report",
-        22: "manage destination"
+        22: "manage destination",
+        23: "manage property type",
+        24: "property advertisement",
+        25: "manage property booking",
     };
 
     const fetchSubAdminData = async () => {
@@ -106,7 +108,6 @@ export default function ViewSubAdmin() {
         );
     }
 
-    // Convert privileges string to array of permission names
     const privilegesArray = data.privileges
         ? data.privileges.split(',').map(id => permissionMap[id.trim()] || `Unknown Permission (${id})`)
         : [];
@@ -178,8 +179,6 @@ export default function ViewSubAdmin() {
                                     <span style={{ fontWeight: '400' }}>{data.email || 'NA'}</span>
                                 </div>
                             </div>
-
-
 
                             <div className='row mt-3'>
                                 <div className='col-lg-3'>

@@ -9,7 +9,6 @@ import { API_URL, APP_PREFIX_PATH } from "../../constant/constant";
 import { Eye, EyeOff } from "react-feather";
 
 export default function AddNewSubAdmin() {
-    // Permissions list with indexes (dashboard removed)
     const permissionsList = [
         { id: 1, name: "manage users" },
         { id: 2, name: "Manage Owners" },
@@ -32,9 +31,11 @@ export default function AddNewSubAdmin() {
         { id: 19, name: "manage contactus" },
         { id: 20, name: "tabular report" },
         { id: 21, name: "analytical report" },
-        { id: 22, name: "manage destination" }
+        { id: 22, name: "manage destination" },
+        { id: 23, name: "manage property type" },
+        { id: 24, name: "property advertisement" },
+        { id: 25, name: "manage property booking" },
     ];
-
 
     const [selectedPermissions, setSelectedPermissions] = useState(
         permissionsList.reduce((acc, permission) => {
@@ -77,7 +78,6 @@ export default function AddNewSubAdmin() {
     const handleSubmit = async () => {
         const newErrors = {};
 
-        // Validation
         if (!formData.name) newErrors.name = 'Please enter name';
         if (!formData.email) newErrors.email = 'Please enter email';
         if (!formData.mobile) newErrors.mobile = 'Please enter mobile number';
@@ -301,7 +301,6 @@ export default function AddNewSubAdmin() {
                     <div className="col-12">
                         <h5>Permissions</h5>
                         <hr />
-                        {/* <p className="text-muted">Select Previleges</p> */}
                     </div>
 
                     {permissionsList.map((permission) => (

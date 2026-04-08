@@ -41,11 +41,11 @@ export default function EditPropertyAdvertisement() {
     one_day_price: '',
     one_day_active: false,
     weekday_price: '',
-    weekday_active: true,
+    weekday_active: false,
     weekend_price: '',
-    weekend_active: true,
+    weekend_active: false,
     full_week_price: '',
-    full_week_active: true,
+    full_week_active: false,
     discount_percentage: '',
     coupon_code: '',
     coupon_discount: '',
@@ -184,11 +184,11 @@ export default function EditPropertyAdvertisement() {
             one_day_price: data.one_day_price || '',
             one_day_active: data.one_day_active === 1,
             weekday_price: data.weekday_price || '',
-            weekday_active: true,
+            weekday_active: data.weekday_active === 1,
             weekend_price: data.weekend_price || '',
-            weekend_active: true,
+            weekend_active: data.weekend_active === 1,
             full_week_price: data.full_week_price || '',
-            full_week_active: true,
+            full_week_active: data.full_week_active === 1,
             discount_percentage: data.discount_percentage || '',
             coupon_code: data.coupon_code || '',
             coupon_discount: data.coupon_discount || '',
@@ -421,27 +421,35 @@ export default function EditPropertyAdvertisement() {
       isValid = false
     }
 
-    // Price validation - All three prices are now required
-    if (!formData.weekday_price) {
+    // Price validation - Only validate if the price period is active
+    if (formData.one_day_active && !formData.one_day_price) {
+      errors.one_day_price = 'Please enter one day price'
+      isValid = false
+    } else if (formData.one_day_active && formData.one_day_price && Number(formData.one_day_price) < 0) {
+      errors.one_day_price = 'Please enter valid price'
+      isValid = false
+    }
+
+    if (formData.weekday_active && !formData.weekday_price) {
       errors.weekday_price = 'Please enter weekday price'
       isValid = false
-    } else if (Number(formData.weekday_price) < 0) {
+    } else if (formData.weekday_active && formData.weekday_price && Number(formData.weekday_price) < 0) {
       errors.weekday_price = 'Please enter valid price'
       isValid = false
     }
 
-    if (!formData.weekend_price) {
+    if (formData.weekend_active && !formData.weekend_price) {
       errors.weekend_price = 'Please enter weekend price'
       isValid = false
-    } else if (Number(formData.weekend_price) < 0) {
+    } else if (formData.weekend_active && formData.weekend_price && Number(formData.weekend_price) < 0) {
       errors.weekend_price = 'Please enter valid price'
       isValid = false
     }
 
-    if (!formData.full_week_price) {
+    if (formData.full_week_active && !formData.full_week_price) {
       errors.full_week_price = 'Please enter full week price'
       isValid = false
-    } else if (Number(formData.full_week_price) < 0) {
+    } else if (formData.full_week_active && formData.full_week_price && Number(formData.full_week_price) < 0) {
       errors.full_week_price = 'Please enter valid price'
       isValid = false
     }
@@ -530,15 +538,15 @@ export default function EditPropertyAdvertisement() {
     formDataObj.append('description_italian', formData.description_italian || '')
     formDataObj.append('description_korean', formData.description_korean || '')
 
-    // Price periods - All are now active by default
-    formDataObj.append('one_day_price', formData.one_day_price || 0)
+    // Price periods - Send active status and price based on checkbox selection
+    formDataObj.append('one_day_price', formData.one_day_active ? formData.one_day_price : 0)
     formDataObj.append('one_day_active', formData.one_day_active ? 1 : 0)
-    formDataObj.append('weekday_price', formData.weekday_price)
-    formDataObj.append('weekday_active', 1) // Always active
-    formDataObj.append('weekend_price', formData.weekend_price)
-    formDataObj.append('weekend_active', 1) // Always active
-    formDataObj.append('full_week_price', formData.full_week_price)
-    formDataObj.append('full_week_active', 1) // Always active
+    formDataObj.append('weekday_price', formData.weekday_active ? formData.weekday_price : 0)
+    formDataObj.append('weekday_active', formData.weekday_active ? 1 : 0)
+    formDataObj.append('weekend_price', formData.weekend_active ? formData.weekend_price : 0)
+    formDataObj.append('weekend_active', formData.weekend_active ? 1 : 0)
+    formDataObj.append('full_week_price', formData.full_week_active ? formData.full_week_price : 0)
+    formDataObj.append('full_week_active', formData.full_week_active ? 1 : 0)
 
     // Other fields
     formDataObj.append('discount_percentage', formData.discount_percentage || 0)
@@ -1162,12 +1170,48 @@ export default function EditPropertyAdvertisement() {
         </div>
 
         {/* Price Section */}
-        <h4 className='mt-4 mb-3'>Price *</h4>
+        <h4 className='mt-4 mb-3'>Price</h4>
         
+        {/* One Day */}
+        <div className='row m-2 align-items-center'>
+          <div className='col-md-6'>
+            <Form.Check
+              type='checkbox'
+              label='One day (2pm till next day 12 afternoon)'
+              checked={formData.one_day_active}
+              onChange={e => handlePricePeriodChange('one_day_active', e.target.checked)}
+            />
+          </div>
+          <div className='col-md-6'>
+            <div className='d-flex align-items-center gap-3'>
+              <span>Price</span>
+              <Form.Control
+                type='number'
+                placeholder='Enter price in KWD'
+                value={formData.one_day_price}
+                onChange={e => handleInputChange('one_day_price', e.target.value)}
+                disabled={!formData.one_day_active}
+                isInvalid={!!ownerError.one_day_price}
+                style={{ maxWidth: '200px' }}
+                min="0"
+              />
+              <span>KWD</span>
+            </div>
+            <Form.Control.Feedback type='invalid'>
+              {ownerError.one_day_price}
+            </Form.Control.Feedback>
+          </div>
+        </div>
+
         {/* Weekday */}
         <div className='row m-2 align-items-center'>
           <div className='col-md-6'>
-            <Form.Label className='fw-bold'>Weekday (Sun-Wed) *</Form.Label>
+            <Form.Check
+              type='checkbox'
+              label='Weekday (Sun-Wed)'
+              checked={formData.weekday_active}
+              onChange={e => handlePricePeriodChange('weekday_active', e.target.checked)}
+            />
           </div>
           <div className='col-md-6'>
             <div className='d-flex align-items-center gap-3'>
@@ -1177,6 +1221,7 @@ export default function EditPropertyAdvertisement() {
                 placeholder='Enter price in KWD'
                 value={formData.weekday_price}
                 onChange={e => handleInputChange('weekday_price', e.target.value)}
+                disabled={!formData.weekday_active}
                 isInvalid={!!ownerError.weekday_price}
                 style={{ maxWidth: '200px' }}
                 min="0"
@@ -1192,7 +1237,12 @@ export default function EditPropertyAdvertisement() {
         {/* Weekend */}
         <div className='row m-2 align-items-center'>
           <div className='col-md-6'>
-            <Form.Label className='fw-bold'>Weekend (Thu-Sat) *</Form.Label>
+            <Form.Check
+              type='checkbox'
+              label='Weekend (Thu-Sat)'
+              checked={formData.weekend_active}
+              onChange={e => handlePricePeriodChange('weekend_active', e.target.checked)}
+            />
           </div>
           <div className='col-md-6'>
             <div className='d-flex align-items-center gap-3'>
@@ -1202,6 +1252,7 @@ export default function EditPropertyAdvertisement() {
                 placeholder='Enter price in KWD'
                 value={formData.weekend_price}
                 onChange={e => handleInputChange('weekend_price', e.target.value)}
+                disabled={!formData.weekend_active}
                 isInvalid={!!ownerError.weekend_price}
                 style={{ maxWidth: '200px' }}
                 min="0"
@@ -1217,7 +1268,12 @@ export default function EditPropertyAdvertisement() {
         {/* Full Week */}
         <div className='row m-2 align-items-center'>
           <div className='col-md-6'>
-            <Form.Label className='fw-bold'>Full week (Sun-Sat) *</Form.Label>
+            <Form.Check
+              type='checkbox'
+              label='Full week (Sun-Sat)'
+              checked={formData.full_week_active}
+              onChange={e => handlePricePeriodChange('full_week_active', e.target.checked)}
+            />
           </div>
           <div className='col-md-6'>
             <div className='d-flex align-items-center gap-3'>
@@ -1227,6 +1283,7 @@ export default function EditPropertyAdvertisement() {
                 placeholder='Enter price in KWD'
                 value={formData.full_week_price}
                 onChange={e => handleInputChange('full_week_price', e.target.value)}
+                disabled={!formData.full_week_active}
                 isInvalid={!!ownerError.full_week_price}
                 style={{ maxWidth: '200px' }}
                 min="0"
@@ -1359,7 +1416,7 @@ export default function EditPropertyAdvertisement() {
           <br />
           <p>Property advertisement has been updated successfully.</p>
           <Modal.Footer></Modal.Footer>
-        </div>
+        </div>  
       </Modal>
     </PageLayout>
   )

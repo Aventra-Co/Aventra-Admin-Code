@@ -312,16 +312,16 @@ export default function ViewPropertyAdvertisement() {
                   </div>
 
                   {/* One Day Price */}
-                  {/* <div className='row mt-2'>
+                  <div className='row mt-2'>
                     <div className='col-lg-5'>
                       <h6>{t('One Day Price')}:</h6>
                     </div>
                     <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
-                        {propertyData.lowest_price ? `${propertyData.lowest_price} KWD` : 'NA'}
+                        {propertyData.one_day_price ? `${propertyData.one_day_price} KWD` : 'NA'}
                       </span>
                     </div>
-                  </div> */}
+                  </div>
 
                   {/* Weekday Price */}
                   <div className='row mt-2'>
@@ -391,6 +391,26 @@ export default function ViewPropertyAdvertisement() {
                     <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.coupon_discount ? `${propertyData.coupon_discount}%` : 'NA'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className='row mt-2'>
+                    <div className='col-lg-5'>
+                      <h6>{t('Coupon Start Date')}:</h6>
+                    </div>
+                    <div className='col-lg-7'>
+                      <span style={{ fontWeight: '400' }}>
+                        {propertyData.start_date_formatted ? `${propertyData.start_date_formatted}` : 'NA'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className='row mt-2'>
+                    <div className='col-lg-5'>
+                      <h6>{t('Coupon End Date')}:</h6>
+                    </div>
+                    <div className='col-lg-7'>
+                      <span style={{ fontWeight: '400' }}>
+                        {propertyData.start_date_formatted ? `${propertyData.start_date_formatted}` : 'NA'}
                       </span>
                     </div>
                   </div>

@@ -9,6 +9,7 @@ import { API_URL, APP_PREFIX_PATH, IMAGE_PATH } from "../../constant/constant";
 import { Eye, EyeOff } from "react-feather";
 import { decode } from 'base-64';
 import { Helmet } from "react-helmet-async";
+
 export default function EditSubAdmin() {
     const { user_id } = useParams();
     const decode_user_id = decode(user_id);
@@ -34,7 +35,10 @@ export default function EditSubAdmin() {
         { id: 19, name: "manage contactus" },
         { id: 20, name: "tabular report" },
         { id: 21, name: "analytical report" },
-        { id: 22, name: "manage destination" }
+        { id: 22, name: "manage destination" },
+        { id: 23, name: "manage property type" },
+        { id: 24, name: "property advertisement" },
+        { id: 25, name: "manage property booking" },
     ];
 
     const [selectedPermissions, setSelectedPermissions] = useState({});
@@ -57,24 +61,20 @@ export default function EditSubAdmin() {
                 if (response.data.success && response.data.result) {
                     const data = response.data.result;
 
-                    // Set form data
                     setFormData({
                         name: data.name || '',
                         email: data.email || ''
                     });
 
-                    // Set existing image if available
                     if (data.image) {
                         setExistingImage(`${IMAGE_PATH}${data.image}`);
                     }
 
-                    // Initialize all permissions as false first
                     const initialPermissions = permissionsList.reduce((acc, permission) => {
                         acc[permission.id] = false;
                         return acc;
                     }, {});
 
-                    // Set selected permissions if they exist
                     if (data.privileges) {
                         const privilegeIds = data.privileges.split(',').map(Number);
                         privilegeIds.forEach(id => {
