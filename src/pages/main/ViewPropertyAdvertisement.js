@@ -395,7 +395,7 @@ export default function ViewPropertyAdvertisement() {
                     </div>
                   </div>
                   <div className='row mt-2'>
-                    <div className='col-lg-5'>
+                    <div className='col-lg-5'>  
                       <h6>{t('Coupon Start Date')}:</h6>
                     </div>
                     <div className='col-lg-7'>
