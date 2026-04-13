@@ -26,6 +26,8 @@ export default function AddStaff() {
         manage_unavailability: 0,
         view_my_wallet: 0,
         view_history: 0,
+        manage_property: 0,
+        view_property: 0
     });
 
     const [showPassword, setShowPassword] = useState(false);

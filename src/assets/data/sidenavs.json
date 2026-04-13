@@ -95,6 +95,11 @@
                 "text": "Manage Property Type"
             },
             {
+                "path": "/amenities",
+                "icon": "AdsClickIcon",
+                "text": "Manage Amenities"
+            },
+            {
                 "path": "/property-advertisement",
                 "icon": "ApartmentIcon",
                 "text": "Property Advertisement"

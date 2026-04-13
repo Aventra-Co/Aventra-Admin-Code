@@ -23,6 +23,8 @@ export default function EditStaff() {
         manage_unavailability: 0,
         view_my_wallet: 0,
         view_history: 0,
+        manage_property: 0,
+        view_property: 0
     });
 
     const [alertModal, setAlertModal] = useState(false);
@@ -85,6 +87,8 @@ export default function EditStaff() {
                         manage_unavailability: data.manage_unavailability || 0,
                         view_my_wallet: data.view_my_wallet || 0,
                         view_history: data.view_history || 0,
+                        manage_property: data.manage_property || 0,
+                        view_property: data.view_property || 0,
                     };
                     setPermissions(staffPermissions);
                 }

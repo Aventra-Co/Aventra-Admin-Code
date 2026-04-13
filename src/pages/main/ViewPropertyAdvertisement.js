@@ -343,7 +343,7 @@ export default function ViewPropertyAdvertisement() {
                     <div className='col-lg-7'>
                       <span style={{ fontWeight: '400' }}>
                         {propertyData.weekend_price ? `${propertyData.weekend_price} KWD` : 'NA'}
-                      </span>
+                      </span>         
                     </div>
                   </div>
 

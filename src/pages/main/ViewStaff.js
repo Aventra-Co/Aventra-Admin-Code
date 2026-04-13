@@ -23,7 +23,9 @@ export default function ViewStaff() {
     view_unavailability: 0,
     manage_unavailability: 0,
     view_my_wallet: 0,
-    view_history: 0
+    view_history: 0,
+    manage_property: 0,
+    view_property: 0
   })
 
   const [trips, setTrips] = useState([])
@@ -54,7 +56,9 @@ export default function ViewStaff() {
             manage_unavailability:
               res.data.staff_arr[0].manage_unavailability || 0,
             view_my_wallet: res.data.staff_arr[0].view_my_wallet || 0,
-            view_history: res.data.staff_arr[0].view_history || 0
+            view_history: res.data.staff_arr[0].view_history || 0,
+            manage_property: res.data.staff_arr[0].manage_property || 0,
+            view_property: res.data.staff_arr[0].view_property || 0
           }
           setPermissions(staffPermissions)
         }

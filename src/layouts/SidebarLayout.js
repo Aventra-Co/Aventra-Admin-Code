@@ -26,6 +26,7 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import PublicIcon from '@mui/icons-material/Public';
 import GroupsIcon from '@mui/icons-material/Groups';
 import ApartmentIcon from '@mui/icons-material/Apartment';
+import AdsClickIcon from '@mui/icons-material/AdsClick';
 import ContactSupportIcon from '@mui/icons-material/ContactSupport';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 import ReviewsIcon from '@mui/icons-material/Reviews';
@@ -105,6 +106,7 @@ export default function SidebarLayout() {
         PublicIcon,
         GroupsIcon,
         ApartmentIcon,
+        AdsClickIcon,
         ContactSupportIcon,
         CompareArrowsIcon,
         ReviewsIcon,
