@@ -10,6 +10,22 @@
   align-items: center;
   z-index: 9999;
 }
+.mc-table td {
+  text-align: center;
+  vertical-align: middle;
+  padding: 12px 8px;
+  font-size: 13px;
+}
+
+.mc-table tbody tr:hover {
+  background-color: #f5f7fb;
+  transition: 0.2s;
+}
+
+.mc-table-head.primary {
+  background: linear-gradient(90deg, #1e5bd7, #3b82f6);
+  color: #fff;
+}
 
 .enlarged-image {
   max-width: 90%;

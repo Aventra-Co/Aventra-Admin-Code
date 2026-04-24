@@ -22,8 +22,10 @@ import {
 export default function ViewOwner() {
   const { t } = useContext(TranslatorContext)
   const [content, setContent] = useState(0)
+  const [ratingTab, setRatingTab] = useState('trip'); // trip | property
   const [unavailabilitySubTab, setUnavailabilitySubTab] = useState('boat') // 'boat' or 'property'
   const { user_id } = useParams()
+  const [bookingTab, setBookingTab] = useState('trip'); // 'trip' or 'property'
   const [loading, setLoading] = useState(false)
   const [Data, setData] = useState('')
   const [enlargedImage, setEnlargedImage] = useState(null)
@@ -130,7 +132,65 @@ export default function ViewOwner() {
       }
     })
   }
+  const fetchRatingsByOwner = async () => {
+  try {
+    const res = await axios.get(
+      `${API_URL}/fetchRatingsByOwner?owner_id=${decode(user_id)}`
+    );
 
+    if (res.data.success) {
+      setRatings(res.data.data || []);
+    } else {
+      setRatings([]);
+    }
+  } catch (err) {
+    console.log(err);
+    setRatings([]);
+  }
+};
+  useEffect(() => {
+    if (content === 5) {
+      fetchRatingsByOwner();   // 🔥 jab Ratings tab open ho tab call
+    }
+  }, [content]);
+  const fetchTripBookings = async () => {
+    try {
+      setLoadingBookings(true)
+      const res = await axios.get(`${API_URL}/fetchTripBookingByUser?user_id=${decode(user_id)}`)
+      if (res.data.success) {
+        setBookings(res.data.booking_arr)
+      } else {
+        setBookings([])
+      }
+    } catch (err) {
+      setBookings([])
+    } finally {
+      setLoadingBookings(false)
+    }
+  }
+
+  const fetchPropertyBookings = async () => {
+    try {
+      setLoadingBookings(true)
+      const res = await axios.get(`${API_URL}/fetchPropertyBookingByUser?user_id=${decode(user_id)}`)
+      if (res.data.success) {
+        setBookings(res.data.booking_arr)
+      } else {
+        setBookings([])
+      }
+    } catch (err) {
+      setBookings([])
+    } finally {
+      setLoadingBookings(false)
+    }
+  }
+  useEffect(() => {
+    if (bookingTab === 'trip') {
+      fetchTripBookings()
+    } else {
+      fetchPropertyBookings()
+    }
+  }, [bookingTab])
   const handlePropertyDelete = property_id => {
     Swal.fire({
       title: 'Are you sure?',
@@ -506,34 +566,36 @@ export default function ViewOwner() {
     )
   })
 
-  const filteredRatings = Ratings.filter(user => {
-    const lowercasedTerm = searchTerm.toLowerCase()
-    return (
-      (user.review &&
-        String(user.review).toLowerCase().includes(lowercasedTerm)) ||
-      (user.entertainment &&
-        String(user.entertainment).toLowerCase().includes(lowercasedTerm)) ||
-      (user.equipment &&
-        String(user.equipment).toLowerCase().includes(lowercasedTerm)) ||
-      (user.food && String(user.food).toLowerCase().includes(lowercasedTerm)) ||
-      (user.hospitality &&
-        String(user.hospitality).toLowerCase().includes(lowercasedTerm)) ||
-      (user.captain &&
-        String(user.captain).toLowerCase().includes(lowercasedTerm)) ||
-      (user.captain &&
-        String(user.captain).toLowerCase().includes(lowercasedTerm)) ||
-      (user.clean &&
-        String(user.clean).toLowerCase().includes(lowercasedTerm)) ||
-      (user.time && String(user.time).toLowerCase().includes(lowercasedTerm)) ||
-      (user.name && String(user.name).toLowerCase().includes(lowercasedTerm)) ||
-      (user.trip_name_english &&
-        String(user.trip_name_english)
-          .toLowerCase()
-          .includes(lowercasedTerm)) ||
-      (user.createtime &&
-        String(user.createtime).toLowerCase().includes(lowercasedTerm))
-    )
-  })
+const filteredRatings = Ratings.filter(user => {
+  const lowercasedTerm = searchTerm.toLowerCase()
+  return (
+    (user.review &&
+      String(user.review).toLowerCase().includes(lowercasedTerm)) ||
+    (user.entertainment &&
+      String(user.entertainment).toLowerCase().includes(lowercasedTerm)) ||
+    (user.equipment &&
+      String(user.equipment).toLowerCase().includes(lowercasedTerm)) ||
+    (user.food && String(user.food).toLowerCase().includes(lowercasedTerm)) ||
+    (user.hospitality &&
+      String(user.hospitality).toLowerCase().includes(lowercasedTerm)) ||
+    (user.captain &&
+      String(user.captain).toLowerCase().includes(lowercasedTerm)) ||
+    (user.clean &&
+      String(user.clean).toLowerCase().includes(lowercasedTerm)) ||
+    (user.time && String(user.time).toLowerCase().includes(lowercasedTerm)) ||
+    (user.name && String(user.name).toLowerCase().includes(lowercasedTerm)) ||
+    (user.trip_name_english &&
+      String(user.trip_name_english)
+        .toLowerCase()
+        .includes(lowercasedTerm)) ||
+    (user.createtime &&
+      String(user.createtime).toLowerCase().includes(lowercasedTerm))
+  )
+})
+
+/* 🔥 YAHAN ADD KARO */
+const tripRatings = filteredRatings.filter(item => item.entity_type === 0);
+const propertyRatings = filteredRatings.filter(item => item.entity_type === 1);
 
   const filteredBoatUnavailability = boatUnavailability.filter(item => {
     const lowercasedTerm = searchTerm.toLowerCase()
@@ -1609,89 +1671,138 @@ export default function ViewOwner() {
                 </>
               )}
               
-              {content === 5 && (
-                <>
-                  <Row
-                    xs={1}
-                    sm={2}
-                    xl={4}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
-                    }}
-                  >
-                    <Col className='mt-3 '>
-                      <LabelFieldComponent
-                        type='search'
-                        icon='Search'
-                        placeholder={`${t('search_here')}`}
-                        labelDir='label-col'
-                        fieldSize='mb-4 w-100 h-md'
-                        value={searchTerm}
-                        onChange={handleSearch}
-                      />
-                    </Col>
-                  </Row>
-                  <div style={{ margin: '1rem' }}>
-                    <div className='mc-table-responsive'>
-                      <table className='mc-table'>
-                        <thead className='mc-table-head primary'>
-                          <tr>
-                            <th>
-                              <div className='mc-table-check'>
-                                <p>{t('sno')}</p>
-                              </div>
-                            </th>
-                            <th>{t('user_name')}</th>
-                            <th>{t('Trip Name')}</th>
-                            <th>{t('Time')}</th>
-                            <th>{t('Clean')}</th>
-                            <th>{t('Captain')}</th>
-                            <th>{t('Hospitality')}</th>
-                            <th>{t('Food')}</th>
-                            <th>{t('Equipment')}</th>
-                            <th>{t('Entertainment')}</th>
-                            <th>{t('review')}</th>
-                            <th>{t('createtime')}</th>
-                          </tr>
-                        </thead>
-                        <tbody className='mc-table-body even'>
-                          {filteredRatings && filteredRatings.length > 0 ? (
-                            filteredRatings.map((item, index) => (
-                              <tr key={index}>
-                                <td title='id'>
-                                  <div className='mc-table-check'>
-                                    <p>{index + 1}</p>
-                                  </div>
-                                </td>
-                                <td>{item.name || 'NA'}</td>
-                                <td>{item.trip_name_english || 'NA'}</td>
-                                <td>{item.time || 'NA'}</td>
-                                <td>{item.clean || 'NA'}</td>
-                                <td>{item.captain || 'NA'}</td>
-                                <td>{item.hospitality || 'NA'}</td>
-                                <td>{item.food || 'NA'}</td>
-                                <td>{item.equipment || 'NA'}</td>
-                                <td>{item.entertainment || 'NA'}</td>
-                                <td>{item.review || 'NA'}</td>
-                                <td>{item.createtime || 'NA'}</td>
-                              </tr>
-                            ))
-                          ) : (
-                            <tr>
-                              <td colSpan='12' style={{ textAlign: 'center' }}>
-                                No data available
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
+                {content === 5 && (
+                  <>
+                    {/* 🔥 SUB TABS */}
+                    <div className="mb-3">
+                      <button
+                        type="button"
+                        className="btn me-2"
+                        onClick={() => setRatingTab('trip')}
+                        style={{
+                          backgroundColor: ratingTab === 'trip' ? '#198754' : 'transparent',
+                          color: ratingTab === 'trip' ? '#fff' : '#198754',
+                          border: '1px solid #198754'
+                        }}
+                      >
+                        Trip Rating
+                      </button>
+
+                      <button
+                        type="button"
+                        className="btn"
+                        onClick={() => setRatingTab('property')}
+                        style={{
+                          backgroundColor: ratingTab === 'property' ? '#198754' : 'transparent',
+                          color: ratingTab === 'property' ? '#fff' : '#198754',
+                          border: '1px solid #198754'
+                        }}
+                      >
+                        Property Rating
+                      </button>
                     </div>
-                  </div>
-                </>
-              )}
-              
+
+                    {/* 🔍 SEARCH */}
+                    <Row>
+                      <Col className='mt-3'>
+                        <LabelFieldComponent
+                          type='search'
+                          icon='Search'
+                          placeholder='Search here'
+                          fieldSize='mb-4 w-100 h-md'
+                          value={searchTerm}
+                          onChange={handleSearch}
+                        />
+                      </Col>
+                    </Row>
+
+                    <div style={{ margin: '1rem' }}>
+                      <div className='mc-table-responsive'>
+
+                        {/* ================= TRIP RATING ================= */}
+                        {ratingTab === 'trip' && (
+                          <table className='mc-table'>
+                            <thead className='mc-table-head primary'>
+                              <tr>
+                                <th>#</th>
+                                <th>User</th>
+                                <th>Trip</th>
+                                <th>Time</th>
+                                <th>Clean</th>
+                                <th>Captain</th>
+                                <th>Hospitality</th>
+                                <th>Food</th>
+                                <th>Equipment</th>
+                                <th>Entertainment</th>
+                                <th>Review</th>
+                                <th>Created</th>
+                              </tr>
+                            </thead>
+
+                            <tbody>
+                              {tripRatings.length > 0 ? (
+                                tripRatings.map((item, i) => (
+                                  <tr key={i}>
+                                    <td>{i + 1}</td>
+                                    <td>{item.name}</td>
+                                    <td>{item.trip_name_english}</td>
+                                    <td>{item.time}</td>
+                                    <td>{item.clean}</td>
+                                    <td>{item.captain}</td>
+                                    <td>{item.hospitality}</td>
+                                    <td>{item.food}</td>
+                                    <td>{item.equipment}</td>
+                                    <td>{item.entertainment}</td>
+                                    <td>{item.review}</td>
+                                    <td>{item.createtime}</td>
+                                  </tr>
+                                ))
+                              ) : (
+                                <tr><td colSpan="12">No Trip Ratings</td></tr>
+                              )}
+                            </tbody>
+                          </table>
+                        )}
+
+                        {/* ================= PROPERTY RATING ================= */}
+                        {ratingTab === 'property' && (
+                          <table className='mc-table'>
+                            <thead className='mc-table-head primary'>
+                              <tr>
+                                <th>#</th>
+                                <th>User</th>
+                                <th>Property</th>
+                                <th>Clean</th>
+                                <th>Hospitality</th>
+                                <th>Review</th>
+                                <th>Created</th>
+                              </tr>
+                            </thead>
+
+                            <tbody>
+                              {propertyRatings.length > 0 ? (
+                                propertyRatings.map((item, i) => (
+                                  <tr key={i}>
+                                    <td>{i + 1}</td>
+                                    <td>{item.name}</td>
+                                    <td>{item.property_name_english}</td>
+                                    <td>{item.clean}</td>
+                                    <td>{item.hospitality}</td>
+                                    <td>{item.review}</td>
+                                    <td>{item.createtime}</td>
+                                  </tr>
+                                ))
+                              ) : (
+                                <tr><td colSpan="7">No Property Ratings</td></tr>
+                              )}
+                            </tbody>
+                          </table>
+                        )}
+
+                      </div>
+                    </div>
+                  </>
+                )}
               {content === 6 && (
                 <>
                   {/* Sub-tabs for Boat/Property Unavailability */}
@@ -1941,116 +2052,224 @@ export default function ViewOwner() {
                 </>
               )}
               
-              {content === 7 && (
-                <>
-                  <Row
-                    xs={1}
-                    sm={2}
-                    xl={4}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
-                    }}
-                  >
-                    <Col className='mt-3 '>
-                      <LabelFieldComponent
-                        type='search'
-                        icon='Search'
-                        placeholder={`${t('search here')}`}
-                        labelDir='label-col'
-                        fieldSize='mb-4 w-100 h-md'
-                        value={searchTerm}
-                        onChange={handleSearch}
-                      />
-                    </Col>
-                  </Row>
-                  <div style={{ margin: '1rem' }}>
-                    {loadingBookings ? (
-                      <div className="d-flex justify-content-center py-4">
-                        <div className="spinner-border text-primary" role="status">
-                          <span className="visually-hidden">Loading...</span>
+                {content === 7 && (
+                  <>
+                    {/* 🔥 SUB TABS */}
+                    <div className="mb-3">
+                      <button
+                        type="button"
+                        className="btn me-2"
+                        onClick={() => setBookingTab('trip')}
+                        style={{
+                          backgroundColor: bookingTab === 'trip' ? '#198754' : 'transparent',
+                          color: bookingTab === 'trip' ? '#fff' : '#198754',
+                          border: '1px solid #198754'
+                        }}
+                      >
+                        Trip Booking
+                      </button>
+
+                      <button
+                        type="button"
+                        className="btn"
+                        onClick={() => setBookingTab('property')}
+                        style={{
+                          backgroundColor: bookingTab === 'property' ? '#198754' : 'transparent',
+                          color: bookingTab === 'property' ? '#fff' : '#198754',
+                          border: '1px solid #198754'
+                        }}
+                      >
+                        Property Booking
+                      </button>
+                    </div>
+
+                    {/* 🔍 SEARCH */}
+                    <Row
+                      xs={1}
+                      sm={2}
+                      xl={4}
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <Col className='mt-3'>
+                        <LabelFieldComponent
+                          type='search'
+                          icon='Search'
+                          placeholder='Search here'
+                          labelDir='label-col'
+                          fieldSize='mb-4 w-100 h-md'
+                          value={searchTerm}
+                          onChange={handleSearch}
+                        />
+                      </Col>
+                    </Row>
+
+                    <div style={{ margin: '1rem' }}>
+                      {loadingBookings ? (
+                        <div className="d-flex justify-content-center py-4">
+                          <div className="spinner-border text-primary"></div>
                         </div>
-                      </div>
-                    ) : (
-                      <div className='mc-table-responsive'>
-                        <table className='mc-table'>
-                          <thead className='mc-table-head primary'>
-                            <tr>
-                              <th>
-                                <div className='mc-table-check'>
-                                  <p>{t("sno")}</p>
-                                </div>
-                              </th>
-                              <th>{t("user name")}</th>
-                              <th>{t("booking id")}</th>
-                              <th>{t("owner name")}</th>
-                              <th>{t("price (KWD/Hr)")}</th>
-                              <th>{t("Booking Date")}</th>
-                              <th>{t("Status")}</th>
-                              <th>{t("Cancel Reason")}</th>
-                              <th>{t("Hours")}</th>
-                              <th>{t("Booking Time")}</th>
-                              <th>{t("Total Amount")}</th>
-                              <th>{t("transaction ID")}</th>
-                              <th>{t("Booked On")}</th>
-                            </tr>
-                          </thead>
-                          <tbody className='mc-table-body even'>
-                            {filteredBookings.length > 0 ? (
-                              filteredBookings.map((item, index) => (
-                                <tr key={index}>
-                                  <td title="id">
-                                    <div className="mc-table-check">
-                                      <p>{index + 1}</p>
-                                    </div>
-                                  </td>
-                                  <td>{item.name || 'NA'}</td>
-                                  <td>
-                                    <span>#{item.random_booking_id || 'NA'}</span>
-                                  </td>
-                                  <td>{item.ownerName || 'NA'}</td>
-                                  <td>{item.price_per_hour || 'NA'}</td>
-                                  <td>{item.date || 'NA'}</td>
-                                  <td>
-                                    <p
-                                      style={{
-                                        padding: '4px 12px',
-                                        borderRadius: '999px',
-                                        backgroundColor:
-                                          item.cancle_status === 0 ? '#D4EDDA' : '#F8D7DA',
-                                        color:
-                                          item.cancle_status === 0 ? '#155724' : '#721c24',
-                                        fontSize: '14px',
-                                        fontWeight: 500,
-                                        display: 'inline-block',
-                                      }}
-                                    >
-                                      {item.cancle_status === 0 ? 'Confirmed' : 'Cancelled'}
-                                    </p>
-                                  </td>
-                                  <td>{item.cancle_reason || 'NA'}</td>
-                                  <td>{item.hours || 'NA'}</td>
-                                  <td>{item.booking_time || 'NA'}</td>
-                                  <td>{item.total_amount || 'NA'}</td>
-                                  <td>{item.transaction_id || 'NA'}</td>
-                                  <td>{item.createtime || 'NA'}</td>
+                      ) : (
+                        <div className='mc-table-responsive'>
+
+                          {/* ================= TRIP BOOKING ================= */}
+                          {bookingTab === 'trip' && (
+                              <tbody>
+                                {filteredBookings.length > 0 ? (
+                                  filteredBookings.map((item, index) => (
+                                    <tr key={index}>
+                                      <td>{index + 1}</td>
+
+                                      <td>#{item.booking_random_id}</td>
+
+                                      <td style={{ fontWeight: '500' }}>
+                                        {item.property_name || 'NA'}
+                                      </td>
+
+                                      <td>{item.checkin_date}</td>
+                                      <td>{item.checkout_date}</td>
+
+                                      <td>
+                                        <span style={{ fontWeight: '500' }}>
+                                          {item.total_nights}
+                                        </span>
+                                      </td>
+
+                                      <td style={{ fontWeight: '600' }}>
+                                        {item.total_amount}
+                                      </td>
+
+                                      {/* STATUS */}
+                                      <td>
+                                        <span
+                                          style={{
+                                            padding: '5px 12px',
+                                            borderRadius: '20px',
+                                            fontSize: '12px',
+                                            fontWeight: '500',
+                                            color: '#fff',
+                                            backgroundColor:
+                                              item.booking_status === 0
+                                                ? '#f0ad4e'
+                                                : item.booking_status === 1
+                                                  ? '#0275d8'
+                                                  : '#5cb85c'
+                                          }}
+                                        >
+                                          {item.booking_status === 0
+                                            ? 'Pending'
+                                            : item.booking_status === 1
+                                              ? 'Ongoing'
+                                              : 'Completed'}
+                                        </span>
+                                      </td>
+
+                                      {/* PAYMENT */}
+                                      <td>
+                                        <span
+                                          style={{
+                                            padding: '5px 12px',
+                                            borderRadius: '20px',
+                                            fontSize: '12px',
+                                            background: '#e6f4ea',
+                                            color: '#28a745',
+                                            fontWeight: '500'
+                                          }}
+                                        >
+                                          Paid
+                                        </span>
+                                      </td>
+
+                                      <td style={{ fontSize: '12px', color: '#666' }}>
+                                        {item.createtime}
+                                      </td>
+                                    </tr>
+                                  ))
+                                ) : (
+                                  <tr>
+                                    <td colSpan="10" style={{ textAlign: 'center' }}>
+                                      No Data
+                                    </td>
+                                  </tr>
+                                )}
+                              </tbody>
+                          )}
+
+                          {/* ================= PROPERTY BOOKING ================= */}
+                          {bookingTab === 'property' && (
+                            <table className='mc-table'>
+                              <thead className='mc-table-head primary'>
+                                <tr>
+                                  <th>#</th>
+                                  <th>Booking ID</th>
+                                  <th>Property</th>
+                                  <th>Checkin</th>
+                                  <th>Checkout</th>
+                                  <th>Nights</th>
+                                  <th>Total</th>
+                                  <th>Status</th>
+                                  <th>Payment</th>
+                                  <th>Created</th>
                                 </tr>
-                              ))
-                            ) : (
-                              <tr>
-                                <td colSpan="13" style={{ textAlign: 'center' }}>
-                                  {t("no_data_available")}
-                                </td>
-                              </tr>
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
-                    )}
-                  </div>
-                </>
-              )}
+                              </thead>
+
+                              <tbody>
+                                {bookings.length > 0 ? (
+                                  bookings.map((item, index) => (
+                                    <tr key={index}>
+                                      <td>{index + 1}</td>
+                                      <td>#{item.booking_random_id}</td>
+                                      <td>{item.property_name}</td>
+                                      <td>{item.checkin_date}</td>
+                                      <td>{item.checkout_date}</td>
+                                      <td>{item.total_nights}</td>
+                                      <td>{item.total_amount}</td>
+
+                                      <td>
+                                        <span className={`badge ${item.booking_status === 0
+                                            ? 'bg-warning'
+                                            : item.booking_status === 1
+                                              ? 'bg-primary'
+                                              : item.booking_status === 2
+                                                ? 'bg-success'
+                                                : 'bg-danger'
+                                          }`}>
+                                          {item.booking_status === 0
+                                            ? 'Pending'
+                                            : item.booking_status === 1
+                                              ? 'Ongoing'
+                                              : item.booking_status === 2
+                                                ? 'Completed'
+                                                : 'Cancelled'}
+                                        </span>
+                                      </td>
+
+                                      <td>
+                                        {item.payment_status === 1 ? 'Paid' : 'Pending'}
+                                      </td>
+
+                                      <td>{item.createtime}</td>
+                                    </tr>
+                                  ))
+                                ) : (
+                                  <tr>
+                                    <td colSpan="10" style={{ textAlign: 'center' }}>
+                                      No Data
+                                    </td>
+                                  </tr>
+                                )}
+                              </tbody>
+                            </table>
+                          )}
+
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
             </Form>
           </Card.Body>
         </div>
