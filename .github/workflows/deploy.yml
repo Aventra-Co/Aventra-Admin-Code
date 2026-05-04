@@ -29,6 +29,7 @@ jobs:
         env:
           REACT_APP_SERVER_URL: ${{ secrets.REACT_APP_SERVER_URL }}
           NPM_CONFIG_SCRIPT_SHELL: /bin/bash
+          CI: false
 
       - name: Deploy build to server via SSH
         uses: appleboy/scp-action@v0.1.7
