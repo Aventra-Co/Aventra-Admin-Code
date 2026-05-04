@@ -15,7 +15,7 @@ import orders from "../assets/data/orders.json";
 import messages from "../assets/data/messages.json";
 import languages from "../assets/data/languages.json";
 import notifications from "../assets/data/notifications.json";
-import { API_URL, APP_PREFIX_PATH, IMAGE_PATH } from '../constant/constant';
+import { API_URL, APP_PREFIX_PATH, IMAGE_PATH, LOGO_URL } from '../constant/constant';
 import Authentication from '../pages/Authentication/auth';
 import axios from 'axios';
 
@@ -78,7 +78,7 @@ export default function HeaderLayout(props) {
         <header className={`mc-header ${scroll}`}>
 
             <Link to={APP_PREFIX_PATH + '/'} className='mc-logo-group'>
-                <img src='https://aventra-co.com/app/server/logo/logo.png' alt='logo' />
+                <img src={LOGO_URL} alt='logo' />
                 <span>{t("AVENTRA")}</span>
             </Link>
             <Authentication />

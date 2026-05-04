@@ -3,7 +3,7 @@ import { TranslatorContext } from "../../context/Translator";
 import { ButtonComponent, AnchorComponent } from "../../components/elements";
 import IconFieldComponent from "../../components/fields/IconFieldComponent";
 import LogoComponent from "../../components/LogoComponent";
-import { API_URL, APP_PREFIX_PATH } from "../../constant/constant";
+import { API_URL, APP_PREFIX_PATH, LOGO_URL } from "../../constant/constant";
 import { Modal } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -68,11 +68,11 @@ export default function RegisterPage() {
 
     return (
         <div className="mc-auth">
-            <img src="https://aventra-co.com/app/server/logo/logo.png" alt="pattern" className="mc-auth-pattern" />
+            <img src={LOGO_URL} alt="pattern" className="mc-auth-pattern" />
             <div className="mc-auth-group">
                 <form className="mc-auth-form" onSubmit={handleSubmit}>
                     <LogoComponent
-                        src="https://aventra-co.com/app/server/logo/logo.png"
+                        src={LOGO_URL}
                         alt="logo"
                         href="/2025/my_boat/admin/"
                         className="mc-auth-logo"

@@ -4,7 +4,7 @@ import { Modal } from 'react-bootstrap';
 import { ButtonComponent, AnchorComponent } from "../../components/elements";
 import IconFieldComponent from "../../components/fields/IconFieldComponent";
 import LogoComponent from "../../components/LogoComponent";
-import { API_URL, APP_PREFIX_PATH } from "../../constant/constant";
+import { API_URL, APP_PREFIX_PATH, LOGO_URL } from "../../constant/constant";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import './LoginPage.css'
@@ -76,14 +76,14 @@ export default function ForgotPasswordPage() {
         <div className="mc-auth">
             <img
                 className="mc-auth-pattern"
-                src="https://aventra-co.com/app/server/logo/logo.png"
+                src={LOGO_URL}
                 alt="pattern"
             />
             <div className="mc-auth-group">
 
                 <form className="mc-auth-form" onSubmit={handleSubmit}>
                     <LogoComponent
-                        src="https://aventra-co.com/app/server/logo/logo.png"
+                        src={LOGO_URL}
                         alt="logo"
                         href={`${APP_PREFIX_PATH}/ecommerce`}
                         className="mc-auth-logo"
