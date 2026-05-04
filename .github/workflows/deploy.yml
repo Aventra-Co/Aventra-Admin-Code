@@ -18,13 +18,17 @@ jobs:
         with:
           node-version: 24
 
+      - name: Configure npm shell
+        run: npm config set script-shell /bin/bash
+
       - name: Install dependencies
-        run: npm ci --no-audit --no-fund --ignore-scripts
+        run: npm ci --no-audit --no-fund
 
       - name: Build
         run: npm run build
         env:
           REACT_APP_SERVER_URL: ${{ secrets.REACT_APP_SERVER_URL }}
+          NPM_CONFIG_SCRIPT_SHELL: /bin/bash
 
       - name: Deploy build to server via SSH
         uses: appleboy/scp-action@v0.1.7
