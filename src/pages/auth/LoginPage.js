@@ -123,7 +123,7 @@ export default function LoginPage() {
                     <LogoComponent
                         src={logo}
                         alt="logo"
-                        href="/app/admin/"
+                        href="/app/central/"
                         className="mc-auth-logo"
                         style={{ width: '55px' }}
                     />

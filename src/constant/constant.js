@@ -1,6 +1,6 @@
 export const BASE_URL = '/';
 export const BASE_TITLE = '';
-export const APP_PREFIX_PATH = '/app/admin';
+export const APP_PREFIX_PATH = '/app/central';
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL || 'https://aventra-co.com/app/server';
 
