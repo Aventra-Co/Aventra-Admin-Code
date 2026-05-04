@@ -10,7 +10,7 @@ import LabelFieldComponent from "../fields/LabelFieldComponent";
 import AddIcon from '@mui/icons-material/Add';
 import { SyncLoader } from 'react-spinners';
 
-let propertyTypeImage = "https://aventra-co.com/temp/server/uploads/doodlart.png"
+let propertyTypeImage = IMAGE_PATH + "doodlart.png"
 
 export default function PropertyTypeTableComponent({ thead, tbody }) {
     const { t } = useContext(TranslatorContext);
