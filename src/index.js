@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as Sentry from "@sentry/react";
 
 // CSS & SCSS
 import "./assets/fonts/inter.css";
@@ -179,6 +180,27 @@ const router = createBrowserRouter([
 
 
 ]);
+
+
+if (process.env.REACT_APP_SENTRY_DSN) {
+    Sentry.init({
+        dsn: process.env.REACT_APP_SENTRY_DSN,
+        environment: process.env.NODE_ENV,
+        sendDefaultPii: true,
+        integrations: [
+            Sentry.browserTracingIntegration(),
+            Sentry.replayIntegration(),
+        ],
+        tracesSampleRate: 1.0,
+        tracePropagationTargets: [
+            "localhost",
+            process.env.REACT_APP_SERVER_URL,
+        ].filter(Boolean),
+        replaysSessionSampleRate: 0.1,
+        replaysOnErrorSampleRate: 1.0,
+        enableLogs: true,
+    });
+}
 
 
 createRoot(document.getElementById("root")).render(
