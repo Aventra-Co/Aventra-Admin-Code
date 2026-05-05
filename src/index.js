@@ -17,14 +17,14 @@ import { LoaderProvider } from "./context/Preloader";
 import { TranslatorProvider } from "./context/Translator";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { LoginPage, RegisterPage, ForgotPasswordPage } from "./pages/auth";
-import { Helmet, HelmetProvider } from "react-helmet-async";
+import { HelmetProvider } from "react-helmet-async";
 import {
     AnalyticsPage, UserListPage, DeletedUserListPage, UserProfilePage, OwnerListPage, AddOwner, EditOwner, ViewOwner, DeletedOwnerListPage, StaffListPage, DeletedStaffPage, ViewStaff, RoleListPage, AddRole, EditRole,
     BannerListPage, CityListPage, TripTypeListPage, ReviewRatingLIstPage, AddTripType, CouponCodeListPage, EditTripType, TripListPage, TripViewPage, DestinationListPage, AddDestination, EditDestination, FoodCategoryListPage, AddFoodCategory, EditFoodCategory, FoodSubCategoryListPage, AddFoodSubCategory, EditFoodSubCategory, EquipmentLIstPage, AddEquipments, EditEquipment, ActivityListPage, AddActivity, EditActivity, ManageCommision, ManageEarning, ManageBookingListPage, OwnerTabularReport, StaffTabularReport, StaffAnalyticalReport, EarningTabularReport, AddStaff, AddBoat, AddTrip, EditStaff,
     AdminProfilePage, ContentViewComponent, BroadcastViewPage, UserTabularReport, UserAnalyticalReport, ContactUsListPage, CountryListPage, TripAnalyticalReport, TripReport, AddNewSubAdmin,
     EditSubAdmin,
     ViewSubAdmin,
-    ManageChats,
+    // ManageChats,
     BroadcastTabularReport,
     ViewAddons,
 } from "./pages/main";
@@ -39,7 +39,7 @@ import EditTrip from "./pages/main/EditTrip";
 import Addunavailability from "./pages/main/Addunavailability";
 import EditUnavailability from "./pages/main/EditUnavailability";
 import ChatComponent from "./pages/main/ChatComponent";
-import AddOns from "./pages/main/AddOns";
+// import AddOns from "./pages/main/AddOns";
 import ManageAddOns from "./pages/main/ManageAddOns";
 import ManageAddOnsSubcategory from "./pages/main/ManageAddonsSubcategory";
 import PromotionReport from "./pages/main/PromotionReport";
@@ -201,7 +201,6 @@ if (process.env.REACT_APP_SENTRY_DSN) {
         enableLogs: true,
     });
 }
-
 
 createRoot(document.getElementById("root")).render(
 

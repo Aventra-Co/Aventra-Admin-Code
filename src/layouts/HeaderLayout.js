@@ -4,17 +4,17 @@ import React, { useContext, useState, useRef, useEffect } from 'react';
 import { ThemeContext } from '../context/Themes';
 import { SidebarContext } from '../context/Sidebar';
 import { TranslatorContext } from '../context/Translator';
-import { Modal, Form } from "react-bootstrap";
-import { ButtonComponent, AnchorComponent } from ".././components/elements";
+import { Modal } from "react-bootstrap";
+import { ButtonComponent } from ".././components/elements";
 // COMPONENTS
 import { Link, useNavigate } from 'react-router-dom';
 import { Dropdown } from "react-bootstrap";
 
 // DATA
-import orders from "../assets/data/orders.json";
-import messages from "../assets/data/messages.json";
+// import orders from "../assets/data/orders.json";
+// import messages from "../assets/data/messages.json";
 import languages from "../assets/data/languages.json";
-import notifications from "../assets/data/notifications.json";
+// import notifications from "../assets/data/notifications.json";
 import { API_URL, APP_PREFIX_PATH, IMAGE_PATH, LOGO_URL } from '../constant/constant';
 import Authentication from '../pages/Authentication/auth';
 import axios from 'axios';
@@ -24,12 +24,12 @@ export default function HeaderLayout(props) {
 
     const { theme, toggleTheme } = useContext(ThemeContext);
     const { sidebar, toggleSidebar } = useContext(SidebarContext);
-    const { t, n, c, changeLanguage, currentLanguage } = useContext(TranslatorContext);
+    const { t, changeLanguage, currentLanguage } = useContext(TranslatorContext);
     const searchRef = useRef();
 
-    const user_type = localStorage.getItem('user_type');
+    // const user_type = localStorage.getItem('user_type');
     const [scroll, setScroll] = useState("fixed");
-    const [search, setSearch] = useState("");
+    const [ search, setSearch] = useState("");
     const [Details, setDetails] = useState("");
 
     const [blockModal, setBlockModal] = useState(false);
@@ -90,12 +90,12 @@ export default function HeaderLayout(props) {
                     <button type='button' className='mc-header-icon toggle' onClick={toggleSidebar}>
                         <i className="material-icons">{sidebar ? "menu_open" : "menu"}</i>
                     </button>
-                    {/* <div className={`mc-header-search-group ${search}`}>
+                    <div className={`mc-header-search-group ${search}`}>
                         <form className="mc-header-search" ref={searchRef}>
                             <button type='button' className='material-icons'>search</button>
                             <input type="search" placeholder={t('quick_finding') + '...'} />
                         </form>
-                    </div> */}
+                    </div>
                 </div>
 
                 <div className='mc-header-right'>
