@@ -28,6 +28,8 @@ jobs:
         run: npm run build
         env:
           REACT_APP_SERVER_URL: ${{ secrets.REACT_APP_SERVER_URL }}
+          REACT_APP_SENTRY_DSN: ${{ secrets.REACT_APP_SENTRY_DSN }}
+          PATH: ${{ secrets.ADMIN_PATH }}
           NPM_CONFIG_SCRIPT_SHELL: /bin/bash
           CI: false
 
