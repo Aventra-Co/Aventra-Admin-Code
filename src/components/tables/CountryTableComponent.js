@@ -26,6 +26,8 @@ export default function CountryTableComponent({ thead, tbody }) {
     const [countryNameArabic, setCountryNameArabic] = useState("");
     const [editcountryName, seteditcountryName] = useState("");
     const [editCountryNameArabic, setEditCountryNameArabic] = useState("");
+    const [phoneCode, setPhoneCode] = useState("");
+    const [editPhoneCode, setEditPhoneCode] = useState("");
     const [countryError, setcountryError] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const entriesPerPage = 50;
@@ -38,6 +40,7 @@ export default function CountryTableComponent({ thead, tbody }) {
         return (
             user.country_name?.toLowerCase().includes(lowercasedTerm) ||
             user.country_name_arabic?.toLowerCase().includes(lowercasedTerm) ||
+            user.phone_code?.toString().toLowerCase().includes(lowercasedTerm) ||
             user.createtime?.toLowerCase().includes(lowercasedTerm)
         );
     });
@@ -68,6 +71,7 @@ export default function CountryTableComponent({ thead, tbody }) {
             setcountryId(item.country_id);
             seteditcountryName(item.country_name || "");
             setEditCountryNameArabic(item.country_name_arabic || "");
+            setEditPhoneCode(item.phone_code || "");
         }
         else if (action === 'delete') {
             setAlertModal(true);
@@ -99,6 +103,9 @@ export default function CountryTableComponent({ thead, tbody }) {
         if (!editCountryNameArabic) {
             error.editCountryNameArabic = "Please enter country name in Arabic"
         }
+        if (!editPhoneCode) {
+            error.editPhoneCode = "Please enter phone code"
+        }
         if (Object.keys(error).length > 0) {
             setcountryError(error)
             return
@@ -107,6 +114,7 @@ export default function CountryTableComponent({ thead, tbody }) {
         formData.append('country_id', countryId)
         formData.append('country_name', editcountryName)
         formData.append('country_name_arabic', editCountryNameArabic)
+        formData.append('phone_code', editPhoneCode)
 
         axios.post(API_URL + '/edit_country', formData, {
             headers: {
@@ -122,6 +130,7 @@ export default function CountryTableComponent({ thead, tbody }) {
             setmsg(response.data.msg)
             seteditcountryName('')
             setEditCountryNameArabic('')
+            setEditPhoneCode('')
             setEditModal(false);
             setsuccessModel(true);
             fetchCountryDetails();
@@ -146,6 +155,9 @@ export default function CountryTableComponent({ thead, tbody }) {
         if (!countryNameArabic) {
             error.countryNameArabic = "Please enter country name in Arabic"
         }
+        if (!phoneCode) {
+            error.phoneCode = "Please enter phone code"
+        }
         if (Object.keys(error).length > 0) {
             setcountryError(error)
             return
@@ -153,6 +165,7 @@ export default function CountryTableComponent({ thead, tbody }) {
         const formData = new FormData();
         formData.append('country_name', countryName)
         formData.append('country_name_arabic', countryNameArabic)
+        formData.append('phone_code', phoneCode)
 
         axios.post(API_URL + '/add_country', formData, {
             headers: {
@@ -168,6 +181,7 @@ export default function CountryTableComponent({ thead, tbody }) {
             setmsg(response.data.msg)
             setcountryName('')
             setCountryNameArabic('')
+            setPhoneCode('')
             fetchCountryDetails();
             setAddModal(false);
             setsuccessModel(true);
@@ -185,6 +199,7 @@ export default function CountryTableComponent({ thead, tbody }) {
         setcountryError('');
         setcountryName('');
         setCountryNameArabic('');
+        setPhoneCode('');
     };
 
     const resetEditModal = () => {
@@ -192,6 +207,7 @@ export default function CountryTableComponent({ thead, tbody }) {
         setcountryError('');
         seteditcountryName('');
         setEditCountryNameArabic('');
+        setEditPhoneCode('');
     };
 
     return (
@@ -232,6 +248,7 @@ export default function CountryTableComponent({ thead, tbody }) {
                                 <th>{t("actions")}</th>
                                 <th>{t("Country name")}</th>
                                 <th>{t("Country name arabic")}</th>
+                                <th>{t("Phone code")}</th>
                                 <th>{t("createtime")}</th>
                             </tr>
                         </thead>
@@ -254,6 +271,9 @@ export default function CountryTableComponent({ thead, tbody }) {
                                     </td>
                                     <td>
                                         <span>{item.country_name_arabic || 'NA'}</span>
+                                    </td>
+                                    <td>
+                                        <span>{item.phone_code || 'NA'}</span>
                                     </td>
                                     <td>{item.createtime || 'NA'}</td>
                                 </tr>
@@ -307,6 +327,25 @@ export default function CountryTableComponent({ thead, tbody }) {
                                     {countryError.editCountryNameArabic}
                                 </Form.Control.Feedback>
                             </Form.Group>
+                            <Form.Group className="form-group mb-4 ml-2">
+                                <Form.Label>{t('Phone Code')}</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    inputMode="numeric"
+                                    placeholder={t('Enter phone code')}
+                                    value={editPhoneCode}
+                                    onChange={(e) => {
+                                        const v = e.target.value.replace(/\D/g, '');
+                                        setEditPhoneCode(v)
+                                        setcountryError((prev) => ({ ...prev, editPhoneCode: "" }));
+                                    }}
+                                    isInvalid={!!countryError.editPhoneCode}
+                                    maxLength={6}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    {countryError.editPhoneCode}
+                                </Form.Control.Feedback>
+                            </Form.Group>
                             <Modal.Footer>
                                 <ButtonComponent type="button" className="btn btn-secondary" onClick={resetEditModal}>
                                     {t('close_popup')}
@@ -355,6 +394,25 @@ export default function CountryTableComponent({ thead, tbody }) {
                                 />
                                 <Form.Control.Feedback type="invalid">
                                     {countryError.countryNameArabic}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            <Form.Group className="form-group mb-4 ml-2">
+                                <Form.Label>{t('Phone Code')}</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    inputMode="numeric"
+                                    placeholder={t('Enter phone code')}
+                                    maxLength={6}
+                                    value={phoneCode}
+                                    onChange={(e) => {
+                                        const v = e.target.value.replace(/\D/g, '');
+                                        setPhoneCode(v)
+                                        setcountryError((prev) => ({ ...prev, phoneCode: "" }));
+                                    }}
+                                    isInvalid={!!countryError.phoneCode}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    {countryError.phoneCode}
                                 </Form.Control.Feedback>
                             </Form.Group>
                             <Modal.Footer>
