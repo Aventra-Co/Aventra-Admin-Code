@@ -54,7 +54,7 @@ export default function BroadcastViewPage() {
       .then(response => {
         const userOptions = response.data.user_arr.map(user => ({
           value: user.user_id,
-          label: user.name
+          label: `${user.name} ${user.email} ${user.mobile}`
         }))
         setUsers(userOptions)
       })
@@ -68,7 +68,7 @@ export default function BroadcastViewPage() {
       .then(response => {
         const userOptions = response.data.owner_arr.map(user => ({
           value: user.user_id,
-          label: user.l_name
+          label: `${user.l_name} ${user.email} ${user.mobile}`
         }))
         setUsers1(userOptions)
       })
