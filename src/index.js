@@ -185,7 +185,7 @@ const router = createBrowserRouter([
 if (process.env.REACT_APP_SENTRY_DSN) {
     Sentry.init({
         dsn: process.env.REACT_APP_SENTRY_DSN,
-        environment: process.env.NODE_ENV,
+        environment: process.env.REACT_APP_SENTRY_ENV || process.env.NODE_ENV,
         sendDefaultPii: true,
         integrations: [
             Sentry.browserTracingIntegration(),

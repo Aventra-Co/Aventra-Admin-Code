@@ -1,9 +1,9 @@
-name: Build & Deploy
+name: Build & Deploy (Staging)
 
 on:
   push:
     branches:
-      - main
+      - staging
 
 jobs:
   deploy:
@@ -29,9 +29,9 @@ jobs:
         env:
           REACT_APP_SERVER_URL: ${{ secrets.REACT_APP_SERVER_URL }}
           REACT_APP_SENTRY_DSN: ${{ secrets.REACT_APP_SENTRY_DSN }}
-          REACT_APP_BASE: app
-          REACT_APP_SENTRY_ENV: production
-          PUBLIC_URL: /app/central
+          REACT_APP_BASE: staging
+          REACT_APP_SENTRY_ENV: staging
+          PUBLIC_URL: /staging/central
           NPM_CONFIG_SCRIPT_SHELL: /bin/bash
           CI: false
 
@@ -43,5 +43,5 @@ jobs:
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
           source: build/
-          target: ${{ secrets.PATH }}
+          target: ${{ secrets.STAGING_PATH }}
           strip_components: 1
