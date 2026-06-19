@@ -70,6 +70,24 @@ export default function UserProfilePage() {
         })
     }
 
+    const markInsuranceRefunded = (booking_type, booking_id) => {
+        if (!window.confirm("Mark the insurance for this booking as refunded?")) return;
+        axios.post(API_URL + `/mark_insurance_refunded`, { booking_type, booking_id })
+            .then((res) => {
+                if (res.data.success) {
+                    if (booking_type === 'trip') {
+                        TripData();
+                    } else {
+                        fetchPropertyBookings();
+                    }
+                } else {
+                    alert(res.data.msg || "Unable to mark insurance as refunded");
+                }
+            }).catch((error) => {
+                console.log(error);
+            })
+    }
+
     const fetchBoatRatings = () => {
         axios.get(API_URL + `/fetch_user_ratings?user_id=${user_id}`).then((res) => {
             console.log('Boat Ratings response', res.data);
@@ -413,6 +431,8 @@ export default function UserProfilePage() {
                                                 <th>{t("Booking Time")}</th>
                                                 <th>{t("Status")}</th>
                                                 <th>{t("Total Amount")}</th>
+                                                <th>{t("Insurance")}</th>
+                                                <th>{t("Insurance Refund")}</th>
                                                 <th>{t("Transaction ID")}</th>
                                                 <th>{t("Booking Date & Time")}</th>
                                             </tr>
@@ -434,13 +454,31 @@ export default function UserProfilePage() {
                                                         <td>{item.booking_time || 'NA'}</td>
                                                         <td>{renderBookingStatus(item.trip_status)}</td>
                                                         <td>{item.total_amount || 'NA'}</td>
+                                                        <td>{item.insurance_amount || '0.00'}</td>
+                                                        <td>
+                                                            {Number(item.insurance_amount) > 0 ? (
+                                                                item.insurance_refunded == 1 ? (
+                                                                    <span style={{ color: 'green' }}>
+                                                                        Refunded{item.insurance_refund_date ? ` (${item.insurance_refund_date})` : ''}
+                                                                    </span>
+                                                                ) : (
+                                                                    <Button
+                                                                        size="sm"
+                                                                        variant="outline-success"
+                                                                        onClick={() => markInsuranceRefunded('trip', item.trip_booking_id)}
+                                                                    >
+                                                                        Mark refunded
+                                                                    </Button>
+                                                                )
+                                                            ) : 'NA'}
+                                                        </td>
                                                         <td>{item.transaction_id || 'NA'}</td>
                                                         <td>{item.createtime || 'NA'}</td>
                                                     </tr>
                                                 ))
                                             ) : (
                                                 <tr>
-                                                    <td colSpan="11" style={{ textAlign: 'center' }}>No data available</td>
+                                                    <td colSpan="13" style={{ textAlign: 'center' }}>No data available</td>
                                                 </tr>
                                             )}
                                         </tbody>
@@ -466,6 +504,8 @@ export default function UserProfilePage() {
                                                 <th>{t("Max Adult")}</th>
                                                 <th>{t("Status")}</th>
                                                 <th>{t("Total Amount")}</th>
+                                                <th>{t("Insurance")}</th>
+                                                <th>{t("Insurance Refund")}</th>
                                                 <th>{t("Transaction ID")}</th>
                                                 <th>{t("Booking Date & Time")}</th>
                                             </tr>
@@ -484,13 +524,31 @@ export default function UserProfilePage() {
                                                         <td>{item.max_adult || 'NA'}</td>
                                                         <td>{renderBookingStatus(item.booking_status)}</td>
                                                         <td>{item.total_amount || 'NA'}</td>
+                                                        <td>{item.insurance_amount || '0.00'}</td>
+                                                        <td>
+                                                            {Number(item.insurance_amount) > 0 ? (
+                                                                item.insurance_refunded == 1 ? (
+                                                                    <span style={{ color: 'green' }}>
+                                                                        Refunded{item.insurance_refund_date ? ` (${item.insurance_refund_date})` : ''}
+                                                                    </span>
+                                                                ) : (
+                                                                    <Button
+                                                                        size="sm"
+                                                                        variant="outline-success"
+                                                                        onClick={() => markInsuranceRefunded('property', item.property_booking_id)}
+                                                                    >
+                                                                        Mark refunded
+                                                                    </Button>
+                                                                )
+                                                            ) : 'NA'}
+                                                        </td>
                                                         <td>{item.transaction_id || 'NA'}</td>
                                                         <td>{item.createtime || 'NA'}</td>
                                                     </tr>
                                                 ))
                                             ) : (
                                                 <tr>
-                                                    <td colSpan="12" style={{ textAlign: 'center' }}>No data available</td>
+                                                    <td colSpan="14" style={{ textAlign: 'center' }}>No data available</td>
                                                 </tr>
                                             )}
                                         </tbody>

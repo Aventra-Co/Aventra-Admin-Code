@@ -32,6 +32,7 @@ export default function EditOwner() {
     const [image, setimage] = useState('');
     const [merchantId, setmerchantId] = useState('');
     const [companyName, setcompanyName] = useState('');
+    const [insurance, setinsurance] = useState('0');
 
     const navigate = useNavigate();
 
@@ -47,6 +48,11 @@ export default function EditOwner() {
                 setgender(data.gender.toString() || "");
                 setmerchantId(data.merchant_id || "");
                 setcompanyName(data.owner_company_name || "");
+                setinsurance(
+                    data.insurance_per_owner !== undefined && data.insurance_per_owner !== null
+                        ? data.insurance_per_owner.toString()
+                        : "0"
+                );
             }
         }).catch(error => {
             console.error("Error fetching owner data:", error);
@@ -81,6 +87,9 @@ export default function EditOwner() {
         if (!companyName) {
             errors.companyName = 'Please enter company name';
         }
+        if (insurance === '' || isNaN(Number(insurance)) || Number(insurance) < 0) {
+            errors.insurance = 'Please enter a valid insurance amount (0 or more)';
+        }
 
         if (Object.keys(errors).length > 0) {
             setownerError(errors);
@@ -97,6 +106,7 @@ export default function EditOwner() {
         formData.append("gender", gender);
         formData.append("merchant_id", merchantId);
         formData.append("owner_company_name", companyName);
+        formData.append("insurance_per_owner", insurance === '' ? 0 : insurance);
         if (image) {
             formData.append("image", image);
         }
@@ -315,6 +325,27 @@ export default function EditOwner() {
                     </div>
 
                     <div className='row m-2'>
+                        <div className='col-md-6'>
+                            <label htmlFor="insurancePerOwner" className="form-label">
+                                Insurance per Owner
+                            </label>
+                            <Form.Control
+                                id="insurancePerOwner"
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                placeholder='Enter insurance amount'
+                                value={insurance}
+                                onChange={(e) => {
+                                    setinsurance(e.target.value);
+                                    setownerError((prev) => ({ ...prev, insurance: "" }));
+                                }}
+                                isInvalid={ownerError.insurance}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {ownerError.insurance}
+                            </Form.Control.Feedback>
+                        </div>
                         <div className='col-md-6'>
                             <label htmlFor="categoryDescription" className="form-label">
                                 Upload Image
