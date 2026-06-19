@@ -37,6 +37,7 @@ export default function AddOwner() {
     const [image, setimage] = useState('');
     const [merchantId, setmerchantId] = useState('');
     const [companyName, setcompanyName] = useState('');
+    const [insurance, setinsurance] = useState('0');
 
     const navigate = useNavigate();
 
@@ -87,6 +88,9 @@ export default function AddOwner() {
         if (!companyName) {
             errors.companyName = 'Please Enter Company Name'
         }
+        if (insurance === '' || isNaN(Number(insurance)) || Number(insurance) < 0) {
+            errors.insurance = 'Please enter a valid insurance amount (0 or more)'
+        }
 
         if (Object.keys(errors).length > 0) {
             setownerError(errors)
@@ -103,6 +107,7 @@ export default function AddOwner() {
         formData.append("image", image);
         formData.append("merchant_id", merchantId);
         formData.append("owner_company_name", companyName);
+        formData.append("insurance_per_owner", insurance === '' ? 0 : insurance);
 
         axios.post(API_URL + '/add_owner', formData, {
             headers: {
@@ -328,6 +333,30 @@ export default function AddOwner() {
                             />
                             <Form.Control.Feedback type="invalid">
                                 {ownerError.image}
+                            </Form.Control.Feedback>
+                        </div>
+                    </div>
+
+                    <div className='row m-2'>
+                        <div className='col-md-6'>
+                            <label htmlFor="insurancePerOwner" className="form-label">
+                                Insurance per Owner
+                            </label>
+                            <Form.Control
+                                id="insurancePerOwner"
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                placeholder='Enter insurance amount'
+                                value={insurance}
+                                onChange={(e) => {
+                                    setinsurance(e.target.value)
+                                    setownerError((prev) => ({ ...prev, insurance: "" }));
+                                }}
+                                isInvalid={ownerError.insurance}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {ownerError.insurance}
                             </Form.Control.Feedback>
                         </div>
                     </div>
