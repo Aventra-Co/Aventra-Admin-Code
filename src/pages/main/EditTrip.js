@@ -43,6 +43,7 @@ export default function EditTrip() {
     minimumHours: '',
     IdleHours: '',
     cancleDay: '',
+    minLeadDays: '',
     trip_time: '',
     trip_date_type: '',
     trip_open_time: '',
@@ -271,6 +272,10 @@ export default function EditTrip() {
     } else if (formData.cancleDay < 0) {
       errors.cancleDay = 'Please Enter Valid Customer Cancle Day'
     }
+    // min_lead_days is optional (0 = no limit); only validate when provided
+    if (formData.minLeadDays !== '' && Number(formData.minLeadDays) < 0) {
+      errors.minLeadDays = 'Please Enter Valid Minimum Lead Days'
+    }
     if (!formData.captainNameEnglish) {
       errors.captainNameEnglish = 'Please Enter Captain Name In English'
     }
@@ -466,6 +471,7 @@ export default function EditTrip() {
     formDataObj.append('idle_hours', formData.IdleHours);
     formDataObj.append('destination_id', formData.destination_id);
     formDataObj.append('free_to_cancel', formData.cancleDay);
+    formDataObj.append('min_lead_days', formData.minLeadDays === '' ? 0 : formData.minLeadDays);
     formDataObj.append('trip_date', formData.trip_dated);
     formDataObj.append('coupon_code', formData.couponCode);
     formDataObj.append('start_date', formData.startDate);
@@ -591,6 +597,7 @@ export default function EditTrip() {
             minimumHours: trip.minimum_hours || '',
             IdleHours: trip.idle_hours || '',
             cancleDay: trip.free_to_cancel || '',
+            minLeadDays: (trip.min_lead_days ?? '') === '' ? '' : String(trip.min_lead_days),
             trip_time: trip.trip_time?.toString() || '',
             trip_date_type: trip.trip_date?.toString() || '',
             trip_open_time: trip.from_time || '',
@@ -1275,6 +1282,25 @@ export default function EditTrip() {
             />
             <Form.Control.Feedback type='invalid'>
               {ownerError.cancleDay}
+            </Form.Control.Feedback>
+          </div>
+
+          <div className='col-md-6'>
+            <label htmlFor='minLeadDays' className='form-label'>
+              Minimum Lead Days
+            </label>
+            <Form.Control
+              type='number'
+              min='0'
+              placeholder='Enter Minimum Lead Days (0 = no limit)'
+              value={formData.minLeadDays}
+              onChange={e => {
+                handleInputChange('minLeadDays', e.target.value)
+              }}
+              isInvalid={ownerError.minLeadDays}
+            />
+            <Form.Control.Feedback type='invalid'>
+              {ownerError.minLeadDays}
             </Form.Control.Feedback>
           </div>
         </div>

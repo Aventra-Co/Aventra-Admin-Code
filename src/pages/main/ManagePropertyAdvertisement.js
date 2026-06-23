@@ -51,6 +51,7 @@ export default function ManagePropertyAdvertisement() {
     start_date: '',
     end_date: '',
     free_cancel_days: '',
+    min_lead_days: '',
     pet_friendly: '',
     selectedAmenities: []
   })
@@ -377,6 +378,10 @@ export default function ManagePropertyAdvertisement() {
       }
     }
 
+    if (formData.min_lead_days !== '' && Number(formData.min_lead_days) < 0) {
+      errors.min_lead_days = 'Please enter valid number'
+      isValid = false
+    }
     if (!formData.free_cancel_days) {
       errors.free_cancel_days = 'Please enter free cancel days'
       isValid = false
@@ -452,6 +457,7 @@ export default function ManagePropertyAdvertisement() {
     formDataObj.append('start_date', formData.start_date || '')
     formDataObj.append('end_date', formData.end_date || '')
     formDataObj.append('free_cancel_days', formData.free_cancel_days)
+    formDataObj.append('min_lead_days', formData.min_lead_days === '' ? 0 : formData.min_lead_days)
     formDataObj.append('pet_friendly', formData.pet_friendly)
 
     // Amenities
@@ -1206,6 +1212,27 @@ export default function ManagePropertyAdvertisement() {
             </div>
             <Form.Control.Feedback type='invalid'>
               {ownerError.free_cancel_days}
+            </Form.Control.Feedback>
+          </div>
+
+          <div className='col-md-6'>
+            <label htmlFor='min_lead_days' className='form-label'>
+              MINIMUM LEAD DAYS
+            </label>
+            <div className='d-flex align-items-center gap-3'>
+              <span>Cannot book before</span>
+              <Form.Control
+                type='number'
+                style={{ maxWidth: '100px' }}
+                value={formData.min_lead_days}
+                onChange={e => handleInputChange('min_lead_days', e.target.value)}
+                isInvalid={!!ownerError.min_lead_days}
+                min="0"
+              />
+              <span>Days from today (0 = no limit)</span>
+            </div>
+            <Form.Control.Feedback type='invalid'>
+              {ownerError.min_lead_days}
             </Form.Control.Feedback>
           </div>
         </div>
